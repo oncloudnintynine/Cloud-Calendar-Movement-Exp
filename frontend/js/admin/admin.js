@@ -62,9 +62,9 @@ customKahGroups = settings.customKahGroups ||[];
 renderKAHSelected();
 renderCustomKahGroups();
 
-tempAdminSectionsOrder = settings.adminSectionsOrder && settings.adminSectionsOrder.length 
+tempAdminSectionsOrder = (settings.adminSectionsOrder && settings.adminSectionsOrder.length 
 ? settings.adminSectionsOrder 
-:['app-mode', 'register-user', 'manage-users', 'admin-pass', 'user-keyword', 'menu-order'];
+:['app-mode', 'register-user', 'manage-users', 'admin-pass', 'user-keyword', 'menu-order']).filter(s => s !== 'code-backup');
 
 const container = document.getElementById('admin-sections-container');
 if (container) {
