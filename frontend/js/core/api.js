@@ -16,6 +16,11 @@ if (show) {
 }
 }
 
+async function updateProgress(progress, status) {
+  showLoader(true, progress, status);
+  await new Promise(r => requestAnimationFrame(r));
+}
+
 function alertError(id, msg) {
 const el = document.getElementById(id);
 el.innerText = msg; 

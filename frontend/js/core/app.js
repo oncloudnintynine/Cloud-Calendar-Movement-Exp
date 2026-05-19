@@ -73,7 +73,7 @@ initDates();
 });
 
 async function showApp() {
-showLoader(true, 15, 'Connecting to server...');
+await updateProgress(15, 'Connecting to server...');
 document.getElementById('login-view').classList.add('hidden-view');
 document.getElementById('app-view').classList.remove('hidden-view');
 document.getElementById('logout-btn').classList.remove('hidden');
@@ -89,15 +89,15 @@ if (cachedData) {
   try {
     const parsed = JSON.parse(cachedData);
     applyInitialData(parsed.settings, parsed.leaves);
-    showLoader(true, 50, 'Updating from server...');
+    await updateProgress(50, 'Updating from server...');
   } catch(e) {}
 }
 
 try {
-  showLoader(true, 25, 'Fetching your data...');
+  await updateProgress(25, 'Fetching your data...');
   const initialData = await apiCall('getInitialData', { adminPass: user.role === 'admin' ? user.pass : null });
   
-  showLoader(true, 65, 'Preparing dashboard...');
+  await updateProgress(65, 'Preparing dashboard...');
   applyInitialData(initialData.settings, initialData.leaves);
   sessionStorage.setItem('initialData', JSON.stringify(initialData));
   
@@ -106,7 +106,7 @@ try {
     if (warnEl) warnEl.classList.add('hidden');
   }
 
-  showLoader(true, 80, 'Almost ready...');
+  await updateProgress(80, 'Almost ready...');
   const allUnitsForIndex = new Set(companyStructure);
   const uniqueDeptsForIndex = Array.from(allUnitsForIndex).sort((a, b) => {
     if (a.toUpperCase() === 'HQ') return -1;

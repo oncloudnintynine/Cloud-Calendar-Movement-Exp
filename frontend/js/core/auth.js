@@ -66,7 +66,7 @@ async function handleLogin() {
 const pass = document.getElementById('login-pass').value;
 if (!pass) return alertError('login-alert', 'Please enter your password');
 
-showLoader(true, 10, 'Verifying credentials...');
+await updateProgress(10, 'Verifying credentials...');
 try {
   user = await apiCall('login', { password: pass });
   localStorage.setItem('user', JSON.stringify(user));
