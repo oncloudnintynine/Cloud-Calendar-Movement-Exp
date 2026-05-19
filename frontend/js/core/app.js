@@ -116,6 +116,9 @@ try {
   buildAttendeeSearchIndex(uniqueDeptsForIndex);
   renderTabIfActive('dashboard');
   renderTabIfActive('my-leaves');
+  
+  await updateProgress(100, 'Done!');
+  await delay(400);
   showLoader(false);
 
 } catch(e) {

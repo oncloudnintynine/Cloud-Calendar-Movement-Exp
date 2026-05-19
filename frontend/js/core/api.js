@@ -21,6 +21,10 @@ async function updateProgress(progress, status) {
   await new Promise(r => requestAnimationFrame(r));
 }
 
+function delay(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+
 function alertError(id, msg) {
 const el = document.getElementById(id);
 el.innerText = msg; 
