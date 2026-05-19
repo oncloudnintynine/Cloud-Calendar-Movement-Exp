@@ -145,27 +145,27 @@ try {
      
      const deptPct = meta.total > 0 ? Math.round((meta.inOffice / meta.total) * 100) : 0;
      
-     if (depth === 0) {
-         html += `<div class="mb-4 rounded-xl overflow-hidden border border-gray-200 dark:border-darkborder bg-white dark:bg-darksurface shadow-sm">`;
-         html += `<div class="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-50 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-gray-200 dark:border-darkborder">`;
-         html += `<h3 class="font-bold text-base md:text-lg text-blue-700 dark:text-blue-400">${applyAcronymsFront(nodeName)}</h3>`;
-         html += `<div class="flex items-center gap-2">`;
-         html += `<span class="text-xs font-semibold text-gray-500 dark:text-darkmuted">${meta.inOffice}/${meta.total}</span>`;
-         html += `<div class="w-16 h-1.5 bg-gray-200 dark:bg-darkborder rounded-full overflow-hidden"><div class="h-full bg-blue-500 rounded-full" style="width: ${deptPct}%"></div></div>`;
-         html += `</div></div>`;
-     } else if (depth === 1) {
-         html += `<div class="mt-2 border-t border-gray-100 dark:border-darkborder">`;
-         html += `<div class="flex items-center justify-between px-4 py-2 bg-purple-50/50 dark:bg-purple-900/10">`;
-         html += `<h4 class="font-bold text-sm text-purple-700 dark:text-purple-400">${applyAcronymsFront(nodeName)}</h4>`;
-         html += `<span class="text-xs font-semibold text-gray-500 dark:text-darkmuted">${meta.inOffice}/${meta.total}</span>`;
-         html += `</div>`;
-     } else {
-         html += `<div class="mt-1 border-t border-gray-100 dark:border-darkborder">`;
-         html += `<div class="flex items-center justify-between px-4 py-1.5 bg-emerald-50/30 dark:bg-emerald-900/10">`;
-         html += `<h5 class="font-semibold text-xs text-emerald-700 dark:text-emerald-400">${applyAcronymsFront(nodeName)}</h5>`;
-         html += `<span class="text-[10px] font-semibold text-gray-500 dark:text-darkmuted">${meta.inOffice}/${meta.total}</span>`;
-         html += `</div>`;
-     }
+      if (depth === 0) {
+          html += `<div class="mb-4 rounded-xl overflow-hidden border border-gray-200 dark:border-darkborder bg-white dark:bg-darksurface shadow-sm">`;
+          html += `<div class="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-50 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-gray-200 dark:border-darkborder">`;
+          html += `<h3 class="font-bold text-base md:text-lg text-blue-700 dark:text-blue-400">${applyAcronymsFront(nodeName)}</h3>`;
+          html += `<div class="flex items-center gap-2">`;
+          html += `<span class="text-xs font-semibold text-gray-500 dark:text-darkmuted">${meta.inOffice}/${meta.total}</span>`;
+          html += `<div class="w-16 h-1.5 bg-gray-200 dark:bg-darkborder rounded-full overflow-hidden"><div class="h-full bg-blue-500 rounded-full" style="width: ${deptPct}%"></div></div>`;
+          html += `</div></div>`;
+      } else if (depth === 1) {
+          html += `<div class="mt-2 ml-4 border-l-2 border-purple-200 dark:border-purple-800">`;
+          html += `<div class="flex items-center justify-between px-4 py-2 bg-purple-50/50 dark:bg-purple-900/10">`;
+          html += `<h4 class="font-bold text-sm text-purple-700 dark:text-purple-400">${applyAcronymsFront(nodeName)}</h4>`;
+          html += `<span class="text-xs font-semibold text-gray-500 dark:text-darkmuted">${meta.inOffice}/${meta.total}</span>`;
+          html += `</div>`;
+      } else {
+          html += `<div class="mt-1 ml-8 border-l-2 border-emerald-200 dark:border-emerald-800">`;
+          html += `<div class="flex items-center justify-between px-4 py-1.5 bg-emerald-50/30 dark:bg-emerald-900/10">`;
+          html += `<h5 class="font-semibold text-xs text-emerald-700 dark:text-emerald-400">${applyAcronymsFront(nodeName)}</h5>`;
+          html += `<span class="text-[10px] font-semibold text-gray-500 dark:text-darkmuted">${meta.inOffice}/${meta.total}</span>`;
+          html += `</div>`;
+      }
 
      if (meta.members.length > 0) {
          html += `<div class="divide-y divide-gray-100 dark:divide-darkborder">`;
