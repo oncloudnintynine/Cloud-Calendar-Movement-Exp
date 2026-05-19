@@ -22,6 +22,43 @@ if (tabId === 'my-leaves' && !window._tabsRendered.myLeaves) {
 };
 
 window.isAgendaCollapsed = { dash: false, my: false };
+window.widgetsCollapsed = {
+  dash: localStorage.getItem('dashWidgetsCollapsed') === 'true',
+  my: localStorage.getItem('myWidgetsCollapsed') === 'true'
+};
+
+window.toggleWidgets = function(ctx) {
+  const wrapper = document.getElementById(`${ctx}-widgets-container`);
+  const btn = document.getElementById(`${ctx}-widgets-toggle-btn`);
+
+  window.widgetsCollapsed[ctx] = !window.widgetsCollapsed[ctx];
+
+  if (window.widgetsCollapsed[ctx]) {
+    wrapper.classList.add('hidden-view');
+    btn.innerText = 'Show Widgets';
+  } else {
+    wrapper.classList.remove('hidden-view');
+    btn.innerText = 'Hide Widgets';
+  }
+
+  localStorage.setItem(`${ctx}WidgetsCollapsed`, window.widgetsCollapsed[ctx]);
+};
+
+window.applyWidgetsState = function() {
+  ['dash', 'my'].forEach(ctx => {
+    const wrapper = document.getElementById(`${ctx}-widgets-container`);
+    const btn = document.getElementById(`${ctx}-widgets-toggle-btn`);
+    if (wrapper && btn) {
+      if (window.widgetsCollapsed[ctx]) {
+        wrapper.classList.add('hidden-view');
+        btn.innerText = 'Show Widgets';
+      } else {
+        wrapper.classList.remove('hidden-view');
+        btn.innerText = 'Hide Widgets';
+      }
+    }
+  });
+};
 
 window.toggleAgendaCard = function(headerEl) {
 const card = headerEl.parentElement;

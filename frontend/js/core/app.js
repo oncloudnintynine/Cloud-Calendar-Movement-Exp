@@ -243,10 +243,12 @@ document.getElementById('admin-behalf-event').classList.add('hidden-view');
 document.getElementById('admin-behalf-combined').classList.add('hidden-view');
 }
 
-if (typeof toggleCombinedFields === 'function') toggleCombinedFields();
+  if (typeof toggleCombinedFields === 'function') toggleCombinedFields();
 
-const activeTab = user.role === 'admin' ? 'admin' : mOrder[0];
-switchTab(activeTab);
+  if (typeof applyWidgetsState === 'function') applyWidgetsState();
+
+  const activeTab = user.role === 'admin' ? 'admin' : mOrder[0];
+  switchTab(activeTab);
 
 window._pendingTabRenders = new Set(['dashboard', 'my-leaves']);
 }
