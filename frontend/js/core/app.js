@@ -85,8 +85,11 @@ user.departments = user.departments ||[]; // Safety fallback for Admins
 document.getElementById('nav-user-name').innerText = user.role === 'admin' ? "Administrator" : (user.departments.length ? `${user.name}` : user.name);
 
 try {
-const settings = await apiCall('getSettings', { adminPass: user.role === 'admin' ? user.pass : null }); 
-window.appTypicalEventTypes = settings.typicalEventTypes ||[]; 
+const initialData = await apiCall('getInitialData', { adminPass: user.role === 'admin' ? user.pass : null });
+const settings = initialData.settings;
+allLeaves = initialData.leaves;
+
+window.appTypicalEventTypes = settings.typicalEventTypes ||[];
 window.appAcronyms = settings.acronyms || {};
 
 window.appAgendaTemplate = settings.agendaTemplate !== undefined && settings.agendaTemplate !== null ? settings.agendaTemplate : '{EventType} - {Name} ({Department})';
@@ -152,33 +155,6 @@ if (adminRegUnit) adminRegUnit.innerHTML = regOptions;
 if (editUserUnit) editUserUnit.innerHTML = regOptions;
 unitsLoaded = true;
 
-if (companyContacts.length > 0) {
-const uniqueNames =[...new Set(companyContacts.map(c => c.name))];
-validContactNames = uniqueNames.map(n => n.toLowerCase());
-fuseAllContacts = new Fuse(companyContacts, { keys:['name', 'dept', 'phone'], threshold: 0.3 });
-
-let attendeeOptions = companyContacts.map(c => ({ id: c.phone, name: c.name, dept: c.dept, type: 'contact' }));
-uniqueDepts.forEach(dept => {
-  attendeeOptions.push({ id: dept, name: `zz All in ${dept}`, dept: dept, type: 'group', expandedNames: `All in ${dept}` });
-});
-
-window.appCustomKahGroups.forEach(g => {
-  const customNames = g.members.map(phone => {
-      const c = companyContacts.find(contact => String(contact.phone) === String(phone));
-      return c ? c.name : phone;
-  }).join(', ');
-  attendeeOptions.push({ id: `kah_custom_${g.name}`, name: `zz KAH: ${g.name}`, dept: 'Custom', type: 'group', expandedNames: customNames });
-});
-
-const kahUnits =[...new Set(window.appKahList.map(k => k.dept))];
-kahUnits.forEach(dept => {
-  const unitNames = window.appKahList.filter(k => k.dept === dept).map(k => k.name).join(', ');
-  attendeeOptions.push({ id: `kah_unit_${dept}`, name: `zz KAH: ${dept}`, dept: dept, type: 'group', expandedNames: unitNames });
-});
-
-fuseAttendees = new Fuse(attendeeOptions, { keys:['name'], threshold: 0.3 });
-}
-
 if (user.role === 'admin') {
 document.getElementById('menu-admin-group').classList.remove('hidden');
 document.getElementById('admin-behalf-leave').classList.remove('hidden-view');
@@ -192,11 +168,19 @@ document.getElementById('admin-behalf-event').classList.add('hidden-view');
 document.getElementById('admin-behalf-combined').classList.add('hidden-view');
 }
 
-await loadLeavesData();
-
 if (typeof toggleCombinedFields === 'function') toggleCombinedFields();
 
-switchTab(user.role === 'admin' ? 'admin' : mOrder[0]); 
+switchTab(user.role === 'admin' ? 'admin' : mOrder[0]);
+
+requestIdleCallback ? requestIdleCallback(() => {
+buildAttendeeSearchIndex(uniqueDepts);
+renderDashboard();
+renderMyLeaves();
+}) : setTimeout(() => {
+buildAttendeeSearchIndex(uniqueDepts);
+renderDashboard();
+renderMyLeaves();
+}, 0);
 
 } catch(e) {
 console.error("Error loading settings: ", e);

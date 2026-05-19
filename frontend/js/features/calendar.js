@@ -148,6 +148,35 @@ renderParadeState();
 } catch (err) { console.error("Error loading leaves data: ", err); }
 }
 
+function buildAttendeeSearchIndex(uniqueDepts) {
+if (companyContacts.length === 0) return;
+
+const uniqueNames =[...new Set(companyContacts.map(c => c.name))];
+validContactNames = uniqueNames.map(n => n.toLowerCase());
+fuseAllContacts = new Fuse(companyContacts, { keys:['name', 'dept', 'phone'], threshold: 0.3 });
+
+let attendeeOptions = companyContacts.map(c => ({ id: c.phone, name: c.name, dept: c.dept, type: 'contact' }));
+uniqueDepts.forEach(dept => {
+  attendeeOptions.push({ id: dept, name: `zz All in ${dept}`, dept: dept, type: 'group', expandedNames: `All in ${dept}` });
+});
+
+window.appCustomKahGroups.forEach(g => {
+  const customNames = g.members.map(phone => {
+      const c = companyContacts.find(contact => String(contact.phone) === String(phone));
+      return c ? c.name : phone;
+  }).join(', ');
+  attendeeOptions.push({ id: `kah_custom_${g.name}`, name: `zz KAH: ${g.name}`, dept: 'Custom', type: 'group', expandedNames: customNames });
+});
+
+const kahUnits =[...new Set(window.appKahList.map(k => k.dept))];
+kahUnits.forEach(dept => {
+  const unitNames = window.appKahList.filter(k => k.dept === dept).map(k => k.name).join(', ');
+  attendeeOptions.push({ id: `kah_unit_${dept}`, name: `zz KAH: ${dept}`, dept: dept, type: 'group', expandedNames: unitNames });
+});
+
+fuseAttendees = new Fuse(attendeeOptions, { keys:['name'], threshold: 0.3 });
+}
+
 function changeMonth(ctx, offset) {
 setProgrammaticScroll();
 if (ctx === 'dash') { 
@@ -710,8 +739,8 @@ const container = document.getElementById(`${ctx}-agenda`);
 if (!container) return;
 
 const targetDate = ctx === 'dash' ? dashDate : myDate;
-const start = new Date(targetDate.getFullYear(), targetDate.getMonth() - 2, 1);
-const end = new Date(targetDate.getFullYear(), targetDate.getMonth() + 6, 0);
+const start = new Date(targetDate.getFullYear(), targetDate.getMonth() - 1, 1);
+const end = new Date(targetDate.getFullYear(), targetDate.getMonth() + 2, 0);
 
 let html = '';
 for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {

@@ -2,6 +2,128 @@
 // Settings.js - Admin Settings Logic 
 // ==========================================
 
+function getInitialData(data) {
+var props = PropertiesService.getScriptProperties();
+
+var cg = getContactsAndGroups();
+var allContacts =[];
+var phoneToDepts = {};
+
+cg.connections.forEach(function(person) {
+var phone = (person.phoneNumbers && person.phoneNumbers.length > 0) ? person.phoneNumbers[0].value.replace(/\D/g, '').slice(-8) : "";
+if (phone && person.names && person.names.length > 0) {
+  var name = cleanName(person.names[0].displayName);
+  if (person.memberships) {
+    var depts =[];
+    person.memberships.forEach(function(m) {
+      if (m.contactGroupMembership && m.contactGroupMembership.contactGroupResourceName) {
+        var gName = cg.groupMap[m.contactGroupMembership.contactGroupResourceName];
+        if (gName) depts.push(gName);
+      }
+    });
+    if (depts.length > 0) {
+      var deptsStr = depts.join(',');
+      phoneToDepts[phone] = deptsStr;
+      
+      var bdayStr = "";
+      if (person.birthdays && person.birthdays.length > 0 && person.birthdays[0].date) {
+        var d = person.birthdays[0].date;
+        if (d.year && d.month && d.day) {
+          bdayStr = d.year + "-" + ('0' + d.month).slice(-2) + "-" + ('0' + d.day).slice(-2);
+        }
+      }
+      
+      allContacts.push({ name: name, phone: phone, dept: deptsStr, resourceName: person.resourceName, birthday: bdayStr });
+    }
+  }
+}
+});
+
+var rawKahList = JSON.parse(props.getProperty('kahList') || "[]");
+var syncedKahList = rawKahList.map(function(k) {
+if (phoneToDepts[k.phone] && phoneToDepts[k.phone] !== k.dept) {
+  k.dept = phoneToDepts[k.phone];
+}
+return k;
+});
+props.setProperty('kahList', JSON.stringify(syncedKahList));
+
+var settings = {
+kahLimit: props.getProperty('kahLimit'),
+approvingAuthority: props.getProperty('approvingAuthority'),
+kahList: syncedKahList,
+kahEmailSubject: props.getProperty('kahEmailSubject') || "Leave Requires Approval: KAH Limit Crossed for {Unit}",
+kahEmailBody: props.getProperty('kahEmailBody') || "User {Name} applied for {EventType} but KAH limit was crossed for {Unit}.",
+
+typicalEventTypes: JSON.parse(props.getProperty('typicalEventTypes') || "[]"),
+gcalTemplate: props.getProperty('gcalTemplate') || '{EventType} - {Name}, {Attendees} {Time}',
+agendaTemplate: props.getProperty('agendaTemplate') !== null ? props.getProperty('agendaTemplate') : '{EventType} - {Name} ({Department})',
+agendaDetailsTemplate: props.getProperty('agendaDetailsTemplate') !== null ? props.getProperty('agendaDetailsTemplate') : 'Time: {Time}\nLocation: {Location}\nAttendees: {Attendees}\nEvent Description: {EventDescription}',
+infoAllTemplate: props.getProperty('infoAllTemplate') !== null ? props.getProperty('infoAllTemplate') : '{EventType} - {Name} ({Department})',
+infoAllDetailsTemplate: props.getProperty('infoAllDetailsTemplate') !== null ? props.getProperty('infoAllDetailsTemplate') : 'Time: {Time}\nLocation: {Location}\nEvent Description: {EventDescription}',
+
+acronyms: JSON.parse(props.getProperty('acronyms') || "{}"),
+customKahGroups: JSON.parse(props.getProperty('customKahGroups') || "[]"),
+
+menuOrder: JSON.parse(props.getProperty('menuOrder') || 'null'),
+adminSectionsOrder: JSON.parse(props.getProperty('adminSectionsOrder') || "null"),
+userKeyword: props.getProperty('userKeyword') || 'peace',
+appMode: props.getProperty('appMode') || 'combined',
+companyStructure: JSON.parse(props.getProperty('companyStructure') || "{}"),
+allContacts: allContacts
+};
+
+var sheet = SpreadsheetApp.openById(props.getProperty('dbSheetId')).getActiveSheet();
+var headers = verifySchema(sheet);
+var rows = sheet.getDataRange().getValues();
+rows.shift();
+
+var leaves =[];
+var updates = false;
+
+for(var i = 0; i < rows.length; i++) {
+var obj = {};
+headers.forEach(function(h, idx) { obj[h] = rows[i][idx]; });
+
+var currentActualDepts = phoneToDepts[obj.Phone] ? phoneToDepts[obj.Phone].split(',') :[];
+var attDepts =[];
+
+if (obj.Attendees) {
+  try {
+    var att = JSON.parse(obj.Attendees);
+    att.forEach(function(a) {
+      if (a.dept && a.dept !== 'Custom') {
+        var dp = a.dept.split(',');
+        dp.forEach(function(d) {
+          if (d.trim() && attDepts.indexOf(d.trim()) === -1) attDepts.push(d.trim());
+        });
+      }
+    });
+  } catch(e) {}
+}
+
+attDepts.forEach(function(d) {
+  if (currentActualDepts.indexOf(d) === -1) currentActualDepts.push(d);
+});
+
+var combinedDeptsStr = currentActualDepts.join(',');
+
+if (combinedDeptsStr && combinedDeptsStr !== obj.Department) {
+   obj.Department = combinedDeptsStr;
+   rows[i][headers.indexOf('Department')] = combinedDeptsStr;
+   updates = true;
+}
+
+leaves.push(obj);
+}
+
+if (updates) {
+sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
+}
+
+return { settings: settings, leaves: leaves };
+}
+
 function getSettings(data) {
 var props = PropertiesService.getScriptProperties();
 

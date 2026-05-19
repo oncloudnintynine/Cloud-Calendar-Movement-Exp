@@ -122,7 +122,7 @@ var data = payload.data || {};
 var credentials = payload.credentials || {};
 var responseData = {};
 
-var secureActions =['getSettings', 'saveSettings', 'submitLeave', 'editLeave', 'cancelLeave', 'getLeaves', 'updateUser', 'deleteUser', 'updateUserUnits', 'renameUnit', 'forceSyncContacts'];
+var secureActions =['getSettings', 'saveSettings', 'submitLeave', 'editLeave', 'cancelLeave', 'getLeaves', 'updateUser', 'deleteUser', 'updateUserUnits', 'renameUnit', 'forceSyncContacts', 'getInitialData'];
 if (secureActions.indexOf(action) !== -1) {
 if (!credentials.pass && !data.adminPass) throw new Error("Unauthorized: Missing credentials");
 
@@ -130,7 +130,7 @@ var checkPass = data.adminPass || credentials.pass;
 var verifiedUser = handleLogin({ password: checkPass });
 
 if (verifiedUser.role !== 'admin' && String(verifiedUser.phone) !== String(credentials.phone)) {
- throw new Error("Unauthorized: Invalid credentials");
+  throw new Error("Unauthorized: Invalid credentials");
 }
 
 data._userRole = verifiedUser.role;
@@ -143,6 +143,7 @@ else if (action === 'saveSettings') responseData = saveSettings(data);
 else if (action === 'submitLeave') responseData = submitLeave(data);
 else if (action === 'editLeave') responseData = editLeave(data);
 else if (action === 'getLeaves') responseData = getLeaves(data);
+else if (action === 'getInitialData') responseData = getInitialData(data);
 else if (action === 'cancelLeave') responseData = cancelLeave(data);
 else if (action === 'registerUser') responseData = registerUser(data);
 else if (action === 'updateUser') responseData = updateUser(data);
