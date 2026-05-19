@@ -107,12 +107,12 @@ const C = {
   badgeApproved: 'inline-flex items-center gap-1 bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800',
 
   // Quick stat cards
-  statCard: 'flex flex-col items-center justify-center p-2.5 rounded-xl bg-white dark:bg-darksurface border border-gray-200 dark:border-darkborder shadow-sm',
-  statValue: 'text-lg font-bold leading-tight',
-  statLabel: 'text-[10px] font-medium text-gray-500 dark:text-darkmuted uppercase tracking-wide mt-0.5',
+  statCard: 'flex flex-col items-center justify-center p-1.5 sm:p-2 md:p-2.5 rounded-lg sm:rounded-xl bg-white dark:bg-darksurface border border-gray-200 dark:border-darkborder shadow-sm',
+  statValue: 'text-sm sm:text-base md:text-lg font-bold leading-tight',
+  statLabel: 'text-[9px] sm:text-[10px] font-medium text-gray-500 dark:text-darkmuted uppercase tracking-wide mt-0.5',
 
   // Filter chips
-  filterChip: 'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border transition cursor-pointer select-none whitespace-nowrap',
+  filterChip: 'inline-flex items-center gap-0.5 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold border transition cursor-pointer select-none whitespace-nowrap',
   filterChipActive: 'bg-blue-600 text-white border-blue-600 shadow-sm',
   filterChipInactive: 'bg-white dark:bg-darksurface text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-darkhover',
 

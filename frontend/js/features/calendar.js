@@ -512,8 +512,8 @@ segments.forEach(seg => {
   const typeColors = getEventTypeColor(seg.l.LeaveType);
   const isMultiDay = seg.len > 1;
   const color = seg.isLeave 
-    ? `${typeColors.dot.replace('bg-', 'bg-')} text-white` 
-    : (isMultiDay ? 'bg-[#f4c264] dark:bg-[#d6a54d] text-gray-900' : `${typeColors.dot.replace('bg-', 'bg-')} text-white`);
+    ? `${typeColors.dot} text-white` 
+    : (isMultiDay ? 'bg-[#f4c264] dark:bg-[#d6a54d] text-gray-900' : `${typeColors.dot} text-white`);
   
   let locStr = seg.l.Location || '';
   if (seg.l.LocationDetails) locStr += ` - ${seg.l.LocationDetails}`;
@@ -889,7 +889,8 @@ if (!group) {
 return group;
 }
 
-window._activeFilter = 'all';
+window._activeFilterDash = 'all';
+window._activeFilterMy = 'all';
 
 function renderQuickStats(data) {
 const container = document.getElementById('dash-quick-stats');
@@ -926,7 +927,7 @@ data.forEach(l => {
 });
 
 const totalContacts = companyContacts.length || 0;
-inOffice = totalContacts - onLeave;
+inOffice = totalContacts - onLeave - onEvent;
 
 const topTypes = Object.entries(typeCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
 const typeChipsHtml = topTypes.map(([type, count]) => {
@@ -938,19 +939,19 @@ const typeChipsHtml = topTypes.map(([type, count]) => {
 }).join('');
 
 container.innerHTML = `
-<div class="${C.statCard} min-w-[70px]">
+<div class="${C.statCard}">
   <div class="${C.statValue} text-blue-600 dark:text-blue-400">${totalRecords}</div>
   <div class="${C.statLabel}">Today</div>
 </div>
-<div class="${C.statCard} min-w-[70px]">
+<div class="${C.statCard}">
   <div class="${C.statValue} text-green-600 dark:text-green-400">${inOffice}</div>
   <div class="${C.statLabel}">In Office</div>
 </div>
-<div class="${C.statCard} min-w-[70px]">
+<div class="${C.statCard}">
   <div class="${C.statValue} text-orange-600 dark:text-orange-400">${onLeave}</div>
   <div class="${C.statLabel}">On Leave</div>
 </div>
-<div class="${C.statCard} min-w-[70px]">
+<div class="${C.statCard}">
   <div class="${C.statValue} text-indigo-600 dark:text-indigo-400">${onEvent}</div>
   <div class="${C.statLabel}">On Event</div>
 </div>
@@ -961,8 +962,9 @@ container.classList.remove('hidden');
 container.classList.add('flex');
 }
 
-function renderFilterChips(data) {
-const container = document.getElementById('dash-filter-chips');
+function renderFilterChips(data, ctx) {
+const containerId = ctx === 'my' ? 'my-filter-chips' : 'dash-filter-chips';
+const container = document.getElementById(containerId);
 if (!container) return;
 
 const typeCounts = {};
@@ -973,21 +975,20 @@ data.forEach(l => {
 });
 
 const types = Object.keys(typeCounts).sort();
-const activeFilter = window._activeFilter || 'all';
+const filterKey = ctx === 'my' ? '_activeFilterMy' : '_activeFilterDash';
+const activeFilter = window[filterKey] || 'all';
 
 const chipsHtml = types.map(type => {
-  const colors = getEventTypeColor(type);
   const isActive = activeFilter === type;
   const chipClass = isActive ? C.filterChipActive : C.filterChipInactive;
-  return `<button class="${C.filterChip} ${chipClass}" onclick="window._activeFilter='${type}'; window.agendaDirty=true; renderDashboard();">${type} (${typeCounts[type]})</button>`;
+  const safeType = type.replace(/'/g, "\\'");
+  return `<button class="${C.filterChip} ${chipClass}" onclick="window.${filterKey}='${safeType}'; window.agendaDirty=true; window.myAgendaDirty=true; renderDashboard(); renderMyLeaves();">${type} <span class="opacity-60">${typeCounts[type]}</span></button>`;
 }).join('');
 
 const allClass = activeFilter === 'all' ? C.filterChipActive : C.filterChipInactive;
 
 container.innerHTML = `
-<button class="${C.filterChip} ${allClass}" onclick="window._activeFilter='all'; window.agendaDirty=true; renderDashboard();">
-  ${ICONS.filter} All
-</button>
+<button class="${C.filterChip} ${allClass}" onclick="window.${filterKey}='all'; window.agendaDirty=true; window.myAgendaDirty=true; renderDashboard(); renderMyLeaves();">All</button>
 ${chipsHtml}
 `;
 
@@ -1068,12 +1069,12 @@ const fuse = new Fuse(filtered, { keys:['Name', 'LeaveType', 'Location', 'Locati
 filtered = fuse.search(q).map(res => res.item);
 }
 
-if (window._activeFilter && window._activeFilter !== 'all') {
-  filtered = filtered.filter(l => l.LeaveType === window._activeFilter);
+if (window._activeFilterDash && window._activeFilterDash !== 'all') {
+  filtered = filtered.filter(l => l.LeaveType === window._activeFilterDash);
 }
 
 renderQuickStats(allLeaves.filter(l => l.Status !== 'Cancelled'));
-renderFilterChips(filtered);
+renderFilterChips(filtered, 'dash');
 
 window.dashFilteredLeaves = filtered;
 
@@ -1137,18 +1138,17 @@ return false;
 
 window.myFilteredLeaves = my;
 
-const myFilteredForChips = my.filter(l => {
-  if (window._activeFilter && window._activeFilter !== 'all') {
-    return l.LeaveType === window._activeFilter;
-  }
-  return true;
-});
-renderFilterChips(my);
+let myFiltered = my;
+if (window._activeFilterMy && window._activeFilterMy !== 'all') {
+  myFiltered = my.filter(l => l.LeaveType === window._activeFilterMy);
+}
+
+renderFilterChips(myFiltered, 'my');
 
 if (dashViewMode === 'agenda') {
 renderMiniCalendar('my');
 if (window.myAgendaDirty) {
-  generateContinuousAgenda('my', myFilteredForChips);
+  generateContinuousAgenda('my', myFiltered);
   window.myAgendaDirty = false;
 }
 

@@ -59,7 +59,7 @@ if (countryEl && countryEl.required && !countryEl.value.trim()) {
 }
 
 if (!isValid && errors.length > 0) {
-  showFormError(ctx, errors[0]);
+  showFormError(ctx, errors.join('<br>'));
 } else {
   hideFormError(ctx);
 }
@@ -454,7 +454,6 @@ if(timeEnd) timeEnd.classList.remove('hidden-view');
 
 async function submitForm(ctx) {
 if (!validateForm(ctx)) {
-  showLoader(false);
   return;
 }
 
