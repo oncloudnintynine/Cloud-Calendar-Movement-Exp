@@ -84,6 +84,30 @@ user.departments = user.departments ||[];
 
 document.getElementById('nav-user-name').innerText = user.role === 'admin' ? "Administrator" : (user.departments.length ? `${user.name}` : user.name);
 
+const dashAgenda = document.getElementById('dash-agenda');
+const myAgenda = document.getElementById('my-agenda');
+const paradeBody = document.getElementById('parade-state-body');
+
+if (dashAgenda) {
+  dashAgenda.innerHTML = `
+    <div class="${C.skeletonCard} mb-3"></div>
+    <div class="${C.skeletonCard} mb-3"></div>
+    <div class="${C.skeletonCard} mb-3"></div>
+  `;
+}
+if (myAgenda) {
+  myAgenda.innerHTML = `
+    <div class="${C.skeletonCard} mb-3"></div>
+    <div class="${C.skeletonCard} mb-3"></div>
+  `;
+}
+if (paradeBody) {
+  paradeBody.innerHTML = `
+    <div class="${C.skeletonCard} h-32 mb-3"></div>
+    <div class="${C.skeletonCard} h-20 mb-3"></div>
+  `;
+}
+
 const cachedData = sessionStorage.getItem('initialData');
 if (cachedData) {
   try {

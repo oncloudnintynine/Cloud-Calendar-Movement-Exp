@@ -153,6 +153,12 @@ extend: {
  <button id="unified-btn-event" onclick="switchTab('submit-event')" class="hidden bg-blue-50 dark:bg-darkinput border-2 border-blue-300 dark:border-gray-500 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-black font-bold py-1.5 px-3 rounded-lg shadow-sm transition text-xs shrink-0 whitespace-nowrap">Add Event</button>
 </div>
 
+<div id="dash-quick-stats" class="hidden flex flex-row gap-2 w-full shrink-0 overflow-x-auto pb-1 scrollbar-hide">
+</div>
+
+<div id="dash-filter-chips" class="hidden flex flex-row gap-1.5 w-full shrink-0 overflow-x-auto pb-1 scrollbar-hide">
+</div>
+
 <div id="dash-agenda-wrapper" class="flex flex-col gap-3 flex-grow overflow-hidden">
  <div class="flex flex-row w-full gap-2 shrink-0 max-h-[220px]">
    <div id="dash-cal-wrapper" class="flex-1 min-w-0 bg-white dark:bg-darksurface rounded-xl shadow-sm border border-gray-200 dark:border-darkborder p-2 flex flex-col text-sm transition-all duration-300">
@@ -204,6 +210,9 @@ extend: {
 
 <div id="view-my-leaves" class="tab-content hidden-view flex-grow flex-col overflow-hidden h-full space-y-3">
 <div id="my-calendar-quick-add" class="flex space-x-2 w-full shrink-0 overflow-x-auto pb-1 scrollbar-hide"></div>
+
+<div id="my-filter-chips" class="hidden flex flex-row gap-1.5 w-full shrink-0 overflow-x-auto pb-1 scrollbar-hide">
+</div>
 
 <div id="my-agenda-wrapper" class="flex flex-col gap-3 flex-grow overflow-hidden">
  <div class="flex flex-row w-full gap-2 shrink-0 max-h-[220px]">

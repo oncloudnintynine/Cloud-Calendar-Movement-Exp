@@ -8,7 +8,7 @@ const paradeBody = document.getElementById('parade-state-body');
 
 if (!companyContacts || companyContacts.length === 0) {
  if(paradeHeader) paradeHeader.innerText = `Overall Parade State`;
- if(paradeBody) paradeBody.innerHTML = `<div class="flex items-center justify-center h-32"><p class="text-gray-500 dark:text-darkmuted italic">Loading personnel data or no contacts found...</p></div>`;
+ if(paradeBody) paradeBody.innerHTML = `<div class="${C.emptyState}">${ICONS.loading}<p class="${C.emptyStateText} mt-2">Loading personnel data...</p></div>`;
  return;
 }
 
@@ -59,6 +59,7 @@ try {
    
    let isOffice = true;
    let locationStr = 'Office';
+   let statusType = 'office';
 
    if (activeRecords.length > 0) {
      let activeRecord = activeRecords[0]; 
@@ -83,20 +84,21 @@ try {
            locationStr += ` - ${activeRecord.LocationDetails}`;
        }
        isOffice = String(activeRecord.Location || '').toLowerCase() === 'office';
+       statusType = isOffice ? 'office' : 'event';
      } else {
        locationStr = activeRecord.LeaveType || 'Leave';
        if (activeRecord.Country) locationStr += ` (${activeRecord.Country})`;
        isOffice = false;
+       statusType = 'leave';
      }
    }
 
    if (isOffice) inOfficeGlobal++;
    
-   // Determine KAH status globally
    const isKAH = window.kahPhones && window.kahPhones.includes(String(contact.phone));
    
    const finalLocationStr = applyAcronymsFront(locationStr);
-   const memberObj = { name: applyAcronymsFront(contact.name || 'Unknown'), isOffice: isOffice, location: finalLocationStr, isKAH: isKAH };
+   const memberObj = { name: applyAcronymsFront(contact.name || 'Unknown'), isOffice: isOffice, location: finalLocationStr, isKAH: isKAH, statusType: statusType };
    
    let updateLevel = tree;
    parts.forEach(part => {
@@ -108,7 +110,19 @@ try {
    });
  });
 
- if (paradeHeader) paradeHeader.innerHTML = `Overall Parade State<br><span class="text-green-600 dark:text-green-400 font-bold">(${inOfficeGlobal} / ${totalGlobal})</span>`;
+ const attendancePct = totalGlobal > 0 ? Math.round((inOfficeGlobal / totalGlobal) * 100) : 0;
+ const pctColor = attendancePct >= 75 ? 'text-green-600 dark:text-green-400' : (attendancePct >= 50 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400');
+ const pctBg = attendancePct >= 75 ? 'bg-green-100 dark:bg-green-900/30' : (attendancePct >= 50 ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-red-100 dark:bg-red-900/30');
+
+ if (paradeHeader) paradeHeader.innerHTML = `
+   <div class="flex items-center justify-between w-full">
+     <span>Overall Parade State</span>
+     <span class="${pctBg} ${pctColor} px-2 py-0.5 rounded-full text-sm font-bold">${attendancePct}%</span>
+   </div>
+   <div class="flex items-center gap-3 mt-1 text-xs font-medium text-gray-500 dark:text-darkmuted">
+     <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span>${inOfficeGlobal} In Office</span>
+     <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-orange-500"></span>${totalGlobal - inOfficeGlobal} Away</span>
+   </div>`;
 
  // SORT RULE: 1. In Office, 2. KAH, 3. Alpha
  const sortMembers = (mems) => {
@@ -129,29 +143,53 @@ try {
      
      let html = '';
      
+     const deptPct = meta.total > 0 ? Math.round((meta.inOffice / meta.total) * 100) : 0;
+     
      if (depth === 0) {
-         html += `<div class="mb-5 border-l-4 border-blue-500 pl-3 md:pl-4 bg-white dark:bg-darksurface py-2">`;
-         html += `<h3 class="font-bold text-lg md:text-xl mb-3 text-blue-700 dark:text-blue-400">${applyAcronymsFront(nodeName)} <span class="text-sm font-semibold text-gray-500 dark:text-darkmuted">(${meta.inOffice} / ${meta.total})</span></h3>`;
+         html += `<div class="mb-4 rounded-xl overflow-hidden border border-gray-200 dark:border-darkborder bg-white dark:bg-darksurface shadow-sm">`;
+         html += `<div class="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-50 to-transparent dark:from-blue-900/20 dark:to-transparent border-b border-gray-200 dark:border-darkborder">`;
+         html += `<h3 class="font-bold text-base md:text-lg text-blue-700 dark:text-blue-400">${applyAcronymsFront(nodeName)}</h3>`;
+         html += `<div class="flex items-center gap-2">`;
+         html += `<span class="text-xs font-semibold text-gray-500 dark:text-darkmuted">${meta.inOffice}/${meta.total}</span>`;
+         html += `<div class="w-16 h-1.5 bg-gray-200 dark:bg-darkborder rounded-full overflow-hidden"><div class="h-full bg-blue-500 rounded-full" style="width: ${deptPct}%"></div></div>`;
+         html += `</div></div>`;
      } else if (depth === 1) {
-         html += `<div class="mt-3 ml-3 border-l-2 border-purple-400 pl-3">`;
-         html += `<h4 class="font-bold text-base mb-2 text-purple-700 dark:text-purple-400">${applyAcronymsFront(nodeName)} <span class="text-xs font-semibold text-gray-500 dark:text-darkmuted">(${meta.inOffice} / ${meta.total})</span></h4>`;
+         html += `<div class="mt-2 border-t border-gray-100 dark:border-darkborder">`;
+         html += `<div class="flex items-center justify-between px-4 py-2 bg-purple-50/50 dark:bg-purple-900/10">`;
+         html += `<h4 class="font-bold text-sm text-purple-700 dark:text-purple-400">${applyAcronymsFront(nodeName)}</h4>`;
+         html += `<span class="text-xs font-semibold text-gray-500 dark:text-darkmuted">${meta.inOffice}/${meta.total}</span>`;
+         html += `</div>`;
      } else {
-         html += `<div class="mt-2 ml-3 border-l border-emerald-400 pl-2">`;
-         html += `<h5 class="font-semibold text-sm mb-1.5 text-emerald-700 dark:text-emerald-400">${applyAcronymsFront(nodeName)} <span class="text-[10px] font-semibold text-gray-500 dark:text-darkmuted">(${meta.inOffice} / ${meta.total})</span></h5>`;
+         html += `<div class="mt-1 border-t border-gray-100 dark:border-darkborder">`;
+         html += `<div class="flex items-center justify-between px-4 py-1.5 bg-emerald-50/30 dark:bg-emerald-900/10">`;
+         html += `<h5 class="font-semibold text-xs text-emerald-700 dark:text-emerald-400">${applyAcronymsFront(nodeName)}</h5>`;
+         html += `<span class="text-[10px] font-semibold text-gray-500 dark:text-darkmuted">${meta.inOffice}/${meta.total}</span>`;
+         html += `</div>`;
      }
 
      if (meta.members.length > 0) {
-         html += `<div class="space-y-1.5 text-[13px] md:text-[14px]">`;
+         html += `<div class="divide-y divide-gray-100 dark:divide-darkborder">`;
          meta.members.forEach((m, i) => {
-             const colorClass = m.isOffice ? 'text-gray-800 dark:text-gray-200' : 'text-orange-600 dark:text-orange-500';
-             const kahStar = m.isKAH ? `<span class="text-yellow-500 mr-1 text-xs" title="KAH">★</span>` : '';
+             const cardClass = m.isOffice 
+               ? C.paradeMemberInOffice 
+               : (m.statusType === 'event' ? C.paradeMemberEvent : C.paradeMemberAway);
+             
+             const statusIcon = m.isOffice 
+               ? `<span class="text-green-600 dark:text-green-400">${ICONS.office}</span>`
+               : (m.statusType === 'event' 
+                 ? `<span class="text-blue-600 dark:text-blue-400">${ICONS.event}</span>`
+                 : `<span class="text-orange-600 dark:text-orange-400">${ICONS.leave}</span>`);
+             
+             const kahBadge = m.isKAH ? `<span class="text-yellow-500" title="KAH">${ICONS.star}</span>` : '';
+             const locText = !m.isOffice ? `<span class="text-xs italic text-gray-500 dark:text-darkmuted ml-1">(${m.location})</span>` : '';
+             
              html += `
-             <div class="flex items-start">
-               <span class="w-5 md:w-6 shrink-0 text-right mr-2 text-gray-400 dark:text-darkmuted font-medium text-xs md:text-sm pt-0.5">${i+1}.</span>
-               <div class="leading-tight">
-                 ${kahStar}<span class="font-semibold ${colorClass}">${m.name}</span>
-                 ${!m.isOffice ? `<span class="italic ${colorClass} ml-1 block md:inline text-xs md:text-sm">(${m.location})</span>` : ''}
-               </div>
+             <div class="${C.paradeMemberCard} ${cardClass} mx-2 my-1">
+               <span class="w-6 shrink-0 text-right text-gray-400 dark:text-darkmuted font-medium text-xs">${i+1}</span>
+               ${statusIcon}
+               ${kahBadge}
+               <span class="font-semibold text-sm flex-1 min-w-0 truncate">${m.name}</span>
+               ${locText}
              </div>`;
          });
          html += `</div>`;
@@ -173,7 +211,7 @@ try {
 
  rootKeys.forEach(root => { finalHtml += renderNode(tree[root], root, 0); });
 
- if (paradeBody) paradeBody.innerHTML = finalHtml || `<p class="text-center text-gray-500">No departments to display.</p>`;
+ if (paradeBody) paradeBody.innerHTML = finalHtml || `<div class="${C.emptyState}">${ICONS.empty}<p class="${C.emptyStateText} mt-2">No departments to display.</p></div>`;
 } catch(err) {
  console.error('Parade State Render Error:', err);
  if (paradeBody) paradeBody.innerHTML = `<p class="text-red-500 text-center p-4">Error generating parade state. Please check console.</p>`;

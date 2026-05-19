@@ -251,8 +251,24 @@ cell.className = baseClass;
 
 const hasEvent = cell.dataset.hasevent === 'true';
 if (hasEvent) {
-    const dotColor = cellDay === d ? 'bg-white' : 'bg-blue-500';
-    cell.innerHTML = `${cellDay}<div class="absolute bottom-0 w-1 h-1 ${dotColor} rounded-full"></div>`;
+    const data = ctx === 'dash' ? window.dashFilteredLeaves ||[] : window.myFilteredLeaves ||[];
+    const monthDate = ctx === 'dash' ? dashMonth : myMonth;
+    const y = monthDate.getFullYear();
+    const m = monthDate.getMonth();
+    const current = new Date(y, m, cellDay);
+    const dayEvents = data.filter(l => isEventOnDate(l, current));
+    const typeCounts = {};
+    dayEvents.forEach(l => {
+      const t = l.LeaveType || 'Other';
+      typeCounts[t] = (typeCounts[t] || 0) + 1;
+    });
+    const topTypes = Object.entries(typeCounts).sort((a, b) => b[1] - a[1]).slice(0, 2);
+    const dotsHtml = topTypes.map(([type]) => {
+      const colors = getEventTypeColor(type);
+      const dotColor = cellDay === d ? 'ring-1 ring-white dark:ring-black' : colors.dot;
+      return `<div class="w-1 h-1 ${dotColor} rounded-full"></div>`;
+    }).join('');
+    cell.innerHTML = `${cellDay}<div class="absolute -bottom-0.5 flex gap-0.5">${dotsHtml}</div>`;
 } else {
     cell.innerHTML = `${cellDay}`;
 }
@@ -376,17 +392,31 @@ for(let d=1; d<=daysInMonth; d++) {
 const current = new Date(y, m, d); current.setHours(0,0,0,0);
 const isSelected = current.toDateString() === selDate.toDateString();
 const isToday = current.toDateString() === new Date().toDateString();
-const hasEvent = data.some(l => isEventOnDate(l, current));
+
+const dayEvents = data.filter(l => isEventOnDate(l, current));
+const hasEvent = dayEvents.length > 0;
 
 let baseClass = "cal-day-cell relative flex items-center justify-center w-5 h-5 mx-auto rounded-full cursor-pointer transition-colors text-[10px] font-medium ";
 if (isSelected) baseClass += "bg-blue-600 text-white font-bold shadow-md ";
 else if (isToday) baseClass += "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200 dark:ring-1 dark:ring-blue-500 font-bold ";
 else baseClass += "hover:bg-gray-200 dark:hover:bg-darkhover ";
 
-const dotColor = isSelected ? 'bg-white' : 'bg-blue-500';
-const dot = hasEvent ? `<div class="absolute bottom-0 w-1 h-1 ${dotColor} rounded-full"></div>` : '';
+let dotsHtml = '';
+if (hasEvent) {
+  const typeCounts = {};
+  dayEvents.forEach(l => {
+    const t = l.LeaveType || 'Other';
+    typeCounts[t] = (typeCounts[t] || 0) + 1;
+  });
+  const topTypes = Object.entries(typeCounts).sort((a, b) => b[1] - a[1]).slice(0, 2);
+  dotsHtml = topTypes.map(([type]) => {
+    const colors = getEventTypeColor(type);
+    const dotColor = isSelected ? 'ring-1 ring-white dark:ring-black' : colors.dot;
+    return `<div class="w-1 h-1 ${dotColor} rounded-full"></div>`;
+  }).join('');
+}
 
-html += `<div class="${baseClass}" data-day="${d}" data-istoday="${isToday}" data-hasevent="${hasEvent}" onclick="selectDate('${ctx}', ${y}, ${m}, ${d})">${d}${dot}</div>`;
+html += `<div class="${baseClass}" data-day="${d}" data-istoday="${isToday}" data-hasevent="${hasEvent}" onclick="selectDate('${ctx}', ${y}, ${m}, ${d})">${d}${dotsHtml ? `<div class="absolute -bottom-0.5 flex gap-0.5">${dotsHtml}</div>` : ''}</div>`;
 }
 const gridEl = document.getElementById(`${ctx}-cal-grid`);
 if (gridEl) gridEl.innerHTML = html;
@@ -479,7 +509,11 @@ for (let i = 0; i < 7; i++) {
 
 html += `<div class="absolute top-8 left-0 right-0 bottom-0 pointer-events-none overflow-hidden">`;
 segments.forEach(seg => {
-  const color = seg.isLeave ? 'bg-[#e26d5c] dark:bg-[#c25a4a] text-white' : (seg.len > 1 ? 'bg-[#f4c264] dark:bg-[#d6a54d] text-gray-900' : 'bg-[#50b182] dark:bg-[#3d9369] text-white');
+  const typeColors = getEventTypeColor(seg.l.LeaveType);
+  const isMultiDay = seg.len > 1;
+  const color = seg.isLeave 
+    ? `${typeColors.dot.replace('bg-', 'bg-')} text-white` 
+    : (isMultiDay ? 'bg-[#f4c264] dark:bg-[#d6a54d] text-gray-900' : `${typeColors.dot.replace('bg-', 'bg-')} text-white`);
   
   let locStr = seg.l.Location || '';
   if (seg.l.LocationDetails) locStr += ` - ${seg.l.LocationDetails}`;
@@ -516,19 +550,22 @@ return html;
 
 function getBadgeClass(status) {
 const safeStatus = String(status || '');
-if(safeStatus.includes('Pending')) return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border border-orange-200 dark:border-orange-800';
-if(safeStatus.includes('Cancelled')) return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800';
-return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800';
+if(safeStatus.includes('Pending')) return C.badgePending;
+if(safeStatus.includes('Cancelled')) return C.badgeCancelled;
+return C.badgeApproved;
 }
 
 function formatStatusBadge(status) {
 let s = String(status || '').replace('Approved', 'Cal Updated');
+let icon = ICONS.check;
+if (s.includes('Pending')) icon = ICONS.alert;
+else if (s.includes('Cancelled')) icon = ICONS.x;
 if (s.includes('KAH Limit Crossed')) {
 const match = s.match(/KAH Limit Crossed for (.*)\)/);
 const dept = match ? match[1] : '';
-return `Cal Updated<br><span class="text-[9px] font-bold text-red-600 dark:text-red-400 tracking-tight leading-tight block mt-1">KAH Limit Crossed</span><span class="text-[9px] font-bold text-red-600 dark:text-red-400 tracking-tight leading-none block mt-0.5">${dept}</span>`;
+return `${ICONS.alert} Cal Updated<br><span class="text-[9px] font-bold text-red-600 dark:text-red-400 tracking-tight leading-tight block mt-1">KAH Limit Crossed</span><span class="text-[9px] font-bold text-red-600 dark:text-red-400 tracking-tight leading-none block mt-0.5">${dept}</span>`;
 }
-return s;
+return `${icon} ${s}`;
 }
 
 function parseAndCleanTemplate(templateStr, vars) {
@@ -577,6 +614,7 @@ const isCollapsed = window.isAgendaCollapsed[ctx];
 return items.map(l => {
 const typeObj = window.appTypicalEventTypes ? window.appTypicalEventTypes.find(t => t.name === l.LeaveType) : null;
 const isEvent = typeObj ? typeObj.isEvent : false;
+const typeColors = getEventTypeColor(l.LeaveType);
 
 let timeStr = "";
 if (isEvent) {
@@ -691,10 +729,26 @@ const finalDetailsHtml = detailsRaw ? parseAndCleanTemplate(detailsRaw, tplVars)
 
 const hasBody = finalDetailsHtml.trim() !== '' || (isInfoAllContext ? compactActionBtns !== '' : actionBtns !== '');
 
+const typeIcon = isEvent ? ICONS.event : ICONS.leave;
+const typeChipHtml = `<span class="${C.agendaTypeChip} ${typeColors.bg} ${typeColors.text}">${typeIcon}${displayType}</span>`;
+
+const metaDataHtml = `
+<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs text-gray-500 dark:text-darkmuted">
+  ${timeStr ? `<span class="inline-flex items-center gap-1">${ICONS.clock}${timeStr}</span>` : ''}
+  ${locStr ? `<span class="inline-flex items-center gap-1">${ICONS.location}${applyAcronymsFront(locStr)}</span>` : ''}
+  ${attendeesDisplay ? `<span class="inline-flex items-center gap-1">${ICONS.users}${applyAcronymsFront(attendeesDisplay).split(',').length} attendee${attendeesDisplay.split(',').length > 1 ? 's' : ''}</span>` : ''}
+</div>`;
+
 if (isInfoAllContext) {
 return `<div class="${C.agendaCardInfoAll}">
   <div class="flex justify-between items-start ${hasBody ? 'cursor-pointer select-none' : ''}" ${hasBody ? 'onclick="toggleAgendaCard(this)"' : ''}>
-    <h3 class="font-bold text-[11px] md:text-xs text-blue-900 dark:text-blue-300 flex-grow pr-2">${finalTitle}</h3>
+    <div class="flex-grow pr-2">
+      <div class="flex items-center gap-2 mb-1">
+        ${typeChipHtml}
+      </div>
+      <h3 class="font-bold text-[11px] md:text-xs text-blue-900 dark:text-blue-300">${finalTitle}</h3>
+      ${metaDataHtml}
+    </div>
     ${hasBody ? `<svg class="w-4 h-4 text-blue-500 transition-transform duration-200 chevron-icon shrink-0 ${isCollapsed ? '' : 'rotate-180'}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>` : ''}
   </div>
   ${hasBody ? `
@@ -705,15 +759,19 @@ return `<div class="${C.agendaCardInfoAll}">
 </div>`;
 }
 
-return `<div class="${C.agendaCard}">
+return `<div class="${C.agendaCard} ${typeColors.accent}">
 <div class="flex justify-between items-start ${hasBody ? 'cursor-pointer select-none' : ''}" ${hasBody ? 'onclick="toggleAgendaCard(this)"' : ''}>
-<div class="flex-grow pr-2">
-<h3 class="font-bold text-sm md:text-base text-gray-900 dark:text-gray-100 leading-tight">${finalTitle}</h3>
-${!isMyCalendar && !isEvent && l.HalfDay !== 'None' && l.HalfDay !== 'NONE' ? `<p class="font-medium text-xs md:text-sm text-gray-700 dark:text-darktext mt-0.5">(${l.HalfDay})</p>` : ''}
+<div class="flex-grow pr-2 min-w-0">
+<div class="flex items-center gap-2 mb-1 flex-wrap">
+  ${typeChipHtml}
+  <span class="text-[10px] md:text-[11px] font-bold px-2 py-0.5 rounded text-center inline-block leading-tight ${getBadgeClass(l.Status)}">${formatStatusBadge(l.Status)}</span>
 </div>
-<div class="flex items-center shrink-0">
-<span class="text-[10px] md:text-[11px] font-bold px-2 py-1 rounded text-center inline-block leading-tight ${getBadgeClass(l.Status)}">${formatStatusBadge(l.Status)}</span>
-${hasBody ? `<svg class="w-5 h-5 ml-1.5 text-gray-400 dark:text-darkmuted transition-transform duration-200 chevron-icon shrink-0 ${isCollapsed ? '' : 'rotate-180'}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>` : ''}
+<h3 class="font-bold text-sm md:text-base text-gray-900 dark:text-gray-100 leading-tight">${finalTitle}</h3>
+${metaDataHtml}
+${!isMyCalendar && !isEvent && l.HalfDay !== 'None' && l.HalfDay !== 'NONE' ? `<p class="font-medium text-xs md:text-sm text-gray-700 dark:text-darktext mt-1">(${l.HalfDay})</p>` : ''}
+</div>
+<div class="flex items-center shrink-0 ml-2">
+${hasBody ? `<svg class="w-5 h-5 text-gray-400 dark:text-darkmuted transition-transform duration-200 chevron-icon shrink-0 ${isCollapsed ? '' : 'rotate-180'}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>` : ''}
 </div>
 </div>
 ${hasBody ? `
@@ -770,11 +828,14 @@ for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
      const yyyy = d.getFullYear();
      const mm = String(d.getMonth() + 1).padStart(2, '0');
      const dd = String(d.getDate()).padStart(2, '0');
+     const isToday = d.toDateString() === new Date().toDateString();
+     const countBadge = dayEvents.length > 0 ? `<span class="ml-2 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400">${dayEvents.length}</span>` : '';
      
      html += `
      <div class="agenda-day-group mb-6" data-date="${yyyy}-${mm}-${dd}">
-         <div class="${C.sectionHeader} mb-3">
-             <h3 class="font-bold text-sm md:text-base text-blue-700 dark:text-blue-400">${formatDisplayDate(d)}</h3>
+         <div class="${C.sectionHeader} mb-3 flex items-center">
+             <h3 class="font-bold text-sm md:text-base ${isToday ? 'text-blue-700 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'}">${isToday ? 'Today' : formatDisplayDate(d)}</h3>
+             ${countBadge}
          </div>
          <div class="space-y-3 px-1">
              ${buildAgendaHtml(dayEvents, ctx === 'my' || (ctx==='dash' && document.getElementById('dash-dept-nav').value==='MY_CALENDAR'), false)}
@@ -783,7 +844,7 @@ for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
  }
 }
 
-container.innerHTML = html || `<p class="text-gray-500 dark:text-darkmuted text-center mt-6">No records found.</p>`;
+container.innerHTML = html || `<div class="${C.emptyState}">${ICONS.empty}<p class="${C.emptyStateText} mt-2">No records found for this period.</p></div>`;
 
 container.removeEventListener('scroll', ctx === 'dash' ? () => handleAgendaScroll('dash') : () => handleAgendaScroll('my'));
 container.addEventListener('scroll', ctx === 'dash' ? () => handleAgendaScroll('dash') : () => handleAgendaScroll('my'));
@@ -804,12 +865,14 @@ if (!group) {
  group = document.createElement('div');
  group.className = 'agenda-day-group mb-6';
  group.dataset.date = dateStr;
+ const isToday = targetDateObj.toDateString() === new Date().toDateString();
  group.innerHTML = `
-     <div class="sticky top-0 bg-gray-50 dark:bg-darkinput z-10 py-1.5 border-y border-gray-200 dark:border-darkborder mb-3 shadow-sm px-2 rounded-lg">
-         <h3 class="font-bold text-sm md:text-base text-blue-700 dark:text-blue-400">${formatDisplayDate(targetDateObj)}</h3>
+     <div class="sticky top-0 bg-gray-50 dark:bg-darkinput z-10 py-1.5 border-y border-gray-200 dark:border-darkborder mb-3 shadow-sm px-2 rounded-lg flex items-center">
+         <h3 class="font-bold text-sm md:text-base ${isToday ? 'text-blue-700 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'}">${isToday ? 'Today' : formatDisplayDate(targetDateObj)}</h3>
+         <span class="ml-2 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold rounded-full bg-gray-200 dark:bg-darkborder text-gray-500 dark:text-darkmuted">0</span>
      </div>
      <div class="space-y-3 px-1">
-         <p class="text-gray-500 dark:text-darkmuted text-center italic mt-2">No records for this date.</p>
+         <div class="${C.emptyState} py-8">${ICONS.empty}<p class="${C.emptyStateText} mt-2">No records for this date.</p></div>
      </div>`;
 
  const allGroups = Array.from(container.querySelectorAll('.agenda-day-group'));
@@ -824,6 +887,112 @@ if (!group) {
  if (!inserted) container.appendChild(group);
 }
 return group;
+}
+
+window._activeFilter = 'all';
+
+function renderQuickStats(data) {
+const container = document.getElementById('dash-quick-stats');
+if (!container) return;
+
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+let totalRecords = 0;
+let onLeave = 0;
+let onEvent = 0;
+let inOffice = 0;
+const typeCounts = {};
+
+data.forEach(l => {
+  if (l.Status === 'Cancelled') return;
+  const s = new Date(l.StartDate); s.setHours(0, 0, 0, 0);
+  const e = new Date(l.EndDate); e.setHours(0, 0, 0, 0);
+  
+  if (s <= today && e >= today) {
+    totalRecords++;
+    const typeObj = window.appTypicalEventTypes ? window.appTypicalEventTypes.find(t => t.name === l.LeaveType) : null;
+    const isEvent = typeObj ? typeObj.isEvent : false;
+    
+    if (isEvent) {
+      onEvent++;
+    } else {
+      onLeave++;
+    }
+    
+    const t = l.LeaveType || 'Other';
+    typeCounts[t] = (typeCounts[t] || 0) + 1;
+  }
+});
+
+const totalContacts = companyContacts.length || 0;
+inOffice = totalContacts - onLeave;
+
+const topTypes = Object.entries(typeCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
+const typeChipsHtml = topTypes.map(([type, count]) => {
+  const colors = getEventTypeColor(type);
+  return `<div class="${C.statCard} min-w-[70px]">
+    <div class="${C.statValue} ${colors.text}">${count}</div>
+    <div class="${C.statLabel} truncate max-w-[65px]">${type}</div>
+  </div>`;
+}).join('');
+
+container.innerHTML = `
+<div class="${C.statCard} min-w-[70px]">
+  <div class="${C.statValue} text-blue-600 dark:text-blue-400">${totalRecords}</div>
+  <div class="${C.statLabel}">Today</div>
+</div>
+<div class="${C.statCard} min-w-[70px]">
+  <div class="${C.statValue} text-green-600 dark:text-green-400">${inOffice}</div>
+  <div class="${C.statLabel}">In Office</div>
+</div>
+<div class="${C.statCard} min-w-[70px]">
+  <div class="${C.statValue} text-orange-600 dark:text-orange-400">${onLeave}</div>
+  <div class="${C.statLabel}">On Leave</div>
+</div>
+<div class="${C.statCard} min-w-[70px]">
+  <div class="${C.statValue} text-indigo-600 dark:text-indigo-400">${onEvent}</div>
+  <div class="${C.statLabel}">On Event</div>
+</div>
+${typeChipsHtml}
+`;
+
+container.classList.remove('hidden');
+container.classList.add('flex');
+}
+
+function renderFilterChips(data) {
+const container = document.getElementById('dash-filter-chips');
+if (!container) return;
+
+const typeCounts = {};
+data.forEach(l => {
+  if (l.Status === 'Cancelled') return;
+  const t = l.LeaveType || 'Other';
+  typeCounts[t] = (typeCounts[t] || 0) + 1;
+});
+
+const types = Object.keys(typeCounts).sort();
+const activeFilter = window._activeFilter || 'all';
+
+const chipsHtml = types.map(type => {
+  const colors = getEventTypeColor(type);
+  const isActive = activeFilter === type;
+  const chipClass = isActive ? C.filterChipActive : C.filterChipInactive;
+  return `<button class="${C.filterChip} ${chipClass}" onclick="window._activeFilter='${type}'; window.agendaDirty=true; renderDashboard();">${type} (${typeCounts[type]})</button>`;
+}).join('');
+
+const allClass = activeFilter === 'all' ? C.filterChipActive : C.filterChipInactive;
+
+container.innerHTML = `
+<button class="${C.filterChip} ${allClass}" onclick="window._activeFilter='all'; window.agendaDirty=true; renderDashboard();">
+  ${ICONS.filter} All
+</button>
+${chipsHtml}
+`;
+
+container.classList.remove('hidden');
+container.classList.add('flex');
 }
 
 function renderDashboard() {
@@ -899,6 +1068,13 @@ const fuse = new Fuse(filtered, { keys:['Name', 'LeaveType', 'Location', 'Locati
 filtered = fuse.search(q).map(res => res.item);
 }
 
+if (window._activeFilter && window._activeFilter !== 'all') {
+  filtered = filtered.filter(l => l.LeaveType === window._activeFilter);
+}
+
+renderQuickStats(allLeaves.filter(l => l.Status !== 'Cancelled'));
+renderFilterChips(filtered);
+
 window.dashFilteredLeaves = filtered;
 
 if (dashViewMode === 'agenda') {
@@ -961,10 +1137,18 @@ return false;
 
 window.myFilteredLeaves = my;
 
+const myFilteredForChips = my.filter(l => {
+  if (window._activeFilter && window._activeFilter !== 'all') {
+    return l.LeaveType === window._activeFilter;
+  }
+  return true;
+});
+renderFilterChips(my);
+
 if (dashViewMode === 'agenda') {
 renderMiniCalendar('my');
 if (window.myAgendaDirty) {
-  generateContinuousAgenda('my', my);
+  generateContinuousAgenda('my', myFilteredForChips);
   window.myAgendaDirty = false;
 }
 

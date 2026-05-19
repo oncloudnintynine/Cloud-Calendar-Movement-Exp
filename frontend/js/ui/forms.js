@@ -3,19 +3,89 @@
 // ==========================================
 
 function toggleInfoAll(forceState) {
-isInfoAll = forceState !== undefined ? forceState : !isInfoAll;['form-event-infoall-btn', 'form-combined-infoall-btn'].forEach(id => {
- const btn = document.getElementById(id);
- if(!btn) return;
- if(isInfoAll) {
-     btn.innerHTML = '📢 Info All (ON)';
-     btn.classList.add('bg-yellow-400', 'dark:bg-yellow-500', 'text-yellow-900', 'dark:text-yellow-900', 'border-yellow-500', 'dark:border-yellow-400', 'shadow-md');
-     btn.classList.remove('text-gray-500', 'dark:text-gray-400', 'border-gray-300', 'dark:border-gray-600', 'hover:bg-gray-100', 'dark:hover:bg-darkhover');
- } else {
-     btn.innerHTML = 'Info All';
-     btn.classList.remove('bg-yellow-400', 'dark:bg-yellow-500', 'text-yellow-900', 'dark:text-yellow-900', 'border-yellow-500', 'dark:border-yellow-400', 'shadow-md');
-     btn.classList.add('text-gray-500', 'dark:text-gray-400', 'border-gray-300', 'dark:border-gray-600', 'hover:bg-gray-100', 'dark:hover:bg-darkhover');
- }
+ isInfoAll = forceState !== undefined ? forceState : !isInfoAll;['form-event-infoall-btn', 'form-combined-infoall-btn'].forEach(id => {
+  const btn = document.getElementById(id);
+  if(!btn) return;
+  if(isInfoAll) {
+      btn.innerHTML = '<svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 4.741a1 1 0 01.332-.536l.042-.026a7 7 0 015.382-.652c.376.047.592.44.446.79l-.74 1.768a1 1 0 01-.832.608l-.456.056a5 5 0 00-3.858 2.382l-.18.318a1 1 0 01-.878.496H4.5a1 1 0 01-.894-1.448l1.83-3.158z"/></svg>Info All (ON)';
+      btn.classList.add('bg-yellow-400', 'dark:bg-yellow-500', 'text-yellow-900', 'dark:text-yellow-900', 'border-yellow-500', 'dark:border-yellow-400', 'shadow-md');
+      btn.classList.remove('text-gray-500', 'dark:text-gray-400', 'border-gray-300', 'dark:border-gray-600', 'hover:bg-gray-100', 'dark:hover:bg-darkhover');
+  } else {
+      btn.innerHTML = 'Info All';
+      btn.classList.remove('bg-yellow-400', 'dark:bg-yellow-500', 'text-yellow-900', 'dark:text-yellow-900', 'border-yellow-500', 'dark:border-yellow-400', 'shadow-md');
+      btn.classList.add('text-gray-500', 'dark:text-gray-400', 'border-gray-300', 'dark:border-gray-600', 'hover:bg-gray-100', 'dark:hover:bg-darkhover');
+  }
 });
+}
+
+function validateForm(ctx) {
+let isValid = true;
+let errors = [];
+
+const typeEl = document.getElementById(`form-${ctx}-type`);
+if (typeEl && !typeEl.value) {
+  errors.push('Please select an event/leave type');
+  typeEl.classList.add('input-error');
+  isValid = false;
+} else if (typeEl) {
+  typeEl.classList.remove('input-error');
+}
+
+const startBtn = document.getElementById(`btn-${ctx}-start`) || document.getElementById(`btn-${ctx}-leave-start`);
+if (!appData[ctx].startD) {
+  errors.push('Please select a start date');
+  if (startBtn) startBtn.classList.add('input-error');
+  isValid = false;
+} else if (startBtn) {
+  startBtn.classList.remove('input-error');
+}
+
+const remarksEl = document.getElementById(`form-${ctx}-remarks`);
+if (remarksEl && remarksEl.required && !remarksEl.value.trim()) {
+  errors.push('Remarks are required');
+  remarksEl.classList.add('input-error');
+  isValid = false;
+} else if (remarksEl) {
+  remarksEl.classList.remove('input-error');
+}
+
+const countryEl = document.getElementById(`form-${ctx}-country`);
+if (countryEl && countryEl.required && !countryEl.value.trim()) {
+  errors.push('Country is required');
+  countryEl.classList.add('input-error');
+  isValid = false;
+} else if (countryEl) {
+  countryEl.classList.remove('input-error');
+}
+
+if (!isValid && errors.length > 0) {
+  showFormError(ctx, errors[0]);
+} else {
+  hideFormError(ctx);
+}
+
+return isValid;
+}
+
+function showFormError(ctx, message) {
+let errorEl = document.getElementById(`form-${ctx}-error`);
+if (!errorEl) {
+  errorEl = document.createElement('div');
+  errorEl.id = `form-${ctx}-error`;
+  errorEl.className = 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm p-3 rounded-lg mb-3 flex items-center gap-2';
+  const formDiv = document.getElementById(`view-submit-${ctx}`) || document.getElementById(`view-submit-combined`);
+  if (formDiv) {
+    const form = formDiv.querySelector('form');
+    if (form) form.insertBefore(errorEl, form.firstChild);
+  }
+}
+errorEl.innerHTML = `<svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg><span>${message}</span>`;
+errorEl.classList.remove('hidden-view');
+}
+
+function hideFormError(ctx) {
+const errorEl = document.getElementById(`form-${ctx}-error`);
+if (errorEl) errorEl.classList.add('hidden-view');
 }
 
 function toggleEventAllDay() {
@@ -383,6 +453,11 @@ if(timeEnd) timeEnd.classList.remove('hidden-view');
 }
 
 async function submitForm(ctx) {
+if (!validateForm(ctx)) {
+  showLoader(false);
+  return;
+}
+
 showLoader(true);
 
 let targetName = user.name;
