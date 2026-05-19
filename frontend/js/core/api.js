@@ -2,8 +2,18 @@
 // API & Network Communication
 // ==========================================
 
-function showLoader(show) { 
-document.getElementById('loader').style.display = show ? 'flex' : 'none'; 
+function showLoader(show, progress, status) { 
+const el = document.getElementById('loader');
+el.style.display = show ? 'flex' : 'none';
+if (show) {
+  const barEl = document.getElementById('loader-bar');
+  const statusEl = document.getElementById('loader-status');
+  if (barEl) {
+    if (progress !== undefined) barEl.style.width = progress + '%';
+    barEl.classList.remove('error');
+  }
+  if (status && statusEl) statusEl.innerText = status;
+}
 }
 
 function alertError(id, msg) {

@@ -73,7 +73,7 @@ initDates();
 });
 
 async function showApp() {
-showLoader(true);
+showLoader(true, 15, 'Connecting to server...');
 document.getElementById('login-view').classList.add('hidden-view');
 document.getElementById('app-view').classList.remove('hidden-view');
 document.getElementById('logout-btn').classList.remove('hidden');
@@ -89,13 +89,15 @@ if (cachedData) {
   try {
     const parsed = JSON.parse(cachedData);
     applyInitialData(parsed.settings, parsed.leaves);
-    showLoader(false);
+    showLoader(true, 50, 'Updating from server...');
   } catch(e) {}
 }
 
 try {
+  showLoader(true, 25, 'Fetching your data...');
   const initialData = await apiCall('getInitialData', { adminPass: user.role === 'admin' ? user.pass : null });
   
+  showLoader(true, 65, 'Preparing dashboard...');
   applyInitialData(initialData.settings, initialData.leaves);
   sessionStorage.setItem('initialData', JSON.stringify(initialData));
   
@@ -103,16 +105,31 @@ try {
     const warnEl = document.getElementById('cache-warning');
     if (warnEl) warnEl.classList.add('hidden');
   }
+
+  showLoader(true, 80, 'Almost ready...');
+  const allUnitsForIndex = new Set(companyStructure);
+  const uniqueDeptsForIndex = Array.from(allUnitsForIndex).sort((a, b) => {
+    if (a.toUpperCase() === 'HQ') return -1;
+    if (b.toUpperCase() === 'HQ') return 1;
+    return a.localeCompare(b);
+  });
+  buildAttendeeSearchIndex(uniqueDeptsForIndex);
+  renderTabIfActive('dashboard');
+  renderTabIfActive('my-leaves');
   showLoader(false);
 
 } catch(e) {
   console.error("Error loading settings: ", e);
   if (!cachedData) {
+    const barEl = document.getElementById('loader-bar');
+    if (barEl) barEl.classList.add('error');
+    showLoader(true, 100, 'Failed to load. Please try again.');
+    setTimeout(() => showLoader(false), 3000);
     alertError('login-alert', 'Error initializing app.');
-    showLoader(false);
   } else {
     const warnEl = document.getElementById('cache-warning');
     if (warnEl) warnEl.classList.remove('hidden');
+    showLoader(false);
   }
 }
 }
@@ -205,16 +222,6 @@ const activeTab = user.role === 'admin' ? 'admin' : mOrder[0];
 switchTab(activeTab);
 
 window._pendingTabRenders = new Set(['dashboard', 'my-leaves']);
-
-requestIdleCallback ? requestIdleCallback(() => {
-buildAttendeeSearchIndex(uniqueDepts);
-renderTabIfActive('dashboard');
-renderTabIfActive('my-leaves');
-}) : setTimeout(() => {
-buildAttendeeSearchIndex(uniqueDepts);
-renderTabIfActive('dashboard');
-renderTabIfActive('my-leaves');
-}, 0);
 }
 
 if ('serviceWorker' in navigator) {

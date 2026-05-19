@@ -36,7 +36,10 @@ extend: {
 <body class="bg-gray-50 text-gray-900 dark:bg-darkbase dark:text-darktext transition-colors duration-200 h-[100dvh] flex flex-col text-[15px] overflow-hidden">
 
 <div id="loader" class="fixed inset-0 bg-white dark:bg-darkbase z-[100] flex-col items-center justify-center hidden">
-<div class="spinner mb-3"></div><p class="font-medium text-lg">Processing...</p>
+<div class="spinner mb-3"></div><p id="loader-status" class="font-medium text-lg mb-2">Loading...</p>
+<div class="w-64 bg-gray-200 dark:bg-darkborder rounded-full h-1.5 overflow-hidden">
+  <div id="loader-bar" class="bg-blue-600 h-1.5 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+</div>
 </div>
 
 <div id="dev-banner" class="bg-red-600 text-white text-center py-1 text-xs font-bold tracking-widest hidden z-50 relative">DEV MODE</div>

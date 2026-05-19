@@ -66,15 +66,15 @@ async function handleLogin() {
 const pass = document.getElementById('login-pass').value;
 if (!pass) return alertError('login-alert', 'Please enter your password');
 
-showLoader(true);
+showLoader(true, 10, 'Verifying credentials...');
 try {
- user = await apiCall('login', { password: pass });
- localStorage.setItem('user', JSON.stringify(user));
- document.getElementById('login-pass').value = '';
- showApp(); 
+  user = await apiCall('login', { password: pass });
+  localStorage.setItem('user', JSON.stringify(user));
+  document.getElementById('login-pass').value = '';
+  showApp(); 
 } catch (err) { 
- alertError('login-alert', err.message); 
- showLoader(false); 
+  alertError('login-alert', err.message); 
+  showLoader(false); 
 }
 }
 
