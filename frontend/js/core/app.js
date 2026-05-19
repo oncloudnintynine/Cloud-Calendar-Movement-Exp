@@ -80,14 +80,41 @@ document.getElementById('logout-btn').classList.remove('hidden');
 document.getElementById('menu-btn').classList.remove('hidden');
 document.getElementById('active-tab-title').classList.remove('hidden');
 
-user.departments = user.departments ||[]; // Safety fallback for Admins
+user.departments = user.departments ||[];
 
 document.getElementById('nav-user-name').innerText = user.role === 'admin' ? "Administrator" : (user.departments.length ? `${user.name}` : user.name);
 
+const cachedData = sessionStorage.getItem('initialData');
+if (cachedData) {
+try {
+  const parsed = JSON.parse(cachedData);
+  applyInitialData(parsed.settings, parsed.leaves);
+  showLoader(false);
+} catch(e) {}
+}
+
 try {
 const initialData = await apiCall('getInitialData', { adminPass: user.role === 'admin' ? user.pass : null });
-const settings = initialData.settings;
-allLeaves = initialData.leaves;
+sessionStorage.setItem('initialData', JSON.stringify(initialData));
+
+if (!cachedData) {
+  applyInitialData(initialData.settings, initialData.leaves);
+  showLoader(false);
+} else {
+  applyInitialData(initialData.settings, initialData.leaves);
+}
+
+} catch(e) {
+console.error("Error loading settings: ", e);
+if (!cachedData) {
+  alertError('login-alert', 'Error initializing app.');
+  showLoader(false);
+}
+}
+}
+
+function applyInitialData(settings, leaves) {
+allLeaves = leaves;
 
 window.appTypicalEventTypes = settings.typicalEventTypes ||[];
 window.appAcronyms = settings.acronyms || {};
@@ -170,23 +197,20 @@ document.getElementById('admin-behalf-combined').classList.add('hidden-view');
 
 if (typeof toggleCombinedFields === 'function') toggleCombinedFields();
 
-switchTab(user.role === 'admin' ? 'admin' : mOrder[0]);
+const activeTab = user.role === 'admin' ? 'admin' : mOrder[0];
+switchTab(activeTab);
+
+window._pendingTabRenders = new Set(['dashboard', 'my-leaves']);
 
 requestIdleCallback ? requestIdleCallback(() => {
 buildAttendeeSearchIndex(uniqueDepts);
-renderDashboard();
-renderMyLeaves();
+renderTabIfActive('dashboard');
+renderTabIfActive('my-leaves');
 }) : setTimeout(() => {
 buildAttendeeSearchIndex(uniqueDepts);
-renderDashboard();
-renderMyLeaves();
+renderTabIfActive('dashboard');
+renderTabIfActive('my-leaves');
 }, 0);
-
-} catch(e) {
-console.error("Error loading settings: ", e);
-alertError('login-alert', 'Error initializing app.');
-}
-showLoader(false);
 }
 
 if ('serviceWorker' in navigator) {

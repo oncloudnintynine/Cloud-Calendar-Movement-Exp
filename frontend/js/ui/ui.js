@@ -91,6 +91,7 @@ if (tabId === 'dashboard' || tabId === 'my-leaves') {
 
 if (tabId === 'parade-state' && typeof renderParadeState === 'function') renderParadeState();
 if (tabId === 'admin-structure' && typeof renderStructureUI === 'function') renderStructureUI();
+if ((tabId === 'dashboard' || tabId === 'my-leaves') && typeof renderTabIfActive === 'function') renderTabIfActive(tabId);
 }
 
 function toggleTheme() {

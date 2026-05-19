@@ -126,8 +126,7 @@ var secureActions =['getSettings', 'saveSettings', 'submitLeave', 'editLeave', '
 if (secureActions.indexOf(action) !== -1) {
 if (!credentials.pass && !data.adminPass) throw new Error("Unauthorized: Missing credentials");
 
-var checkPass = data.adminPass || credentials.pass;
-var verifiedUser = handleLogin({ password: checkPass });
+var verifiedUser = verifyAuth(credentials, data);
 
 if (verifiedUser.role !== 'admin' && String(verifiedUser.phone) !== String(credentials.phone)) {
   throw new Error("Unauthorized: Invalid credentials");

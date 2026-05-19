@@ -112,4 +112,4 @@ try {
 } catch(e) { alertError(context === 'admin' ? 'admin-alert' : 'register-alert', e.message); } finally { showLoader(false); }
 }
 
-function logout() { localStorage.removeItem('user'); user = null; showLogin(); }
+function logout() { localStorage.removeItem('user'); sessionStorage.removeItem('initialData'); user = null; showLogin(); }

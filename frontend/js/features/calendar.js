@@ -6,6 +6,20 @@ window.agendaDirty = true;
 window.myAgendaDirty = true;
 window.isProgrammaticScroll = false;
 window.progScrollTimeout = null;
+window._tabsRendered = { dashboard: false, myLeaves: false };
+
+window.renderTabIfActive = function(tabId) {
+if (tabId === 'dashboard' && !window._tabsRendered.dashboard) {
+  renderDashboard();
+  window._tabsRendered.dashboard = true;
+  if (window._pendingTabRenders) window._pendingTabRenders.delete('dashboard');
+}
+if (tabId === 'my-leaves' && !window._tabsRendered.myLeaves) {
+  renderMyLeaves();
+  window._tabsRendered.myLeaves = true;
+  if (window._pendingTabRenders) window._pendingTabRenders.delete('my-leaves');
+}
+};
 
 window.isAgendaCollapsed = { dash: false, my: false };
 
@@ -138,8 +152,14 @@ allLeaves = await apiCall('getLeaves');
 window.agendaDirty = true;
 window.myAgendaDirty = true;
 
-renderDashboard(); 
-renderMyLeaves(); 
+try {
+  const cached = JSON.parse(sessionStorage.getItem('initialData') || '{}');
+  cached.leaves = allLeaves;
+  sessionStorage.setItem('initialData', JSON.stringify(cached));
+} catch(e) {}
+
+if (window._tabsRendered.dashboard) renderDashboard();
+if (window._tabsRendered.myLeaves) renderMyLeaves();
 
 const paradeView = document.getElementById('view-parade-state');
 if(paradeView && !paradeView.classList.contains('hidden-view') && typeof renderParadeState === 'function') {
@@ -807,6 +827,7 @@ return group;
 }
 
 function renderDashboard() {
+window._tabsRendered.dashboard = true;
 const searchEl = document.getElementById('dash-search');
 const q = searchEl ? searchEl.value.toLowerCase() : '';
 const deptNav = document.getElementById('dash-dept-nav');
@@ -911,6 +932,7 @@ if (monthGridEl) monthGridEl.innerHTML = buildFullMonthGrid(dashMonth, filtered,
 }
 
 function renderMyLeaves() {
+window._tabsRendered.myLeaves = true;
 const my = allLeaves.filter(l => {
 if (l.Status === 'Cancelled') return false;
 if (String(l.InfoAll).toUpperCase() === 'TRUE') return true;

@@ -2,11 +2,18 @@
 // Auth.js - Login & People API Logic
 // ==========================================
 
+var _execCgCache = null;
+
 function getContactsAndGroups() {
+if (_execCgCache) return _execCgCache;
+
 var cache = CacheService.getScriptCache();
 var cached = cache.get("contacts_groups");
 if (cached) {
-  try { return JSON.parse(cached); } catch(e) {}
+  try { 
+    _execCgCache = JSON.parse(cached);
+    return _execCgCache; 
+  } catch(e) {}
 }
 
 var groupMap = {};
@@ -31,6 +38,7 @@ do {
 } while (pageToken);
 
 var result = { groupMap: groupMap, connections: connections };
+_execCgCache = result;
 try {
   cache.put("contacts_groups", JSON.stringify(result), 1800); 
 } catch(e) {}
@@ -39,6 +47,7 @@ return result;
 }
 
 function invalidateContactsCache() {
+_execCgCache = null;
 CacheService.getScriptCache().remove("contacts_groups");
 }
 
@@ -46,6 +55,26 @@ function cleanName(name) {
 // FIX: Specifically target the exact Cloud Group suffix to prevent stripping legitimate brackets,
 // and ensures it successfully strips the string even if Google pushed it into the Last Name field.
 return name ? name.replace(/\s*\(Cloud Group\s*:\s*.*?\)\s*/gi, '').trim() : "";
+}
+
+function verifyAuth(credentials, data) {
+var checkPass = data.adminPass || credentials.pass;
+if (!checkPass) throw new Error("Unauthorized: Missing credentials");
+
+var props = PropertiesService.getScriptProperties();
+
+if (checkPass === (props.getProperty('adminPassword') || 'P@ssw0rd')) {
+  return { role: 'admin', phone: 'admin', name: 'Administrator' };
+}
+
+var keyword = props.getProperty('userKeyword') || 'peace';
+if (checkPass.endsWith(keyword)) {
+  var phone = checkPass.slice(0, -keyword.length).replace(/\D/g, '').slice(-8);
+  if (phone.length !== 8) throw new Error("Invalid password format.");
+  return { role: 'user', phone: phone };
+}
+
+throw new Error("Unauthorized: Invalid credentials");
 }
 
 function handleLogin(data) {
