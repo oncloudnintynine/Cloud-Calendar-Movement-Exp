@@ -119,7 +119,7 @@ function buildTreeHtml(node, depth) {
                    
                    ${!isGrandChild ? `
                    <div class="flex space-x-2 mt-2">
-                       <input type="text" id="new-child-${fullPath}" placeholder="Add Sub-Unit to ${k}..." class="w-full border border-gray-300 dark:border-gray-600 rounded p-1.5 text-xs bg-white dark:bg-black text-gray-900 dark:text-white uppercase outline-none focus:border-blue-500 transition">
+                        <input type="text" id="new-child-${fullPath}" placeholder="Add Sub-Unit to ${k}..." class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 text-xs bg-white dark:bg-black text-gray-900 dark:text-white uppercase outline-none focus:border-blue-500 transition">
                        <button onclick="addChildUnit('${fullPath}')" class="bg-gray-600 hover:bg-gray-700 text-white text-xs font-bold px-3 rounded transition">Add</button>
                    </div>` : ''}
                </div>
@@ -145,7 +145,7 @@ rightContainer.innerHTML = `
 function renderCards(contacts, showCross, currentUnit) {
 if (!contacts) return '';
 return contacts.map(c => `
-   <div onclick="openReassignModal('${c.resourceName}', '${c.name.replace(/'/g, "\\'")}', '${c.phone}', '${currentUnit}')" class="relative bg-white dark:bg-darkinput p-2 rounded shadow-sm border border-gray-200 dark:border-darkborder text-xs flex flex-col cursor-pointer transition-colors hover:border-blue-400 dark:hover:border-blue-600">
+    <div onclick="openReassignModal('${c.resourceName}', '${c.name.replace(/'/g, "\\'")}', '${c.phone}', '${currentUnit}')" class="relative bg-white dark:bg-darkinput p-2 rounded-lg shadow-sm border border-gray-200 dark:border-darkborder text-xs flex flex-col cursor-pointer transition-colors hover:border-blue-400 dark:hover:border-blue-600">
      <span class="font-bold text-gray-800 dark:text-gray-100 pr-4 truncate">${c.name}</span>
      <span class="text-[10px] text-gray-500 dark:text-darkmuted mt-0.5">${c.phone}</span>
      ${showCross ? `

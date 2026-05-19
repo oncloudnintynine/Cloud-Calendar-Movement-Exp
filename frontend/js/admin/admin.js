@@ -108,7 +108,7 @@ function renderMenuOrder() {
 const list = document.getElementById('menu-order-list');
 if(!list) return;
 list.innerHTML = tempMenuOrder.map((id) => `
-<div data-id="${id}" class="flex justify-between items-center bg-white dark:bg-darksurface p-3 rounded-lg border border-gray-300 dark:border-darkborder shadow-sm cursor-grab">
+<div data-id="${id}" class="${C.listItem} cursor-grab">
 <div class="flex items-center space-x-3 w-full">
  <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted handle cursor-grab" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>
  <span class="font-bold text-gray-700 dark:text-darktext">${TAB_NAMES[id] || id}</span>
@@ -132,7 +132,7 @@ const isFixed = FIXED_TYPICAL_EVENTS.includes(safeName);
 
 let locHtml = '<div class="flex-grow"></div>';
 if (safeName === 'Meeting') {
- locHtml = `<input type="text" value="${t.defaultLoc || ''}" onchange="updateTypicalEventType(${i}, 'defaultLoc', this.value)" placeholder="Default Location" class="flex-grow min-w-[100px] border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-2 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none focus:border-blue-500 transition text-sm">`;
+ locHtml = `<input type="text" value="${t.defaultLoc || ''}" onchange="updateTypicalEventType(${i}, 'defaultLoc', this.value)" placeholder="Default Location" class="flex-grow min-w-[100px] ${C.inputSm} focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none focus:border-blue-500 transition text-sm">`;
 }
 
 let removeBtnHtml = '<div class="w-6 shrink-0 ml-auto hidden sm:block"></div>';
@@ -141,15 +141,15 @@ if (!isFixed) {
 }
 
 html += `
-<div data-idx="${i}" class="flex flex-col sm:flex-row items-start sm:items-center gap-2 bg-white dark:bg-darksurface p-3 rounded-xl border border-gray-300 dark:border-darkborder shadow-sm ${!isFixed ? 'cursor-grab' : ''}">
+<div data-idx="${i}" class="${C.card} p-3 ${!isFixed ? 'cursor-grab' : ''}">
 <div class="flex items-center w-full sm:w-auto gap-2">
  <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted shrink-0 ${!isFixed ? 'handle-event-type cursor-grab' : 'hidden'}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>
  ${isFixed ? `<div class="w-2 sm:w-0 shrink-0"></div>` : ''}
- <input type="text" value="${safeName}" onchange="updateTypicalEventType(${i}, 'name', this.value)" class="flex-grow sm:w-32 border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-2 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none focus:border-blue-500 transition text-sm font-semibold" ${isFixed ? 'disabled' : ''}>
+ <input type="text" value="${safeName}" onchange="updateTypicalEventType(${i}, 'name', this.value)" class="flex-grow sm:w-32 ${C.inputSm} focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none focus:border-blue-500 transition text-sm font-semibold" ${isFixed ? 'disabled' : ''}>
 </div>
 
 <div class="flex items-center w-full sm:w-auto gap-2 flex-grow">
- <select onchange="updateTypicalEventType(${i}, 'isEvent', this.value === 'true')" class="flex-grow sm:flex-grow-0 border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-2 bg-gray-50 dark:bg-[#1a1a1a] text-gray-900 dark:text-white outline-none focus:border-blue-500 text-sm cursor-pointer shrink-0">
+ <select onchange="updateTypicalEventType(${i}, 'isEvent', this.value === 'true')" class="flex-grow sm:flex-grow-0 ${C.inputSm} text-gray-900 dark:text-white outline-none focus:border-blue-500 text-sm cursor-pointer shrink-0">
     <option value="true" ${t.isEvent ? 'selected' : ''}>Time-Bound</option>
     <option value="false" ${!t.isEvent ? 'selected' : ''}>All/Half-Day</option>
  </select>
@@ -215,7 +215,7 @@ let html = '';
 for (let key in tempAcronyms) {
 const acr = tempAcronyms[key];
 html += `
-<div class="flex items-center space-x-2 bg-white dark:bg-darksurface p-2 rounded-lg border border-gray-300 dark:border-darkborder shadow-sm mb-2">
+<div class="${C.listItem} mb-2">
 <span class="font-bold w-1/4 text-sm text-yellow-700 dark:text-yellow-500 truncate" title="${key}">${key}</span>
 <span class="text-gray-400 dark:text-darkmuted w-4 text-center shrink-0">➔</span>
 <span class="flex-grow w-1/2 text-sm text-gray-800 dark:text-gray-200 truncate" title="${acr.full}">${acr.full}</span>
@@ -318,7 +318,7 @@ html += `<div class="mb-4"><h4 class="font-bold text-lg text-gray-800 dark:text-
 if (grouped[parent]['_direct']) {
  html += `<div class="space-y-1">`;
  grouped[parent]['_direct'].forEach(k => {
-     html += `<div class="flex justify-between items-center bg-white dark:bg-darksurface p-2 rounded-lg border border-gray-300 dark:border-darkborder shadow-sm pl-4"><span class="font-medium">${k.name} <span class="text-xs text-gray-500 ml-1">(${k.dept})</span></span><button onclick="removeKAH('${k.phone}')" class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 p-1.5 rounded-lg font-bold px-3 transition">&times;</button></div>`;
+     html += `<div class="${C.listItem} pl-4"><span class="font-medium">${k.name} <span class="text-xs text-gray-500 ml-1">(${k.dept})</span></span><button onclick="removeKAH('${k.phone}')" class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 p-1.5 rounded-lg font-bold px-3 transition">&times;</button></div>`;
  });
  html += `</div>`;
 }
@@ -327,7 +327,7 @@ for (const child in grouped[parent]) {
 if (child !== '_direct') {
  html += `<h5 class="font-semibold text-sm text-gray-600 dark:text-gray-400 mt-2 mb-1 pl-2 border-l-2 border-blue-400">${child}</h5><div class="space-y-1">`;
  grouped[parent][child].forEach(k => {
-     html += `<div class="flex justify-between items-center bg-white dark:bg-darksurface p-2 rounded-lg border border-gray-300 dark:border-darkborder shadow-sm pl-4"><span class="font-medium">${k.name} <span class="text-xs text-gray-500 ml-1">(${k.dept})</span></span><button onclick="removeKAH('${k.phone}')" class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 p-1.5 rounded-lg font-bold px-3 transition">&times;</button></div>`;
+     html += `<div class="${C.listItem} pl-4"><span class="font-medium">${k.name} <span class="text-xs text-gray-500 ml-1">(${k.dept})</span></span><button onclick="removeKAH('${k.phone}')" class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 p-1.5 rounded-lg font-bold px-3 transition">&times;</button></div>`;
  });
  html += `</div>`;
 }
@@ -341,7 +341,7 @@ function renderCustomKahGroups() {
 const container = document.getElementById('custom-kah-groups-list');
 if (!container) return;
 container.innerHTML = customKahGroups.map((g, i) => `
-<div class="border border-gray-300 dark:border-darkborder rounded-xl p-3 bg-gray-50 dark:bg-darkinput shadow-sm">
+<div class="${C.card} p-3 bg-gray-50 dark:bg-darkinput shadow-sm">
 <div class="flex justify-between items-center mb-2 border-b border-gray-300 dark:border-darkborder pb-1.5">
   <span class="font-bold text-blue-700 dark:text-blue-400 text-base">zz KAH: ${g.name}</span>
   <button onclick="removeCustomKahGroup(${i})" class="text-red-500 hover:text-red-700 text-xs font-bold transition">Delete Group</button>
@@ -351,13 +351,13 @@ container.innerHTML = customKahGroups.map((g, i) => `
      const contact = companyContacts.find(c => String(c.phone) === String(phone));
      const name = contact ? contact.name : phone;
      const dept = contact ? contact.dept : '';
-     return `<div class="flex justify-between items-center bg-white dark:bg-darksurface p-2 rounded-lg border border-gray-300 dark:border-darkborder shadow-sm text-sm"><span class="font-medium truncate">${name} <span class="text-xs text-gray-500 font-normal ml-1">(${dept})</span></span> <button onclick="removeKahGroupMember(${i}, '${phone}')" class="text-red-500 font-bold px-2">&times;</button></div>`;
+      return `<div class="${C.listItem} text-sm"><span class="font-medium truncate">${name} <span class="text-xs text-gray-500 font-normal ml-1">(${dept})</span></span> <button onclick="removeKahGroupMember(${i}, '${phone}')" class="text-red-500 font-bold px-2">&times;</button></div>`;
   }).join('')}
   ${g.members.length === 0 ? '<p class="text-xs text-gray-500 dark:text-darkmuted italic text-center py-1">No members added yet.</p>' : ''}
 </div>
 <div class="relative">
-  <input type="text" id="kah-group-search-${i}" placeholder="Add personnel to group..." class="w-full text-sm py-1.5 px-3 border-2 border-gray-300 dark:border-gray-500 rounded-lg outline-none shadow-sm focus:border-blue-500 bg-white dark:bg-black text-gray-900 dark:text-white transition" autocomplete="off" onkeyup="searchKahGroupMember(${i})">
-  <div id="kah-group-results-${i}" class="absolute z-40 w-full bg-white dark:bg-darksurface border-x border-b border-gray-300 dark:border-darkborder rounded-b-lg shadow-xl max-h-32 overflow-y-auto hidden-view"></div>
+   <input type="text" id="kah-group-search-${i}" placeholder="Add personnel to group..." class="w-full text-sm py-1.5 px-3 ${C.inputSm} focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white transition" autocomplete="off" onkeyup="searchKahGroupMember(${i})">
+   <div id="kah-group-results-${i}" class="${C.dropdown}"></div>
 </div>
 </div>
 `).join('');

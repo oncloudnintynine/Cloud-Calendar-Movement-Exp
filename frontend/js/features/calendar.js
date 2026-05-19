@@ -549,11 +549,11 @@ timeStr = `${formatDisplayDate(new Date(l.StartDate))} to ${formatDisplayDate(ne
 let actionBtns = '';
 let compactActionBtns = '';
 if ((String(l.Phone) === String(user.phone) || user.role === 'admin') && l.Status !== 'Cancelled') {
-actionBtns = `<div class="flex space-x-3 mt-3 pt-3 border-t border-gray-200 dark:border-darkborder"><button onclick="triggerEdit('${l.ID}')" class="font-bold bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 px-4 py-1.5 rounded-lg transition">Edit</button><button onclick="cancelLeave('${l.ID}', '${l.Phone}')" class="font-bold bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 px-4 py-1.5 rounded-lg transition">Cancel</button></div>`;
+actionBtns = `<div class="flex space-x-3 mt-3 pt-3 border-t border-gray-200 dark:border-darkborder"><button onclick="triggerEdit('${l.ID}')" class="${C.btnEdit}">Edit</button><button onclick="cancelLeave('${l.ID}', '${l.Phone}')" class="${C.btnCancel}">Cancel</button></div>`;
 
 compactActionBtns = `<div class="flex space-x-2 mt-2 pt-2 border-t border-blue-200 dark:border-blue-800/50">
- <button onclick="triggerEdit('${l.ID}')" class="font-bold bg-blue-200/50 dark:bg-blue-800/40 hover:bg-blue-300/50 dark:hover:bg-blue-800/60 text-blue-800 dark:text-blue-300 border border-blue-300 dark:border-blue-700 px-3 py-1 rounded-md transition text-xs">Edit</button>
- <button onclick="cancelLeave('${l.ID}', '${l.Phone}')" class="font-bold bg-red-100/80 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 px-3 py-1 rounded-md transition text-xs">Cancel</button>
+ <button onclick="triggerEdit('${l.ID}')" class="${C.btnEditSm}">Edit</button>
+ <button onclick="cancelLeave('${l.ID}', '${l.Phone}')" class="${C.btnCancelSm}">Cancel</button>
 </div>`;
 }
 
@@ -643,7 +643,7 @@ const finalDetailsHtml = detailsRaw ? parseAndCleanTemplate(detailsRaw, tplVars)
 const hasBody = finalDetailsHtml.trim() !== '' || (isInfoAllContext ? compactActionBtns !== '' : actionBtns !== '');
 
 if (isInfoAllContext) {
-return `<div class="p-2.5 rounded-lg border border-blue-200 dark:border-blue-800/60 bg-white/60 dark:bg-black/20 flex flex-col">
+return `<div class="${C.agendaCardInfoAll}">
   <div class="flex justify-between items-start ${hasBody ? 'cursor-pointer select-none' : ''}" ${hasBody ? 'onclick="toggleAgendaCard(this)"' : ''}>
     <h3 class="font-bold text-[11px] md:text-xs text-blue-900 dark:text-blue-300 flex-grow pr-2">${finalTitle}</h3>
     ${hasBody ? `<svg class="w-4 h-4 text-blue-500 transition-transform duration-200 chevron-icon shrink-0 ${isCollapsed ? '' : 'rotate-180'}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>` : ''}
@@ -656,7 +656,7 @@ return `<div class="p-2.5 rounded-lg border border-blue-200 dark:border-blue-800
 </div>`;
 }
 
-return `<div class="border border-gray-300 dark:border-darkborder p-3 md:p-4 rounded-xl shadow-sm bg-white dark:bg-darksurface flex flex-col transition hover:border-blue-300 dark:hover:border-blue-700">
+return `<div class="${C.agendaCard}">
 <div class="flex justify-between items-start ${hasBody ? 'cursor-pointer select-none' : ''}" ${hasBody ? 'onclick="toggleAgendaCard(this)"' : ''}>
 <div class="flex-grow pr-2">
 <h3 class="font-bold text-sm md:text-base text-gray-900 dark:text-gray-100 leading-tight">${finalTitle}</h3>
@@ -724,7 +724,7 @@ for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
      
      html += `
      <div class="agenda-day-group mb-6" data-date="${yyyy}-${mm}-${dd}">
-         <div class="sticky top-0 bg-gray-50 dark:bg-[#1a1a1a] z-10 py-1.5 border-y border-gray-200 dark:border-darkborder mb-3 shadow-sm px-2 rounded-lg">
+         <div class="${C.sectionHeader} mb-3">
              <h3 class="font-bold text-sm md:text-base text-blue-700 dark:text-blue-400">${formatDisplayDate(d)}</h3>
          </div>
          <div class="space-y-3 px-1">
@@ -756,7 +756,7 @@ if (!group) {
  group.className = 'agenda-day-group mb-6';
  group.dataset.date = dateStr;
  group.innerHTML = `
-     <div class="sticky top-0 bg-gray-50 dark:bg-[#1a1a1a] z-10 py-1.5 border-y border-gray-200 dark:border-darkborder mb-3 shadow-sm px-2 rounded-lg">
+     <div class="sticky top-0 bg-gray-50 dark:bg-darkinput z-10 py-1.5 border-y border-gray-200 dark:border-darkborder mb-3 shadow-sm px-2 rounded-lg">
          <h3 class="font-bold text-sm md:text-base text-blue-700 dark:text-blue-400">${formatDisplayDate(targetDateObj)}</h3>
      </div>
      <div class="space-y-3 px-1">

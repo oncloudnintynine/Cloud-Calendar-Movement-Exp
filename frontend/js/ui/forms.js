@@ -200,8 +200,8 @@ renderAttendees(ctx);
 function renderAttendees(ctx) {
 const c = document.getElementById(`${ctx}-attendees-chip-container`);
 if(c) {
-c.innerHTML = eventAttendees.map(a => `
- <div class="inline-flex items-center bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-300 rounded-lg px-2 py-1 text-sm font-semibold shadow-sm">
+ c.innerHTML = eventAttendees.map(a => `
+ <div class="${C.chip}">
    ${a.name}
    <button type="button" onclick="removeAttendee('${ctx}', '${a.id}')" class="ml-2 text-blue-600 dark:text-blue-400 hover:text-red-500 focus:outline-none">&times;</button>
  </div>

@@ -111,10 +111,10 @@ extend: {
  <div id="login-alert" class="hidden bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 text-sm p-3 rounded-xl mb-4 text-center"></div>
  <div class="mb-6 relative">
    <label class="block font-medium mb-2">Password</label>
-   <input type="password" id="login-pass" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-xl py-3 px-4 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800/50 pr-12 transition">
+    <input type="password" id="login-pass" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800/50 pr-12 transition">
    <button onclick="togglePassword('login-pass', this)" class="absolute right-3 top-9 text-gray-500 dark:text-darkmuted p-1"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg></button>
  </div>
- <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition text-lg">Login</button>
+  <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-lg shadow-md transition text-base">Login</button>
  <div class="mt-5 text-center">
    <button onclick="toggleRegisterView(true)" class="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline">New user? Register here</button>
  </div>
@@ -125,12 +125,12 @@ extend: {
  <p class="text-center text-sm text-gray-500 dark:text-darkmuted mb-4">Create your account</p>
  <div id="register-alert" class="hidden bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 text-sm p-3 rounded-xl mb-4 text-center"></div>
  <div class="space-y-3 mb-6">
-   <div><label class="block font-medium mb-1 text-sm">Full Name</label><input type="text" id="reg-name" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-xl py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"></div>
-   <div><label class="block font-medium mb-1 text-sm">Mobile No</label><input type="tel" id="reg-mobile" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-xl py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"></div>
-   <div><label class="block font-medium mb-1 text-sm">Unit</label><select id="reg-unit" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-xl py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition cursor-pointer"><option value="" disabled selected>Select...</option></select></div>
-   <div><label class="block font-medium mb-1 text-sm">Birthday</label><button type="button" id="btn-register-birthday" onclick="openPicker('date', 'register', 'birthday')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-xl py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-gray-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select...</button></div>
+    <div><label class="block font-medium mb-1 text-sm">Full Name</label><input type="text" id="reg-name" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"></div>
+    <div><label class="block font-medium mb-1 text-sm">Mobile No</label><input type="tel" id="reg-mobile" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"></div>
+    <div><label class="block font-medium mb-1 text-sm">Unit</label><select id="reg-unit" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition cursor-pointer"><option value="" disabled selected>Select...</option></select></div>
+    <div><label class="block font-medium mb-1 text-sm">Birthday</label><button type="button" id="btn-register-birthday" onclick="openPicker('date', 'register', 'birthday')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-gray-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select...</button></div>
  </div>
- <button onclick="handleRegister('self')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition text-lg mb-3">Register</button>
+  <button onclick="handleRegister('self')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-lg shadow-md transition text-base mb-3">Register</button>
  <button onclick="toggleRegisterView(false)" class="w-full bg-gray-200 dark:bg-darkborder hover:bg-gray-300 dark:hover:bg-gray-600 font-bold py-2 px-4 rounded-xl shadow-sm transition border border-gray-300 dark:border-gray-600">Back to Login</button>
 </div>
 </div>
@@ -143,9 +143,9 @@ extend: {
 <div class="flex flex-row items-center space-x-2 w-full shrink-0 overflow-x-auto pb-1 scrollbar-hide">
  <input type="text" id="dash-search" placeholder="Search..." class="flex-grow min-w-[120px] border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-white dark:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800/50 transition text-sm" onkeyup="window.agendaDirty=true; renderDashboard();">
  
- <button id="unified-btn-combined" onclick="switchTab('submit-combined')" class="hidden bg-blue-50 dark:bg-[#1a1a1a] border-2 border-blue-300 dark:border-gray-500 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-black font-bold py-1.5 px-3 rounded-lg shadow-sm transition text-xs shrink-0 whitespace-nowrap">Add Event / Leave</button>
- <button id="unified-btn-leave" onclick="switchTab('submit-leave')" class="hidden bg-blue-50 dark:bg-[#1a1a1a] border-2 border-blue-300 dark:border-gray-500 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-black font-bold py-1.5 px-3 rounded-lg shadow-sm transition text-xs shrink-0 whitespace-nowrap">Add Leave/MC</button>
- <button id="unified-btn-event" onclick="switchTab('submit-event')" class="hidden bg-blue-50 dark:bg-[#1a1a1a] border-2 border-blue-300 dark:border-gray-500 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-black font-bold py-1.5 px-3 rounded-lg shadow-sm transition text-xs shrink-0 whitespace-nowrap">Add Event</button>
+ <button id="unified-btn-combined" onclick="switchTab('submit-combined')" class="hidden bg-blue-50 dark:bg-darkinput border-2 border-blue-300 dark:border-gray-500 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-black font-bold py-1.5 px-3 rounded-lg shadow-sm transition text-xs shrink-0 whitespace-nowrap">Add Event / Leave</button>
+ <button id="unified-btn-leave" onclick="switchTab('submit-leave')" class="hidden bg-blue-50 dark:bg-darkinput border-2 border-blue-300 dark:border-gray-500 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-black font-bold py-1.5 px-3 rounded-lg shadow-sm transition text-xs shrink-0 whitespace-nowrap">Add Leave/MC</button>
+ <button id="unified-btn-event" onclick="switchTab('submit-event')" class="hidden bg-blue-50 dark:bg-darkinput border-2 border-blue-300 dark:border-gray-500 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-black font-bold py-1.5 px-3 rounded-lg shadow-sm transition text-xs shrink-0 whitespace-nowrap">Add Event</button>
 </div>
 
 <div id="dash-agenda-wrapper" class="flex flex-col gap-3 flex-grow overflow-hidden">
@@ -176,9 +176,9 @@ extend: {
 
 <div id="dash-month-wrapper" class="hidden-view flex-grow flex-col overflow-hidden bg-white dark:bg-darksurface rounded-xl shadow-sm border border-gray-200 dark:border-darkborder p-2">
    <div class="flex justify-between items-center mb-2 shrink-0 px-1">
-     <button onclick="changeMonth('dash', -1)" class="p-1.5 hover:bg-gray-100 dark:hover:bg-darkhover rounded-lg font-bold transition text-sm border border-transparent dark:border-darkborder">◀ Prev</button>
+     <button onclick="changeMonth('dash', -1)" class="p-1.5 hover:bg-gray-100 dark:hover:bg-darkhover rounded-lg font-bold transition text-sm border-transparent dark:border-darkborder">◀ Prev</button>
      <div id="dash-month-title" class="font-bold text-lg"></div>
-     <button onclick="changeMonth('dash', 1)" class="p-1.5 hover:bg-gray-100 dark:hover:bg-darkhover rounded-lg font-bold transition text-sm border border-transparent dark:border-darkborder">Next ▶</button>
+     <button onclick="changeMonth('dash', 1)" class="p-1.5 hover:bg-gray-100 dark:hover:bg-darkhover rounded-lg font-bold transition text-sm border-transparent dark:border-darkborder">Next ▶</button>
    </div>
    <div class="grid grid-cols-7 text-center text-[11px] font-bold text-gray-500 dark:text-darkmuted mb-1 shrink-0 border-b border-gray-200 dark:border-darkborder pb-1">
        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
@@ -191,7 +191,7 @@ extend: {
 <div class="bg-white dark:bg-darksurface rounded-xl shadow-sm border border-gray-200 dark:border-darkborder p-4 flex-grow flex flex-col min-h-0 h-full">
  <div class="flex justify-between items-center border-b border-gray-200 dark:border-darkborder pb-2 mb-3 sticky top-0 bg-white dark:bg-darksurface z-10 shrink-0">
    <h2 id="parade-state-header" class="text-lg font-bold text-blue-600 dark:text-blue-400 m-0 leading-tight">Overall Parade State</h2>
-   <button type="button" id="btn-parade-target" onclick="openPicker('datetime', 'parade', 'target')" class="border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1 px-3 bg-gray-50 dark:bg-[#1a1a1a] hover:bg-white dark:hover:bg-black font-medium text-xs transition">Change Time</button>
+   <button type="button" id="btn-parade-target" onclick="openPicker('datetime', 'parade', 'target')" class="border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1 px-3 bg-gray-50 dark:bg-darkinput hover:bg-white dark:hover:bg-black font-medium text-xs transition">Change Time</button>
  </div>
  <div id="parade-state-body" class="flex-1 overflow-y-auto space-y-4 pr-1 pb-4"></div>
 </div>
@@ -228,9 +228,9 @@ extend: {
 
 <div id="my-month-wrapper" class="hidden-view flex-grow flex-col overflow-hidden bg-white dark:bg-darksurface rounded-xl shadow-sm border border-gray-200 dark:border-darkborder p-2">
    <div class="flex justify-between items-center mb-2 shrink-0 px-1">
-     <button onclick="changeMonth('my', -1)" class="p-1.5 hover:bg-gray-100 dark:hover:bg-darkhover rounded-lg font-bold transition text-sm border border-transparent dark:border-darkborder">◀ Prev</button>
+     <button onclick="changeMonth('my', -1)" class="p-1.5 hover:bg-gray-100 dark:hover:bg-darkhover rounded-lg font-bold transition text-sm border-transparent dark:border-darkborder">◀ Prev</button>
      <div id="my-month-title" class="font-bold text-lg"></div>
-     <button onclick="changeMonth('my', 1)" class="p-1.5 hover:bg-gray-100 dark:hover:bg-darkhover rounded-lg font-bold transition text-sm border border-transparent dark:border-darkborder">Next ▶</button>
+     <button onclick="changeMonth('my', 1)" class="p-1.5 hover:bg-gray-100 dark:hover:bg-darkhover rounded-lg font-bold transition text-sm border-transparent dark:border-darkborder">Next ▶</button>
    </div>
    <div class="grid grid-cols-7 text-center text-[11px] font-bold text-gray-500 dark:text-darkmuted mb-1 shrink-0 border-b border-gray-200 dark:border-darkborder pb-1">
        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
@@ -253,14 +253,14 @@ extend: {
    <div class="flex space-x-2 items-end">
      <div class="flex-grow">
        <label class="block font-semibold mb-1 text-sm">Event Type</label>
-       <select id="form-combined-type" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition cursor-pointer font-bold text-blue-700 dark:text-blue-400" onchange="toggleCombinedFields()" required></select>
+       <select id="form-combined-type" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition cursor-pointer font-bold text-blue-700 dark:text-blue-400" onchange="toggleCombinedFields()" required></select>
      </div>
      <button type="button" id="form-combined-infoall-btn" onclick="toggleInfoAll()" class="shrink-0 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 font-bold text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-darkhover transition">Info All</button>
    </div>
 
    <div>
      <label id="label-combined-remarks" class="block font-semibold mb-1 text-sm">Remarks <span class="text-[10px] font-normal text-gray-500">(Optional)</span></label>
-     <textarea id="form-combined-remarks" rows="2" oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px';" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm overflow-hidden resize-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm"></textarea>
+     <textarea id="form-combined-remarks" rows="2" oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px';" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm overflow-hidden resize-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm"></textarea>
    </div>
    
    <div id="combined-attendees-wrapper" class="relative hidden-view">
@@ -274,11 +274,11 @@ extend: {
      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
        <div>
          <label class="block font-semibold mb-1 text-sm">Location</label>
-         <input type="text" id="form-combined-location" value="Office" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm">
+         <input type="text" id="form-combined-location" value="Office" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm">
        </div>
        <div>
          <label class="block font-semibold mb-1 text-sm">Location Details <span class="text-[10px] font-normal text-gray-500 dark:text-gray-400">(Optional)</span></label>
-         <input type="text" id="form-combined-location-details" placeholder="e.g. Room 302" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm">
+         <input type="text" id="form-combined-location-details" placeholder="e.g. Room 302" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm">
        </div>
      </div>
 
@@ -291,12 +291,12 @@ extend: {
        <div class="relative">
          <div class="absolute -left-[30px] top-1.5 w-3.5 h-3.5 rounded-full bg-blue-500 ring-4 ring-white dark:ring-darksurface"></div>
          <label class="block font-bold text-[10px] text-gray-500 dark:text-darkmuted uppercase tracking-wider mb-1">Start</label>
-         <button type="button" id="btn-combined-event-start" onclick="openPicker(appData.combined.isAllDay ? 'date' : 'datetime', 'combined', 'start')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select Date & Time</button>
+         <button type="button" id="btn-combined-event-start" onclick="openPicker(appData.combined.isAllDay ? 'date' : 'datetime', 'combined', 'start')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select Date & Time</button>
        </div>
        <div class="relative">
          <div class="absolute -left-[30px] top-1.5 w-3.5 h-3.5 rounded-full bg-red-500 ring-4 ring-white dark:ring-darksurface"></div>
          <label class="block font-bold text-[10px] text-gray-500 dark:text-darkmuted uppercase tracking-wider mb-1">End</label>
-         <button type="button" id="btn-combined-event-end" onclick="openPicker(appData.combined.isAllDay ? 'date' : 'datetime', 'combined', 'end')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select Date & Time</button>
+         <button type="button" id="btn-combined-event-end" onclick="openPicker(appData.combined.isAllDay ? 'date' : 'datetime', 'combined', 'end')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select Date & Time</button>
        </div>
        <div id="combined-until-container" class="relative hidden-view pt-1">
          <div class="absolute -left-[30px] top-3 w-3.5 h-3.5 rounded-full bg-purple-500 ring-4 ring-white dark:ring-darksurface"></div>
@@ -307,7 +307,7 @@ extend: {
 
      <div>
        <label class="block font-semibold mb-1 text-sm">Repeat Event</label>
-       <select id="form-combined-repeat" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition cursor-pointer text-sm" onchange="toggleCombinedRepeatUntil()">
+       <select id="form-combined-repeat" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition cursor-pointer text-sm" onchange="toggleCombinedRepeatUntil()">
          <option value="NONE">Does not repeat</option>
          <option value="DAILY">Daily</option>
          <option value="WEEKLY">Weekly</option>
@@ -322,11 +322,11 @@ extend: {
      <div class="flex space-x-2 w-full" id="combined-leave-time-start">
        <div class="flex-grow">
          <label class="block font-semibold mb-1 text-sm">Start Date</label>
-         <button type="button" id="btn-combined-leave-start" onclick="openPicker('date', 'combined', 'start')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select Date</button>
+         <button type="button" id="btn-combined-leave-start" onclick="openPicker('date', 'combined', 'start')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select Date</button>
        </div>
        <div class="w-24 shrink-0" id="combined-leave-ampm-start">
          <label class="block font-semibold mb-1 text-center text-sm">Time</label>
-         <div class="relative flex bg-gray-200 dark:bg-[#222] rounded-lg p-1 h-[38px] cursor-pointer select-none border-2 border-transparent" onclick="toggleAMPM('start', 'combined')">
+          <div class="relative flex bg-gray-200 dark:bg-[#222] rounded-lg p-1 h-[38px] cursor-pointer select-none" onclick="toggleAMPM('start', 'combined')">
            <div id="start-combined-slider" class="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-blue-600 rounded transition-transform"></div>
            <div class="relative z-10 flex-1 flex items-center justify-center font-bold text-white transition-colors text-xs" id="start-combined-am">AM</div>
            <div class="relative z-10 flex-1 flex items-center justify-center font-bold text-gray-500 dark:text-darkmuted transition-colors text-xs" id="start-combined-pm">PM</div>
@@ -337,11 +337,11 @@ extend: {
      <div class="flex space-x-2 w-full" id="combined-leave-time-end">
        <div class="flex-grow">
          <label class="block font-semibold mb-1 text-sm">End Date</label>
-         <button type="button" id="btn-combined-leave-end" onclick="openPicker('date', 'combined', 'end')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select Date</button>
+         <button type="button" id="btn-combined-leave-end" onclick="openPicker('date', 'combined', 'end')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select Date</button>
        </div>
        <div class="w-24 shrink-0" id="combined-leave-ampm-end">
          <label class="block font-semibold mb-1 text-center text-sm">Time</label>
-         <div class="relative flex bg-gray-200 dark:bg-[#222] rounded-lg p-1 h-[38px] cursor-pointer select-none border-2 border-transparent" onclick="toggleAMPM('end', 'combined')">
+          <div class="relative flex bg-gray-200 dark:bg-[#222] rounded-lg p-1 h-[38px] cursor-pointer select-none" onclick="toggleAMPM('end', 'combined')">
            <div id="end-combined-slider" class="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-blue-600 rounded transition-transform translate-x-full"></div>
            <div class="relative z-10 flex-1 flex items-center justify-center font-bold text-gray-500 dark:text-darkmuted transition-colors text-xs" id="end-combined-am">AM</div>
            <div class="relative z-10 flex-1 flex items-center justify-center font-bold text-white transition-colors text-xs" id="end-combined-pm">PM</div>
@@ -349,17 +349,17 @@ extend: {
        </div>
      </div>
      
-     <div id="combined-overseas-fields" class="hidden-view grid grid-cols-2 gap-3 p-3 bg-gray-100 dark:bg-darkinput rounded-lg border border-gray-300 dark:border-darkborder mt-2">
-       <div><label class="block font-semibold mb-1 text-sm">Country <span class="text-red-500">*</span></label><input type="text" id="form-combined-country" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded p-1.5 bg-white dark:bg-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-sm transition"></div>
-       <div><label class="block font-semibold mb-1 text-sm text-gray-500">State</label><input type="text" id="form-combined-state" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded p-1.5 bg-white dark:bg-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-sm transition"></div>
-     </div>
+      <div id="combined-overseas-fields" class="hidden-view grid grid-cols-2 gap-3 p-3 bg-gray-100 dark:bg-darkinput rounded-lg border border-gray-300 dark:border-darkborder mt-2">
+        <div><label class="block font-semibold mb-1 text-sm">Country <span class="text-red-500">*</span></label><input type="text" id="form-combined-country" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-white dark:bg-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-sm transition"></div>
+        <div><label class="block font-semibold mb-1 text-sm text-gray-500">State</label><input type="text" id="form-combined-state" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-white dark:bg-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-sm transition"></div>
+      </div>
    </div>
 
  </div>
 
  <div class="shrink-0 p-3 border-t border-gray-200 dark:border-darkborder bg-gray-100 dark:bg-darkinput z-10">
-   <button type="submit" id="submit-combined-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow-md transition text-base border border-transparent">Save Record</button>
-   <button type="button" id="cancel-edit-combined-btn" onclick="cancelEditMode()" class="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 rounded-lg shadow hidden-view mt-2 transition text-sm border border-transparent">Cancel Edit</button>
+    <button type="submit" id="submit-combined-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow-md transition text-base">Save Record</button>
+    <button type="button" id="cancel-edit-combined-btn" onclick="cancelEditMode()" class="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 rounded-lg shadow hidden-view mt-2 transition text-sm">Cancel Edit</button>
  </div>
 </form>
 </div>
@@ -375,12 +375,12 @@ extend: {
    </div>
    <div>
      <label class="block font-semibold mb-1 text-sm">Leave/MC/OIL Type</label>
-     <select id="form-leave-type" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition cursor-pointer" onchange="toggleOverseasFields('leave')" required></select>
+     <select id="form-leave-type" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition cursor-pointer" onchange="toggleOverseasFields('leave')" required></select>
    </div>
 
    <div>
      <label class="block font-semibold mb-1 text-sm">Remarks</label>
-     <textarea id="form-leave-remarks" rows="2" oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px';" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm overflow-hidden resize-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm"></textarea>
+     <textarea id="form-leave-remarks" rows="2" oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px';" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm overflow-hidden resize-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm"></textarea>
    </div>
    
    <div id="leave-attendees-wrapper" class="relative hidden-view">
@@ -393,11 +393,11 @@ extend: {
    <div class="flex space-x-2" id="leave-time-start">
      <div class="flex-grow">
        <label class="block font-semibold mb-1 text-sm">Start Date</label>
-       <button type="button" id="btn-leave-start" onclick="openPicker('date', 'leave', 'start')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select Date</button>
+       <button type="button" id="btn-leave-start" onclick="openPicker('date', 'leave', 'start')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select Date</button>
      </div>
      <div class="w-24 shrink-0" id="leave-ampm-start">
        <label class="block font-semibold mb-1 text-center text-sm">Time</label>
-       <div class="relative flex bg-gray-200 dark:bg-[#222] rounded-lg p-1 h-[38px] cursor-pointer select-none border-2 border-transparent" onclick="toggleAMPM('start', 'leave')">
+        <div class="relative flex bg-gray-200 dark:bg-[#222] rounded-lg p-1 h-[38px] cursor-pointer select-none" onclick="toggleAMPM('start', 'leave')">
          <div id="start-leave-slider" class="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-blue-600 rounded transition-transform"></div>
          <div class="relative z-10 flex-1 flex items-center justify-center font-bold text-white transition-colors text-xs" id="start-leave-am">AM</div>
          <div class="relative z-10 flex-1 flex items-center justify-center font-bold text-gray-500 dark:text-darkmuted transition-colors text-xs" id="start-leave-pm">PM</div>
@@ -407,11 +407,11 @@ extend: {
    <div class="flex space-x-2" id="leave-time-end">
      <div class="flex-grow">
        <label class="block font-semibold mb-1 text-sm">End Date</label>
-       <button type="button" id="btn-leave-end" onclick="openPicker('date', 'leave', 'end')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select Date</button>
+       <button type="button" id="btn-leave-end" onclick="openPicker('date', 'leave', 'end')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select Date</button>
      </div>
      <div class="w-24 shrink-0" id="leave-ampm-end">
        <label class="block font-semibold mb-1 text-center text-sm">Time</label>
-       <div class="relative flex bg-gray-200 dark:bg-[#222] rounded-lg p-1 h-[38px] cursor-pointer select-none border-2 border-transparent" onclick="toggleAMPM('end', 'leave')">
+        <div class="relative flex bg-gray-200 dark:bg-[#222] rounded-lg p-1 h-[38px] cursor-pointer select-none" onclick="toggleAMPM('end', 'leave')">
          <div id="end-leave-slider" class="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-blue-600 rounded transition-transform translate-x-full"></div>
          <div class="relative z-10 flex-1 flex items-center justify-center font-bold text-gray-500 dark:text-darkmuted transition-colors text-xs" id="end-leave-am">AM</div>
          <div class="relative z-10 flex-1 flex items-center justify-center font-bold text-white transition-colors text-xs" id="end-leave-pm">PM</div>
@@ -419,15 +419,15 @@ extend: {
      </div>
    </div>
    
-   <div id="leave-overseas-fields" class="hidden-view grid grid-cols-2 gap-3 p-3 bg-gray-100 dark:bg-darkinput rounded-lg border border-gray-300 dark:border-darkborder mt-2">
-     <div><label class="block font-semibold mb-1 text-sm">Country <span class="text-red-500">*</span></label><input type="text" id="form-leave-country" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded p-1.5 bg-white dark:bg-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-sm transition"></div>
-     <div><label class="block font-semibold mb-1 text-sm text-gray-500">State</label><input type="text" id="form-leave-state" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded p-1.5 bg-white dark:bg-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-sm transition"></div>
-   </div>
+    <div id="leave-overseas-fields" class="hidden-view grid grid-cols-2 gap-3 p-3 bg-gray-100 dark:bg-darkinput rounded-lg border border-gray-300 dark:border-darkborder mt-2">
+      <div><label class="block font-semibold mb-1 text-sm">Country <span class="text-red-500">*</span></label><input type="text" id="form-leave-country" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-white dark:bg-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-sm transition"></div>
+      <div><label class="block font-semibold mb-1 text-sm text-gray-500">State</label><input type="text" id="form-leave-state" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-white dark:bg-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-sm transition"></div>
+    </div>
 
  </div>
  <div class="shrink-0 p-3 border-t border-gray-200 dark:border-darkborder bg-gray-100 dark:bg-darkinput z-10">
-   <button type="submit" id="submit-leave-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow-md transition border border-transparent">Save Record</button>
-   <button type="button" id="cancel-edit-leave-btn" onclick="cancelEditMode()" class="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 rounded-lg shadow hidden-view mt-2 transition border border-transparent">Cancel Edit</button>
+    <button type="submit" id="submit-leave-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow-md transition">Save Record</button>
+    <button type="button" id="cancel-edit-leave-btn" onclick="cancelEditMode()" class="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 rounded-lg shadow hidden-view mt-2 transition">Cancel Edit</button>
  </div>
 </form>
 </div>
@@ -445,14 +445,14 @@ extend: {
    <div class="flex space-x-2 items-end">
      <div class="flex-grow">
        <label class="block font-semibold mb-1 text-sm">Event Type</label>
-       <select id="form-event-type" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition cursor-pointer" required></select>
+       <select id="form-event-type" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition cursor-pointer" required></select>
      </div>
      <button type="button" id="form-event-infoall-btn" onclick="toggleInfoAll()" class="shrink-0 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 font-bold text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-darkhover transition">Info All</button>
    </div>
 
    <div>
      <label id="label-event-remarks" class="block font-semibold mb-1 text-sm">Remarks</label>
-     <textarea id="form-event-remarks" rows="2" oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px';" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm overflow-hidden resize-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm"></textarea>
+     <textarea id="form-event-remarks" rows="2" oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px';" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm overflow-hidden resize-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm"></textarea>
    </div>
    
    <div class="relative">
@@ -465,11 +465,11 @@ extend: {
    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
      <div>
        <label class="block font-semibold mb-1 text-sm">Location</label>
-       <input type="text" id="form-event-location" value="Office" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm" required>
+       <input type="text" id="form-event-location" value="Office" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm" required>
      </div>
      <div>
        <label class="block font-semibold mb-1 text-sm">Location Details <span class="text-[10px] font-normal text-gray-500 dark:text-gray-400">(Optional)</span></label>
-       <input type="text" id="form-event-location-details" placeholder="e.g. Room 302" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm">
+       <input type="text" id="form-event-location-details" placeholder="e.g. Room 302" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm">
      </div>
    </div>
 
@@ -482,12 +482,12 @@ extend: {
      <div class="relative">
        <div class="absolute -left-[30px] top-1.5 w-3.5 h-3.5 rounded-full bg-blue-500 ring-4 ring-white dark:ring-darksurface"></div>
        <label class="block font-bold text-[10px] text-gray-500 dark:text-darkmuted uppercase tracking-wider mb-1">Start</label>
-       <button type="button" id="btn-event-start" onclick="openPicker(appData.event.isAllDay ? 'date' : 'datetime', 'event', 'start')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select Date & Time</button>
+       <button type="button" id="btn-event-start" onclick="openPicker(appData.event.isAllDay ? 'date' : 'datetime', 'event', 'start')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select Date & Time</button>
      </div>
      <div class="relative">
        <div class="absolute -left-[30px] top-1.5 w-3.5 h-3.5 rounded-full bg-red-500 ring-4 ring-white dark:ring-darksurface"></div>
        <label class="block font-bold text-[10px] text-gray-500 dark:text-darkmuted uppercase tracking-wider mb-1">End</label>
-       <button type="button" id="btn-event-end" onclick="openPicker(appData.event.isAllDay ? 'date' : 'datetime', 'event', 'end')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select Date & Time</button>
+       <button type="button" id="btn-event-end" onclick="openPicker(appData.event.isAllDay ? 'date' : 'datetime', 'event', 'end')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select Date & Time</button>
      </div>
      <div id="event-until-container" class="relative hidden-view pt-1">
        <div class="absolute -left-[30px] top-3 w-3.5 h-3.5 rounded-full bg-purple-500 ring-4 ring-white dark:ring-darksurface"></div>
@@ -498,7 +498,7 @@ extend: {
 
    <div>
      <label class="block font-semibold mb-1 text-sm">Repeat Event</label>
-     <select id="form-event-repeat" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition cursor-pointer text-sm" onchange="toggleRepeatUntil('event')">
+     <select id="form-event-repeat" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition cursor-pointer text-sm" onchange="toggleRepeatUntil('event')">
        <option value="NONE">Does not repeat</option>
        <option value="DAILY">Daily</option>
        <option value="WEEKLY">Weekly</option>
@@ -511,8 +511,8 @@ extend: {
  </div>
 
  <div class="shrink-0 p-3 border-t border-gray-200 dark:border-darkborder bg-gray-100 dark:bg-darkinput z-10">
-   <button type="submit" id="submit-event-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow-md transition text-base border border-transparent">Save Event</button>
-   <button type="button" id="cancel-edit-event-btn" onclick="cancelEditMode()" class="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 rounded-lg shadow hidden-view mt-2 transition text-sm border border-transparent">Cancel Edit</button>
+    <button type="submit" id="submit-event-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow-md transition text-base">Save Event</button>
+    <button type="button" id="cancel-edit-event-btn" onclick="cancelEditMode()" class="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 rounded-lg shadow hidden-view mt-2 transition text-sm">Cancel Edit</button>
  </div>
 
 </form>
@@ -548,21 +548,21 @@ extend: {
      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
        <div>
          <label class="block font-semibold mb-1 text-xs">Full Name</label>
-         <input type="text" id="admin-reg-name" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-[#1a1a1a] text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="e.g. Tan Ah Kow">
+         <input type="text" id="admin-reg-name" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-darkinput text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="e.g. Tan Ah Kow">
        </div>
        <div>
          <label class="block font-semibold mb-1 text-xs">Mobile No</label>
-         <input type="tel" id="admin-reg-mobile" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-[#1a1a1a] text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="e.g. 96745345">
+         <input type="tel" id="admin-reg-mobile" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-darkinput text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="e.g. 96745345">
        </div>
      </div>
      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
        <div>
          <label class="block font-semibold mb-1 text-xs">Unit</label>
-         <select id="admin-reg-unit" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-[#1a1a1a] text-sm outline-none cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"></select>
+         <select id="admin-reg-unit" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-darkinput text-sm outline-none cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"></select>
        </div>
        <div>
          <label class="block font-semibold mb-1 text-xs">Birthday</label>
-         <button type="button" id="btn-admin-register-birthday" onclick="openPicker('date', 'adminRegister', 'birthday')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-[#1a1a1a] text-left outline-none font-medium text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">Select...</button>
+         <button type="button" id="btn-admin-register-birthday" onclick="openPicker('date', 'adminRegister', 'birthday')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-darkinput text-left outline-none font-medium text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">Select...</button>
        </div>
      </div>
      <button onclick="submitAdminRegister()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg shadow-sm transition text-sm">Register User</button>
@@ -575,7 +575,7 @@ extend: {
      <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted cursor-grab section-handle" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>
    </div>
    <div class="relative mb-2">
-     <input type="text" id="admin-manage-search" placeholder="Search user to edit or remove..." class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-[#1a1a1a] text-sm outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" autocomplete="off" onkeyup="searchUserToManage()">
+     <input type="text" id="admin-manage-search" placeholder="Search user to edit or remove..." class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-darkinput text-sm outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" autocomplete="off" onkeyup="searchUserToManage()">
      <div id="admin-manage-results" class="absolute z-50 w-full bg-white dark:bg-darksurface border-2 border-blue-400 dark:border-blue-600 rounded-lg shadow-xl hidden-view max-h-40 overflow-y-auto mt-1"></div>
    </div>
    
@@ -619,7 +619,7 @@ extend: {
      <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted cursor-grab section-handle" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>
    </div>
    <div class="relative">
-     <input type="password" id="set-admin-pass" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 pr-10 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm" placeholder="Leave blank to keep current">
+     <input type="password" id="set-admin-pass" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 pr-10 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm" placeholder="Leave blank to keep current">
      <button onclick="togglePassword('set-admin-pass', this)" class="absolute right-2 top-2 text-gray-500 dark:text-darkmuted p-1">
        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
      </button>
@@ -632,7 +632,7 @@ extend: {
      <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted cursor-grab section-handle" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>
    </div>
    <div>
-     <input type="text" id="set-user-keyword" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm" placeholder="e.g. peace">
+     <input type="text" id="set-user-keyword" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm" placeholder="e.g. peace">
      <p class="text-[10px] text-gray-500 mt-1 leading-tight">Users will log in with their mobile number followed by this keyword.</p>
    </div>
  </div>
@@ -642,7 +642,7 @@ extend: {
      <h3 class="font-bold text-base text-blue-600 dark:text-blue-400">App Menu Order</h3>
      <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted cursor-grab section-handle" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>
    </div>
-   <div id="menu-order-list" class="space-y-1.5 bg-gray-100 dark:bg-[#1a1a1a] p-2 rounded-lg border border-gray-300 dark:border-gray-600"></div>
+   <div id="menu-order-list" class="space-y-1.5 bg-gray-100 dark:bg-darkinput p-2 rounded-lg border border-gray-300 dark:border-gray-600"></div>
  </div>
 
 </div>
@@ -658,12 +658,12 @@ extend: {
    
    <div>
      <h3 class="font-bold text-lg text-blue-600 dark:text-blue-400 mb-3 border-b border-gray-200 dark:border-darkborder pb-1">Typical Event Types</h3>
-     <div id="typical-event-types-list" class="space-y-1.5 bg-gray-100 dark:bg-[#1a1a1a] p-2 rounded-lg border border-gray-300 dark:border-gray-600 mb-2"></div>
+     <div id="typical-event-types-list" class="space-y-1.5 bg-gray-100 dark:bg-darkinput p-2 rounded-lg border border-gray-300 dark:border-gray-600 mb-2"></div>
      
      <div class="flex flex-wrap sm:flex-nowrap gap-2">
-       <input type="text" id="new-typical-event-type" class="flex-grow w-full sm:w-auto border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-sm outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="Add new type...">
+       <input type="text" id="new-typical-event-type" class="flex-grow w-full sm:w-auto border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-sm outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="Add new type...">
        <div class="flex w-full sm:w-auto space-x-2">
-         <select id="new-typical-event-isEvent" class="flex-grow sm:flex-grow-0 border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-2 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-sm outline-none cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
+         <select id="new-typical-event-isEvent" class="flex-grow sm:flex-grow-0 border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-2 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-sm outline-none cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
              <option value="true">Time-Bound</option>
              <option value="false">All-Day / Half-Day</option>
          </select>
@@ -780,13 +780,13 @@ extend: {
      
      <div class="flex flex-wrap sm:flex-nowrap gap-2 mb-3">
        <div class="flex w-full sm:w-auto space-x-2">
-         <input type="text" id="new-acronym-key" class="w-1/3 sm:w-24 border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-sm outline-none shadow-sm focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition" placeholder="Short (MTG)">
-         <input type="text" id="new-acronym-val" class="flex-grow w-2/3 sm:w-auto border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black text-sm outline-none shadow-sm focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition" placeholder="Full Word (Meeting)">
+         <input type="text" id="new-acronym-key" class="w-1/3 sm:w-24 border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-sm outline-none shadow-sm focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition" placeholder="Short (MTG)">
+         <input type="text" id="new-acronym-val" class="flex-grow w-2/3 sm:w-auto border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-sm outline-none shadow-sm focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 transition" placeholder="Full Word (Meeting)">
        </div>
        <button type="button" onclick="addAcronym()" class="w-full sm:w-auto shrink-0 bg-gray-300 dark:bg-gray-700 font-bold px-4 py-1.5 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-600 transition text-sm">Add</button>
      </div>
 
-     <div id="acronyms-list" class="space-y-1.5 bg-gray-100 dark:bg-[#1a1a1a] p-2 rounded-lg border border-gray-300 dark:border-gray-600 mb-2 min-h-[40px]"></div>
+     <div id="acronyms-list" class="space-y-1.5 bg-gray-100 dark:bg-darkinput p-2 rounded-lg border border-gray-300 dark:border-gray-600 mb-2 min-h-[40px]"></div>
    </div>
 
  </div>
@@ -805,11 +805,11 @@ extend: {
      <h2 class="text-lg font-bold border-b border-gray-200 dark:border-darkborder pb-2 text-yellow-600 dark:text-yellow-500 mb-3">Key Appointment Holders</h2>
      
      <div class="grid grid-cols-2 gap-3 mb-3">
-       <div><label class="block font-semibold mb-1 text-sm">KAH Limit (%)</label><input type="number" id="set-kah-limit" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm"></div>
-       <div><label class="block font-semibold mb-1 text-sm">Approving Email</label><input type="email" id="set-appr-email" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm"></div>
+       <div><label class="block font-semibold mb-1 text-sm">KAH Limit (%)</label><input type="number" id="set-kah-limit" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm"></div>
+       <div><label class="block font-semibold mb-1 text-sm">Approving Email</label><input type="email" id="set-appr-email" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm"></div>
      </div>
      
-     <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-3 bg-gray-50 dark:bg-[#1a1a1a] space-y-4">
+     <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-3 bg-gray-50 dark:bg-darkinput space-y-4">
        <div>
          <label class="block font-semibold mb-1 text-sm">KAH Email Subject Format</label>
          <input type="text" id="set-kah-subject" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-white dark:bg-black text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="e.g. Leave Requires Approval: KAH Limit Crossed for {Unit}">
@@ -841,15 +841,15 @@ extend: {
        <input type="text" id="kah-search" placeholder="Type name to add..." class="w-full border-2 border-blue-300 dark:border-blue-700 rounded-lg py-2 px-3 bg-blue-50/50 dark:bg-blue-900/10 focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm placeholder-blue-400 dark:placeholder-blue-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800/50 transition text-sm font-semibold" autocomplete="off" onkeyup="searchKAH()">
        <div id="kah-results" class="absolute z-50 w-full bg-white dark:bg-darksurface border-2 border-blue-400 dark:border-blue-600 rounded-lg shadow-2xl hidden-view max-h-40 overflow-y-auto mt-1"></div>
      </div>
-     <div id="kah-selected-list" class="mt-3 space-y-3 bg-gray-100 dark:bg-[#1a1a1a] p-2 rounded-lg border border-gray-300 dark:border-darkborder min-h-[40px] empty:hidden"></div>
+     <div id="kah-selected-list" class="mt-3 space-y-3 bg-gray-100 dark:bg-darkinput p-2 rounded-lg border border-gray-300 dark:border-darkborder min-h-[40px] empty:hidden"></div>
    </div>
 
    <div>
      <h3 class="font-bold text-base text-gray-800 dark:text-gray-200 mb-2 mt-4 pt-4 border-t border-gray-200 dark:border-darkborder">Custom KAH Groups</h3>
      <p class="text-xs text-gray-500 dark:text-darkmuted mb-3">Create specific groups of personnel (e.g. "Commanders") to easily select as attendees.</p>
      <div class="flex space-x-2 mb-3">
-       <input type="text" id="new-kah-group-name" placeholder="New Group Name..." class="flex-grow border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-[#1a1a1a] focus:bg-white dark:focus:bg-black outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm">
-       <button onclick="addCustomKahGroup()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-1.5 rounded-lg shadow-sm transition text-sm border border-transparent">Create</button>
+       <input type="text" id="new-kah-group-name" placeholder="New Group Name..." class="flex-grow border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm">
+        <button onclick="addCustomKahGroup()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-1.5 rounded-lg shadow-sm transition text-sm">Create</button>
      </div>
      <div id="custom-kah-groups-list" class="space-y-3"></div>
    </div>
@@ -857,7 +857,7 @@ extend: {
  </div>
 
  <div class="shrink-0 p-3 bg-white dark:bg-darksurface border-t border-gray-200 dark:border-darkborder shadow-[0_-4px_6px_rgba(0,0,0,0.1)] z-20">
-   <button onclick="saveKahSettings()" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2.5 rounded-lg shadow-md text-base transition border border-transparent">Save KAH Settings</button>
+    <button onclick="saveKahSettings()" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2.5 rounded-lg shadow-md text-base transition">Save KAH Settings</button>
  </div>
 
 </div>
@@ -867,7 +867,7 @@ extend: {
 <div class="flex-grow flex flex-col h-full bg-white dark:bg-darksurface rounded-xl shadow border border-gray-200 dark:border-darkborder overflow-hidden">
  
  <div class="flex-grow flex flex-col min-h-[40vh] border-b border-gray-200 dark:border-darkborder">
-    <div class="sticky top-0 bg-gray-100 dark:bg-[#1a1a1a] p-2 border-b border-gray-200 dark:border-darkborder z-10 shadow-sm flex flex-col md:flex-row justify-between md:items-center gap-2">
+    <div class="sticky top-0 bg-gray-100 dark:bg-darkinput p-2 border-b border-gray-200 dark:border-darkborder z-10 shadow-sm flex flex-col md:flex-row justify-between md:items-center gap-2">
         <div class="flex items-center justify-between w-full md:w-auto">
             <h3 class="font-bold text-sm md:text-base text-gray-800 dark:text-gray-200 pr-2">Manage Units & Personnel</h3>
             <div class="flex items-center bg-gray-200 dark:bg-darkborder rounded p-0.5 shrink-0 ml-auto md:ml-2">
@@ -877,7 +877,7 @@ extend: {
         </div>
         <div class="flex space-x-2 mt-2 md:mt-0">
           <input type="text" id="new-parent-unit" placeholder="New Parent Unit..." class="w-full md:w-48 border-2 border-gray-300 dark:border-gray-500 rounded-lg p-1.5 text-xs bg-white dark:bg-black text-gray-900 dark:text-white outline-none focus:border-blue-500 transition uppercase">
-          <button onclick="addParentUnit()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 rounded-lg transition text-xs border border-transparent">Add</button>
+           <button onclick="addParentUnit()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 rounded-lg transition text-xs">Add</button>
         </div>
     </div>
     <div id="structure-builder-list" class="flex-grow overflow-y-auto p-2 space-y-2 bg-gray-50 dark:bg-darkinput pb-6"></div>
@@ -891,8 +891,8 @@ extend: {
  </div>
 
  <div class="shrink-0 p-3 bg-white dark:bg-darksurface border-t border-gray-200 dark:border-darkborder shadow-[0_-4px_6px_rgba(0,0,0,0.1)] z-20 flex space-x-2">
-     <button onclick="saveCompanyStructure()" class="flex-grow bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-lg shadow transition text-sm border border-transparent">Save Assignments</button>
-     <button onclick="forceOverwriteContacts()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 rounded-lg shadow transition text-sm border border-transparent" title="100% Overwrite Google Contacts">Force Sync G-Contacts</button>
+      <button onclick="saveCompanyStructure()" class="flex-grow bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-lg shadow transition text-sm">Save Assignments</button>
+      <button onclick="forceOverwriteContacts()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 rounded-lg shadow transition text-sm" title="100% Overwrite Google Contacts">Force Sync G-Contacts</button>
  </div>
 
 </div>
@@ -930,6 +930,7 @@ extend: {
 </main>
 
 <script src="js/core/config.js?v=56"></script>
+<script src="js/ui/tokens.js?v=56"></script>
 <script src="js/core/state.js?v=56"></script>
 <script src="js/core/api.js?v=56"></script>
 <script src="js/core/auth.js?v=56"></script>
