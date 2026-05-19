@@ -58,23 +58,40 @@ return name ? name.replace(/\s*\(Cloud Group\s*:\s*.*?\)\s*/gi, '').trim() : "";
 }
 
 function verifyAuth(credentials, data) {
-var checkPass = data.adminPass || credentials.pass;
-if (!checkPass) throw new Error("Unauthorized: Missing credentials");
+  var checkPass = data.adminPass || credentials.pass;
+  if (!checkPass) throw new Error("Unauthorized: Missing credentials");
 
-var props = PropertiesService.getScriptProperties();
+  var props = PropertiesService.getScriptProperties();
 
-if (checkPass === (props.getProperty('adminPassword') || 'P@ssw0rd')) {
-  return { role: 'admin', phone: 'admin', name: 'Administrator' };
-}
+  if (checkPass === (props.getProperty('adminPassword') || 'P@ssw0rd')) {
+    return { role: 'admin', phone: 'admin', name: 'Administrator' };
+  }
 
-var keyword = props.getProperty('userKeyword') || 'peace';
-if (checkPass.endsWith(keyword)) {
-  var phone = checkPass.slice(0, -keyword.length).replace(/\D/g, '').slice(-8);
-  if (phone.length !== 8) throw new Error("Invalid password format.");
-  return { role: 'user', phone: phone };
-}
+  var keyword = props.getProperty('userKeyword') || 'peace';
+  if (checkPass.endsWith(keyword)) {
+    var phone = checkPass.slice(0, -keyword.length).replace(/\D/g, '').slice(-8);
+    if (phone.length !== 8) throw new Error("Invalid password format.");
 
-throw new Error("Unauthorized: Invalid credentials");
+    var cg = getContactsAndGroups();
+    var userName = "";
+
+    cg.connections.forEach(function(person) {
+      if (person.phoneNumbers) {
+        person.phoneNumbers.forEach(function(phoneObj) {
+          if (phoneObj.value && phoneObj.value.replace(/\D/g, '').slice(-8) === phone) {
+            if (!userName && person.names && person.names.length > 0) {
+              userName = cleanName(person.names[0].displayName);
+            }
+          }
+        });
+      }
+    });
+
+    if (!userName) throw new Error("User phone number not found in Google Contacts.");
+    return { role: 'user', phone: phone, name: userName };
+  }
+
+  throw new Error("Unauthorized: Invalid credentials");
 }
 
 function handleLogin(data) {

@@ -158,10 +158,10 @@ try {
   sessionStorage.setItem('initialData', JSON.stringify(cached));
 } catch(e) {}
 
-if (window._tabsRendered.dashboard) renderDashboard();
-if (window._tabsRendered.myLeaves) renderMyLeaves();
+  renderDashboard();
+  renderMyLeaves();
 
-const paradeView = document.getElementById('view-parade-state');
+  const paradeView = document.getElementById('view-parade-state');
 if(paradeView && !paradeView.classList.contains('hidden-view') && typeof renderParadeState === 'function') {
 renderParadeState(); 
 }

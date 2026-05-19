@@ -86,30 +86,34 @@ document.getElementById('nav-user-name').innerText = user.role === 'admin' ? "Ad
 
 const cachedData = sessionStorage.getItem('initialData');
 if (cachedData) {
-try {
-  const parsed = JSON.parse(cachedData);
-  applyInitialData(parsed.settings, parsed.leaves);
-  showLoader(false);
-} catch(e) {}
+  try {
+    const parsed = JSON.parse(cachedData);
+    applyInitialData(parsed.settings, parsed.leaves);
+    showLoader(false);
+  } catch(e) {}
 }
 
 try {
-const initialData = await apiCall('getInitialData', { adminPass: user.role === 'admin' ? user.pass : null });
-sessionStorage.setItem('initialData', JSON.stringify(initialData));
-
-if (!cachedData) {
+  const initialData = await apiCall('getInitialData', { adminPass: user.role === 'admin' ? user.pass : null });
+  
   applyInitialData(initialData.settings, initialData.leaves);
+  sessionStorage.setItem('initialData', JSON.stringify(initialData));
+  
+  if (cachedData) {
+    const warnEl = document.getElementById('cache-warning');
+    if (warnEl) warnEl.classList.add('hidden');
+  }
   showLoader(false);
-} else {
-  applyInitialData(initialData.settings, initialData.leaves);
-}
 
 } catch(e) {
-console.error("Error loading settings: ", e);
-if (!cachedData) {
-  alertError('login-alert', 'Error initializing app.');
-  showLoader(false);
-}
+  console.error("Error loading settings: ", e);
+  if (!cachedData) {
+    alertError('login-alert', 'Error initializing app.');
+    showLoader(false);
+  } else {
+    const warnEl = document.getElementById('cache-warning');
+    if (warnEl) warnEl.classList.remove('hidden');
+  }
 }
 }
 
