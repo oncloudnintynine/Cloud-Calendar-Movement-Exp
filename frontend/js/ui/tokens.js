@@ -68,7 +68,7 @@ const C = {
   btnPrimarySm: 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg shadow transition text-xs',
 
   // Secondary / cancel button
-  btnSecondary: 'w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 rounded-lg shadow transition text-sm',
+  btnSecondary: 'w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2.5 rounded-lg shadow transition text-base',
 
   // Dropdown search results
   dropdown: 'absolute z-30 w-full bg-white dark:bg-darksurface border-2 border-blue-400 dark:border-blue-600 rounded-lg shadow-2xl hidden-view max-h-40 overflow-y-auto mt-1',
@@ -207,7 +207,7 @@ function formFooterHtml(buttonText, cancelId) {
   var html = '<div class="' + C.formFooter + '">' +
     '<button type="submit" class="' + C.btnPrimary + '">' + buttonText + '</button>';
   if (cancelId) {
-    html += '<button type="button" id="' + cancelId + '" onclick="cancelEditMode()" class="' + C.btnSecondary + ' hidden-view mt-2">Cancel Edit</button>';
+    html += '<button type="button" id="' + cancelId + '" onclick="cancelEditMode()" class="' + C.btnSecondary + ' hidden-view mt-2">Cancel Record</button>';
   }
   html += '</div>';
   return html;
