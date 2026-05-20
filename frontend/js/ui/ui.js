@@ -3,66 +3,100 @@
 // ==========================================
 
 window._searchTimeout = null;
+let railCollapsed = false;
 
-// --- Left Rail State ---
-let leftRailCollapsed = false;
-
-function toggleLeftRail() {
-  leftRailCollapsed = !leftRailCollapsed;
-  const rail = document.getElementById('left-rail');
-  const body = document.body;
-  if (rail) {
-    if (leftRailCollapsed) {
-      rail.classList.add('left-rail-collapsed');
-      rail.classList.remove('left-rail-expanded');
-    } else {
-      rail.classList.add('left-rail-expanded');
-      rail.classList.remove('left-rail-collapsed');
-    }
-  }
-  if (body) {
-    body.classList.toggle('left-rail-collapsed', leftRailCollapsed);
-    body.classList.toggle('left-rail-expanded', !leftRailCollapsed);
-  }
-  localStorage.setItem('leftRailCollapsed', leftRailCollapsed ? '1' : '0');
+function debouncedSearch(callback, delay) {
+ clearTimeout(window._searchTimeout);
+ window._searchTimeout = setTimeout(callback, delay || 300);
 }
 
-function initLeftRail() {
-  const saved = localStorage.getItem('leftRailCollapsed');
-  leftRailCollapsed = saved === '1';
-  const rail = document.getElementById('left-rail');
-  const body = document.body;
-  if (rail) {
-    if (leftRailCollapsed) {
-      rail.classList.add('left-rail-collapsed');
-      rail.classList.remove('left-rail-expanded');
-    } else {
-      rail.classList.add('left-rail-expanded');
-      rail.classList.remove('left-rail-collapsed');
-    }
-  }
-  if (body) {
-    body.classList.toggle('left-rail-collapsed', leftRailCollapsed);
-    body.classList.toggle('left-rail-expanded', !leftRailCollapsed);
-  }
+// --- Rail Toggle (Desktop Left Sidebar) ---
+function toggleRail() {
+ const rail = document.getElementById('nav-rail');
+ const content = document.getElementById('nav-rail-content');
+ const main = document.getElementById('main-content');
+ const iconCollapse = document.getElementById('rail-icon-collapse');
+ const iconExpand = document.getElementById('rail-icon-expand');
+ const iconCollapseNav = document.getElementById('rail-icon-collapse-nav');
+ const iconExpandNav = document.getElementById('rail-icon-expand-nav');
+
+ railCollapsed = !railCollapsed;
+
+ if (railCollapsed) {
+   rail.classList.add('nav-rail-collapsed');
+   content.style.opacity = '0';
+   main.classList.remove('md:ml-[200px]');
+   main.classList.add('md:ml-[48px]');
+   if (iconCollapse) iconCollapse.classList.remove('hidden');
+   if (iconExpand) iconExpand.classList.add('hidden');
+   if (iconCollapseNav) iconCollapseNav.classList.remove('hidden');
+   if (iconExpandNav) iconExpandNav.classList.add('hidden');
+ } else {
+   rail.classList.remove('nav-rail-collapsed');
+   content.style.opacity = '1';
+   main.classList.remove('md:ml-[48px]');
+   main.classList.add('md:ml-[200px]');
+   if (iconCollapse) iconCollapse.classList.add('hidden');
+   if (iconExpand) iconExpand.classList.remove('hidden');
+   if (iconCollapseNav) iconCollapseNav.classList.add('hidden');
+   if (iconExpandNav) iconExpandNav.classList.remove('hidden');
+ }
+ localStorage.setItem('railCollapsed', railCollapsed ? '1' : '0');
 }
 
-// --- Bottom Bar Active State ---
-function updateBottomBarActive(tabId) {
-  document.querySelectorAll('.bottom-tab').forEach(btn => {
-    btn.classList.remove('bottomTabActive');
-  });
-  const activeBtn = document.getElementById(`bottom-tab-${tabId}`);
-  if (activeBtn) activeBtn.classList.add('bottomTabActive');
+function applyRailState() {
+ const rail = document.getElementById('nav-rail');
+ const content = document.getElementById('nav-rail-content');
+ const main = document.getElementById('main-content');
+ const iconCollapse = document.getElementById('rail-icon-collapse');
+ const iconExpand = document.getElementById('rail-icon-expand');
+ const iconCollapseNav = document.getElementById('rail-icon-collapse-nav');
+ const iconExpandNav = document.getElementById('rail-icon-expand-nav');
+
+ if (railCollapsed) {
+   rail.classList.add('nav-rail-collapsed');
+   content.style.opacity = '0';
+   main.classList.remove('md:ml-[200px]');
+   main.classList.add('md:ml-[48px]');
+   if (iconCollapse) iconCollapse.classList.remove('hidden');
+   if (iconExpand) iconExpand.classList.add('hidden');
+   if (iconCollapseNav) iconCollapseNav.classList.remove('hidden');
+   if (iconExpandNav) iconExpandNav.classList.add('hidden');
+ } else {
+   rail.classList.remove('nav-rail-collapsed');
+   content.style.opacity = '1';
+   main.classList.remove('md:ml-[48px]');
+   main.classList.add('md:ml-[200px]');
+   if (iconCollapse) iconCollapse.classList.add('hidden');
+   if (iconExpand) iconExpand.classList.remove('hidden');
+   if (iconCollapseNav) iconCollapseNav.classList.add('hidden');
+   if (iconExpandNav) iconExpandNav.classList.remove('hidden');
+ }
 }
 
-// --- Slide Menu (still available for admin on mobile / legacy) ---
+// --- Mobile Admin Menu (opens slide-out for admin deep-links) ---
+function openAdminMenu() {
+ const menu = document.getElementById('slide-menu');
+ const panel = document.getElementById('slide-menu-panel');
+ // Show only admin items in the slide menu when opened from bottom bar
+ const primaryItems = menu.querySelectorAll('#menu-dashboard, #menu-parade-state, #menu-my-leaves, #menu-submit-combined');
+ primaryItems.forEach(btn => btn.classList.add('hidden'));
+
+ if (menu.classList.contains('hidden')) {
+   menu.classList.remove('hidden');
+   setTimeout(() => { panel.classList.remove('-translate-x-full'); }, 10);
+ } else closeMenu();
+}
+
 function toggleMenu() {
 const menu = document.getElementById('slide-menu');
 const panel = document.getElementById('slide-menu-panel');
 if (menu.classList.contains('hidden')) {
-menu.classList.remove('hidden');
-setTimeout(() => { panel.classList.remove('-translate-x-full'); }, 10);
+ // Reset visibility - show all items when opening via hamburger
+ const primaryItems = menu.querySelectorAll('#menu-dashboard, #menu-parade-state, #menu-my-leaves, #menu-submit-combined');
+ primaryItems.forEach(btn => btn.classList.remove('hidden'));
+ menu.classList.remove('hidden');
+ setTimeout(() => { panel.classList.remove('-translate-x-full'); }, 10);
 } else closeMenu();
 }
 
@@ -83,7 +117,7 @@ if(menuContainer) {
 orderArr.forEach(id => {
   const btn = document.getElementById(`menu-${id}`);
   if (btn) {
-    if (appMode === 'combined' && ['submit-leave', 'submit-event'].includes(id)) {
+    if (appMode === 'combined' && ['submit-leave', 'submit-event', 'my-leaves'].includes(id)) {
       btn.classList.add('hidden');
     } else if (appMode === 'separated' && id === 'submit-combined') {
       btn.classList.add('hidden');
@@ -113,106 +147,61 @@ document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidd
 const view = document.getElementById(`view-${tabId}`);
 if (view) { view.classList.remove('hidden'); view.classList.add('flex'); }
 
-// Update left rail active state
-document.querySelectorAll('#left-rail button[id^="rail-"]').forEach(btn => {
-btn.classList.remove('bg-blue-50', 'text-blue-600', 'dark:bg-darkhover', 'dark:text-blue-400', 'font-semibold');
+// Sync rail active state
+document.querySelectorAll('#nav-rail button[id^="menu-"], #nav-rail a[id^="menu-"]').forEach(btn => {
+btn.classList.remove('nav-rail-item-active', 'bg-blue-50', 'text-blue-600', 'dark:bg-darkhover', 'dark:text-blue-400');
 });
-const activeRail = document.getElementById(`rail-${tabId}`);
-if (activeRail && activeRail.tagName === 'BUTTON') {
-  activeRail.classList.add('bg-blue-50', 'text-blue-600', 'dark:bg-darkhover', 'dark:text-blue-400', 'font-semibold');
+
+const activeMenu = document.getElementById(`menu-${tabId}`);
+if (activeMenu && activeMenu.tagName === 'BUTTON') {
+  activeMenu.classList.add('nav-rail-item-active', 'bg-blue-50', 'text-blue-600', 'dark:bg-darkhover', 'dark:text-blue-400');
 }
 
-// Update bottom bar active state
-updateBottomBarActive(tabId);
+// Sync bottom bar active state
+document.querySelectorAll('.bottom-tab').forEach(tab => {
+tab.classList.remove('bottom-tab-active', 'text-blue-600', 'dark:text-blue-400');
+});
+
+const activeBottom = document.getElementById(`bottom-${tabId}`);
+if (activeBottom) {
+  activeBottom.classList.add('bottom-tab-active', 'text-blue-600', 'dark:text-blue-400');
+} else if (tabId.startsWith('admin') || tabId === 'kah-management') {
+  // Admin deep-links highlight the Admin tab
+  const adminTab = document.getElementById('bottom-admin');
+  if (adminTab) adminTab.classList.add('bottom-tab-active', 'text-blue-600', 'dark:text-blue-400');
+}
 
 const titleEl = document.getElementById('active-tab-title');
 if (titleEl) {
-if (currentEditId && tabId.startsWith('submit-')) titleEl.innerText = "Update Record";
-else titleEl.innerText = TAB_NAMES[tabId] || '';
+ if (currentEditId && tabId.startsWith('submit-')) titleEl.innerText = "Update Record";
+ else titleEl.innerText = TAB_NAMES[tabId] || '';
 }
 
 const deptNav = document.getElementById('dash-dept-nav');
 const controlsWrapper = document.getElementById('dash-controls-wrapper');
 
 if (controlsWrapper) {
-if (tabId === 'dashboard' || tabId === 'my-leaves') {
-    if (tabId === 'dashboard') {
-        if (deptNav) deptNav.classList.remove('hidden');
-    } else {
-        if (deptNav) deptNav.classList.add('hidden');
-    }
-    controlsWrapper.classList.remove('hidden');
-    controlsWrapper.classList.add('flex');
-} else {
-    controlsWrapper.classList.add('hidden');
-    controlsWrapper.classList.remove('flex');
-}
+ if (tabId === 'dashboard' || tabId === 'my-leaves') {
+     if (tabId === 'dashboard') {
+         if (deptNav) deptNav.classList.remove('hidden');
+     } else {
+         if (deptNav) deptNav.classList.add('hidden');
+     }
+     controlsWrapper.classList.remove('hidden');
+     controlsWrapper.classList.add('flex');
+ } else {
+     controlsWrapper.classList.add('hidden');
+     controlsWrapper.classList.remove('flex');
+ }
 }
 
 if (tabId === 'parade-state' && typeof renderParadeState === 'function') renderParadeState();
 if (tabId === 'admin-structure' && typeof renderStructureUI === 'function') renderStructureUI();
 if ((tabId === 'dashboard' || tabId === 'my-leaves') && typeof renderTabIfActive === 'function') renderTabIfActive(tabId);
 
-// Hide FAB since Add is now a bottom tab
+// FAB visibility - hidden by default since bottom bar handles Add action
 const fab = document.getElementById('mobile-fab');
 if (fab) fab.classList.add('hidden');
-}
-
-// --- Unified form type toggle ---
-function setFormType(type) {
-  // type: 'leave' or 'event'
-  appData.combined.currentType = type;
-  
-  const leaveFields = document.getElementById('combined-leave-fields');
-  const eventFields = document.getElementById('combined-event-fields');
-  const attendeesWrapper = document.getElementById('combined-attendees-wrapper');
-  const infoAllBtn = document.getElementById('form-combined-infoall-btn');
-  const typeSelect = document.getElementById('form-combined-type');
-  
-  // Update segmented control buttons
-  const leaveBtn = document.getElementById('form-type-leave');
-  const eventBtn = document.getElementById('form-type-event');
-  
-  if (type === 'leave') {
-    if (leaveFields) { leaveFields.classList.remove('hidden'); }
-    if (eventFields) { eventFields.classList.add('hidden'); }
-    if (attendeesWrapper) attendeesWrapper.classList.remove('hidden');
-    if (infoAllBtn) infoAllBtn.classList.remove('hidden');
-    if (typeSelect) typeSelect.parentElement.classList.remove('hidden');
-    if (leaveBtn) {
-      leaveBtn.classList.add('segmented-btn-active');
-      leaveBtn.classList.remove('segmented-btn-inactive');
-    }
-    if (eventBtn) {
-      eventBtn.classList.remove('segmented-btn-active');
-      eventBtn.classList.add('segmented-btn-inactive');
-    }
-  } else {
-    if (leaveFields) { leaveFields.classList.add('hidden'); }
-    if (eventFields) { eventFields.classList.remove('hidden'); }
-    if (attendeesWrapper) attendeesWrapper.classList.remove('hidden');
-    if (infoAllBtn) infoAllBtn.classList.remove('hidden');
-    if (typeSelect) typeSelect.parentElement.classList.remove('hidden');
-    if (leaveBtn) {
-      leaveBtn.classList.remove('segmented-btn-active');
-      leaveBtn.classList.add('segmented-btn-inactive');
-    }
-    if (eventBtn) {
-      eventBtn.classList.add('segmented-btn-active');
-      eventBtn.classList.remove('segmented-btn-inactive');
-    }
-  }
-  
-  localStorage.setItem('combinedFormType', type);
-}
-
-function initFormType() {
-  const saved = localStorage.getItem('combinedFormType');
-  if (saved && ['leave', 'event'].includes(saved)) {
-    appData.combined.currentType = saved;
-  } else {
-    appData.combined.currentType = 'leave';
-  }
 }
 
 function toggleTheme() {
