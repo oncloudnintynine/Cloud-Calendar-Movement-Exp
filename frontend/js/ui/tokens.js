@@ -114,6 +114,46 @@ paradeMemberCard: 'flex items-center gap-2.5 p-3 rounded-lg border transition-al
 
    // Agenda section headers (sticky)
    sectionHeader: 'sticky top-0 bg-white/95 dark:bg-darksurface/95 backdrop-blur-sm z-10 py-2 border-b border-gray-200/80 dark:border-darkborder mb-3 px-2 rounded-lg shadow-sm',
+
+   // Left rail (desktop nav)
+   leftRail: 'fixed top-[52px] left-0 bottom-0 w-[220px] bg-white dark:bg-darksurface border-r border-gray-200/80 dark:border-darkborder z-30 flex flex-col overflow-hidden transition-all duration-300 ease-in-out',
+   leftRailCollapsed: 'fixed top-[52px] left-0 bottom-0 w-[56px] bg-white dark:bg-darksurface border-r border-gray-200/80 dark:border-darkborder z-30 flex flex-col overflow-hidden transition-all duration-300 ease-in-out',
+   leftRailItem: 'flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium text-gray-600 dark:text-darkmuted hover:bg-gray-100 dark:hover:bg-darkhover cursor-pointer transition text-sm truncate whitespace-nowrap',
+   leftRailItemActive: 'bg-blue-50 text-blue-600 dark:bg-darkhover dark:text-blue-400 font-semibold',
+   leftRailIcon: 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
+   leftRailDivider: 'border-t border-gray-200/80 dark:border-darkborder my-1 mx-3',
+   leftRailLabel: 'text-[9px] font-bold uppercase tracking-widest text-gray-400 dark:text-darkmuted px-3 py-1.5 truncate',
+
+   // Bottom tab bar (mobile)
+   bottomBar: 'fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-darksurface/95 backdrop-blur-sm border-t border-gray-200/80 dark:border-darkborder z-40 flex md:hidden safe-area-bottom',
+   bottomTab: 'flex flex-col items-center justify-center py-1.5 px-1 min-w-[64px] flex-1 text-[10px] font-medium text-gray-500 dark:text-darkmuted hover:text-gray-700 dark:hover:text-darktext transition gap-0.5',
+   bottomTabActive: 'text-blue-600 dark:text-blue-400 font-semibold',
+   bottomTabIcon: 'w-[22px] h-[22px]',
+
+   // Segmented control (form type toggle)
+   segmentedControl: 'inline-flex bg-gray-100 dark:bg-darkborder rounded-lg p-0.5 w-full sm:w-auto',
+   segmentedBtn: 'flex-1 px-3 py-2 rounded-md font-semibold text-xs transition text-center whitespace-nowrap',
+   segmentedBtnActive: 'bg-white dark:bg-darksurface shadow-sm text-blue-600 dark:text-blue-400',
+   segmentedBtnInactive: 'text-gray-500 dark:text-darkmuted hover:text-gray-700 dark:hover:text-gray-300',
+
+   // Collapsible section (admin)
+   collapsibleSection: 'bg-white dark:bg-darksurface rounded-xl border border-gray-200/80 dark:border-darkborder shadow-[0_1px_3px_rgba(0,0,0,0.06)] overflow-hidden',
+   collapsibleHeader: 'flex justify-between items-center px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-darkhover/50 transition select-none',
+   collapsibleTitle: 'font-bold text-sm',
+   collapsibleBody: 'px-4 pb-4 pt-1',
+
+   // Form footer (unified)
+   formFooter: 'shrink-0 p-4 border-t border-gray-200/80 dark:border-darkborder bg-gray-50/60 dark:bg-darkinput/95 backdrop-blur-sm z-10',
+
+   // Widget panel toggle
+   widgetToggleBtn: 'text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2.5 py-1.5 rounded-lg transition hover:bg-blue-100 dark:hover:bg-blue-900/30',
+
+   // Admin sub-nav item
+   adminSubNavItem: 'block w-full text-left px-3 py-2 rounded-lg font-medium text-gray-600 dark:text-darkmuted hover:bg-gray-100 dark:hover:bg-darkhover transition text-sm truncate whitespace-nowrap',
+   adminSubNavActive: 'bg-blue-50 text-blue-600 dark:bg-darkhover dark:text-blue-400 font-semibold',
+
+   // Collapse button
+   collapseBtn: 'p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-darkhover transition text-gray-500 dark:text-darkmuted cursor-pointer shrink-0',
 };
 
 // --- HTML Helper Functions ---

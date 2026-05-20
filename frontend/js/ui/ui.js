@@ -4,11 +4,59 @@
 
 window._searchTimeout = null;
 
-function debouncedSearch(callback, delay) {
- clearTimeout(window._searchTimeout);
- window._searchTimeout = setTimeout(callback, delay || 300);
+// --- Left Rail State ---
+let leftRailCollapsed = false;
+
+function toggleLeftRail() {
+  leftRailCollapsed = !leftRailCollapsed;
+  const rail = document.getElementById('left-rail');
+  const body = document.body;
+  if (rail) {
+    if (leftRailCollapsed) {
+      rail.classList.add('left-rail-collapsed');
+      rail.classList.remove('left-rail-expanded');
+    } else {
+      rail.classList.add('left-rail-expanded');
+      rail.classList.remove('left-rail-collapsed');
+    }
+  }
+  if (body) {
+    body.classList.toggle('left-rail-collapsed', leftRailCollapsed);
+    body.classList.toggle('left-rail-expanded', !leftRailCollapsed);
+  }
+  localStorage.setItem('leftRailCollapsed', leftRailCollapsed ? '1' : '0');
 }
 
+function initLeftRail() {
+  const saved = localStorage.getItem('leftRailCollapsed');
+  leftRailCollapsed = saved === '1';
+  const rail = document.getElementById('left-rail');
+  const body = document.body;
+  if (rail) {
+    if (leftRailCollapsed) {
+      rail.classList.add('left-rail-collapsed');
+      rail.classList.remove('left-rail-expanded');
+    } else {
+      rail.classList.add('left-rail-expanded');
+      rail.classList.remove('left-rail-collapsed');
+    }
+  }
+  if (body) {
+    body.classList.toggle('left-rail-collapsed', leftRailCollapsed);
+    body.classList.toggle('left-rail-expanded', !leftRailCollapsed);
+  }
+}
+
+// --- Bottom Bar Active State ---
+function updateBottomBarActive(tabId) {
+  document.querySelectorAll('.bottom-tab').forEach(btn => {
+    btn.classList.remove('bottomTabActive');
+  });
+  const activeBtn = document.getElementById(`bottom-tab-${tabId}`);
+  if (activeBtn) activeBtn.classList.add('bottomTabActive');
+}
+
+// --- Slide Menu (still available for admin on mobile / legacy) ---
 function toggleMenu() {
 const menu = document.getElementById('slide-menu');
 const panel = document.getElementById('slide-menu-panel');
@@ -35,7 +83,7 @@ if(menuContainer) {
 orderArr.forEach(id => {
   const btn = document.getElementById(`menu-${id}`);
   if (btn) {
-    if (appMode === 'combined' && ['submit-leave', 'submit-event', 'my-leaves'].includes(id)) {
+    if (appMode === 'combined' && ['submit-leave', 'submit-event'].includes(id)) {
       btn.classList.add('hidden');
     } else if (appMode === 'separated' && id === 'submit-combined') {
       btn.classList.add('hidden');
@@ -65,12 +113,17 @@ document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidd
 const view = document.getElementById(`view-${tabId}`);
 if (view) { view.classList.remove('hidden'); view.classList.add('flex'); }
 
-document.querySelectorAll('#slide-menu-panel button[id^="menu-"]').forEach(btn => {
-btn.classList.remove('bg-blue-50', 'text-blue-600', 'dark:bg-darkhover', 'dark:text-blue-400');
+// Update left rail active state
+document.querySelectorAll('#left-rail button[id^="rail-"]').forEach(btn => {
+btn.classList.remove('bg-blue-50', 'text-blue-600', 'dark:bg-darkhover', 'dark:text-blue-400', 'font-semibold');
 });
+const activeRail = document.getElementById(`rail-${tabId}`);
+if (activeRail && activeRail.tagName === 'BUTTON') {
+  activeRail.classList.add('bg-blue-50', 'text-blue-600', 'dark:bg-darkhover', 'dark:text-blue-400', 'font-semibold');
+}
 
-const activeMenu = document.getElementById(`menu-${tabId}`);
-if (activeMenu && activeMenu.tagName === 'BUTTON') activeMenu.classList.add('bg-blue-50', 'text-blue-600', 'dark:bg-darkhover', 'dark:text-blue-400');
+// Update bottom bar active state
+updateBottomBarActive(tabId);
 
 const titleEl = document.getElementById('active-tab-title');
 if (titleEl) {
@@ -100,15 +153,66 @@ if (tabId === 'parade-state' && typeof renderParadeState === 'function') renderP
 if (tabId === 'admin-structure' && typeof renderStructureUI === 'function') renderStructureUI();
 if ((tabId === 'dashboard' || tabId === 'my-leaves') && typeof renderTabIfActive === 'function') renderTabIfActive(tabId);
 
-// FAB visibility - hide when on submit-combined form
+// Hide FAB since Add is now a bottom tab
 const fab = document.getElementById('mobile-fab');
-if (fab) {
-  if (tabId === 'submit-combined') {
-    fab.classList.add('hidden');
-  } else {
-    fab.classList.remove('hidden');
-  }
+if (fab) fab.classList.add('hidden');
 }
+
+// --- Unified form type toggle ---
+function setFormType(type) {
+  // type: 'leave' or 'event'
+  appData.combined.currentType = type;
+  
+  const leaveFields = document.getElementById('combined-leave-fields');
+  const eventFields = document.getElementById('combined-event-fields');
+  const attendeesWrapper = document.getElementById('combined-attendees-wrapper');
+  const infoAllBtn = document.getElementById('form-combined-infoall-btn');
+  const typeSelect = document.getElementById('form-combined-type');
+  
+  // Update segmented control buttons
+  const leaveBtn = document.getElementById('form-type-leave');
+  const eventBtn = document.getElementById('form-type-event');
+  
+  if (type === 'leave') {
+    if (leaveFields) { leaveFields.classList.remove('hidden'); }
+    if (eventFields) { eventFields.classList.add('hidden'); }
+    if (attendeesWrapper) attendeesWrapper.classList.remove('hidden');
+    if (infoAllBtn) infoAllBtn.classList.remove('hidden');
+    if (typeSelect) typeSelect.parentElement.classList.remove('hidden');
+    if (leaveBtn) {
+      leaveBtn.classList.add('segmented-btn-active');
+      leaveBtn.classList.remove('segmented-btn-inactive');
+    }
+    if (eventBtn) {
+      eventBtn.classList.remove('segmented-btn-active');
+      eventBtn.classList.add('segmented-btn-inactive');
+    }
+  } else {
+    if (leaveFields) { leaveFields.classList.add('hidden'); }
+    if (eventFields) { eventFields.classList.remove('hidden'); }
+    if (attendeesWrapper) attendeesWrapper.classList.remove('hidden');
+    if (infoAllBtn) infoAllBtn.classList.remove('hidden');
+    if (typeSelect) typeSelect.parentElement.classList.remove('hidden');
+    if (leaveBtn) {
+      leaveBtn.classList.remove('segmented-btn-active');
+      leaveBtn.classList.add('segmented-btn-inactive');
+    }
+    if (eventBtn) {
+      eventBtn.classList.add('segmented-btn-active');
+      eventBtn.classList.remove('segmented-btn-inactive');
+    }
+  }
+  
+  localStorage.setItem('combinedFormType', type);
+}
+
+function initFormType() {
+  const saved = localStorage.getItem('combinedFormType');
+  if (saved && ['leave', 'event'].includes(saved)) {
+    appData.combined.currentType = saved;
+  } else {
+    appData.combined.currentType = 'leave';
+  }
 }
 
 function toggleTheme() {

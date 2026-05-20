@@ -230,14 +230,22 @@ if (adminRegUnit) adminRegUnit.innerHTML = regOptions;
 if (editUserUnit) editUserUnit.innerHTML = regOptions;
 unitsLoaded = true;
 
+// Initialize left rail and form type
+if (typeof initLeftRail === 'function') initLeftRail();
+if (typeof initFormType === 'function') initFormType();
+
 if (user.role === 'admin') {
 document.getElementById('menu-admin-group').classList.remove('hidden');
+document.getElementById('rail-admin-group').classList.remove('hidden');
+document.getElementById('rail-admin-divider').classList.remove('hidden');
 document.getElementById('admin-behalf-leave').classList.remove('hidden');
 document.getElementById('admin-behalf-event').classList.remove('hidden');
 document.getElementById('admin-behalf-combined').classList.remove('hidden');
 if(typeof populateAdminSettingsForm === 'function') populateAdminSettingsForm(settings);
 } else {
 document.getElementById('menu-admin-group').classList.add('hidden');
+document.getElementById('rail-admin-group').classList.add('hidden');
+document.getElementById('rail-admin-divider').classList.add('hidden');
 document.getElementById('admin-behalf-leave').classList.add('hidden');
 document.getElementById('admin-behalf-event').classList.add('hidden');
 document.getElementById('admin-behalf-combined').classList.add('hidden');

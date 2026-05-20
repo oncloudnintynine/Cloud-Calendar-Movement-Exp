@@ -7,6 +7,77 @@ let userToManageResource = null;
 
 const FIXED_TYPICAL_EVENTS =["Meeting", "Others", "Official Trip", "Overseas Leave", "Local Leave"];
 
+// --- Admin Sub-Navigation Rendering (left rail admin items) ---
+function renderAdminSubNav() {
+  const container = document.getElementById('admin-sub-nav-list');
+  if (!container) return;
+  
+  const sections = [
+    { id: 'admin', label: 'App Settings' },
+    { id: 'kah-management', label: 'KAH Management' },
+    { id: 'admin-structure', label: 'Org Structure' },
+    { id: 'admin-event-templates', label: 'Event Types & Templates' },
+    { id: 'admin-acronyms', label: 'Acronyms' },
+  ];
+  
+  container.innerHTML = sections.map(s => 
+    `<button id="rail-${s.id}" onclick="switchTab('${s.id}')" class="admin-sub-nav-item rail-${s.id}">
+      <svg class="w-4 h-4 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      <span>${s.label}</span>
+    </button>`
+  ).join('');
+}
+
+// --- Collapsible Admin Sections Rendering ---
+function renderCollapsibleAdminSections() {
+  const container = document.getElementById('admin-sections-container');
+  if (!container) return;
+  
+  // Preserve existing section content
+  const existingContent = {};
+  container.querySelectorAll('[data-section]').forEach(el => {
+    existingContent[el.dataset.section] = el.outerHTML;
+  });
+  
+  const sections = [
+    { id: 'app-mode', title: 'App Interface Mode', color: 'purple' },
+    { id: 'register-user', title: 'Register New User', color: 'emerald' },
+    { id: 'manage-users', title: 'Edit / Remove Users', color: 'red' },
+    { id: 'admin-pass', title: 'Admin Password', color: 'blue' },
+    { id: 'user-keyword', title: 'User Login Keyword', color: 'blue' },
+    { id: 'menu-order', title: 'App Menu Order', color: 'blue' },
+  ];
+  
+  let html = '';
+  sections.forEach(s => {
+    const content = existingContent[s.id] || '';
+    // Extract inner content from data-section div if available
+    let innerHtml = content;
+    if (content) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = content;
+      const sectionDiv = tmp.firstElementChild;
+      if (sectionDiv) {
+        // Remove handle for collapsible mode, keep title
+        const handle = sectionDiv.querySelector('.section-handle');
+        if (handle) handle.remove();
+        innerHtml = sectionDiv.innerHTML.replace(/<div class="flex justify-between items-center mb-3">.*?<\/div>/s, '');
+      }
+    }
+    
+    html += `
+      <details class="collapsible-section ${C.collapsibleSection}" data-collapse-section="${s.id}" open>
+        <summary class="${C.collapsibleHeader}">
+          <span class="${C.collapsibleTitle} text-${s.color}-600 dark:text-${s.color}-400">${s.title}</span>
+          <svg class="collapsible-chevron w-5 h-5 text-gray-400 dark:text-darkmuted shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="${C.collapsibleBody}">${innerHtml}</div>
+      </details>`;
+  });
+  
+  container.innerHTML = html;
+}
+
 // --- TEMPLATE CHIPS HELPER ---
 function insertAtCursor(inputId, text) {
 const input = document.getElementById(inputId);
@@ -85,6 +156,10 @@ if (container) {
      });
  }
 }
+
+// Render sub-nav and collapsible sections
+renderAdminSubNav();
+renderCollapsibleAdminSections();
 } catch(e) {
 console.error("Error populating admin form:", e);
 }
