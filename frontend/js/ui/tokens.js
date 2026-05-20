@@ -86,12 +86,12 @@ const C = {
   badgeApproved: 'inline-flex items-center gap-1 bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200/80 dark:border-green-800',
 
   // Quick stat cards
-  statCard: 'flex flex-col items-center justify-center p-2 sm:p-3 md:p-4 rounded-xl bg-white dark:bg-darksurface border border-gray-200/80 dark:border-darkborder shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
+  statCard: 'flex flex-col items-center justify-center p-3 sm:p-4 md:p-5 rounded-xl bg-white dark:bg-darksurface border border-gray-200/80 dark:border-darkborder shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
   statValue: 'text-sm sm:text-base md:text-lg font-bold leading-tight',
-  statLabel: 'text-[9px] sm:text-[10px] font-medium text-gray-500 dark:text-darkmuted uppercase tracking-wide mt-0.5',
+  statLabel: 'text-[10px] sm:text-[11px] font-medium text-gray-500 dark:text-darkmuted uppercase tracking-wide mt-1',
 
   // Filter chips
-  filterChip: 'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-medium border transition cursor-pointer select-none whitespace-nowrap',
+  filterChip: 'inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[12px] sm:text-xs font-medium border transition cursor-pointer select-none whitespace-nowrap',
   filterChipActive: 'bg-blue-600 text-white border-blue-600 shadow-sm',
   filterChipInactive: 'bg-white dark:bg-darksurface text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-darkborder hover:bg-gray-50 dark:hover:bg-darkhover',
 
@@ -113,7 +113,7 @@ paradeMemberCard: 'flex items-center gap-2.5 p-3 rounded-lg border transition-al
    paradeMemberEvent: 'bg-blue-50/60 dark:bg-blue-900/10 border border-blue-200/80 dark:border-blue-800/40',
 
    // Agenda section headers (sticky)
-   sectionHeader: 'sticky top-0 bg-white/95 dark:bg-darksurface/95 backdrop-blur-sm z-10 py-1.5 border-b border-gray-200/80 dark:border-darkborder mb-3 px-1 rounded-lg shadow-sm',
+   sectionHeader: 'sticky top-0 bg-white/95 dark:bg-darksurface/95 backdrop-blur-sm z-10 py-2 border-b border-gray-200/80 dark:border-darkborder mb-3 px-2 rounded-lg shadow-sm',
 };
 
 // --- HTML Helper Functions ---
@@ -220,7 +220,7 @@ function statusBadgeHtml(status) {
     cls = C.badgeCancelled;
     icon = ICONS.x;
   }
-  return '<span class="text-[10px] md:text-[11px] font-bold px-2 py-1 rounded text-center inline-block leading-tight ' + cls + '">' + icon + '<span>' + text + '</span></span>';
+  return '<span class="text-[11px] md:text-[12px] font-bold px-2.5 py-1.5 rounded text-center inline-block leading-tight ' + cls + '">' + icon + '<span>' + text + '</span></span>';
 }
 
 // Export for use in other files (via window global since no module system)

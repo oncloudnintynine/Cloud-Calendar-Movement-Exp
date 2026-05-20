@@ -279,12 +279,12 @@ cells.forEach(cell => {
 const cellDay = parseInt(cell.dataset.day);
 const isToday = cell.dataset.istoday === 'true';
 
-let baseClass = "cal-day-cell relative flex items-center justify-center w-7 h-7 mx-auto rounded-full cursor-pointer transition-colors text-xs font-medium ";
- if (isToday) baseClass += "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200 dark:ring-1 dark:ring-blue-500 font-bold ";
- else baseClass += "hover:bg-gray-200 dark:hover:bg-darkhover ";
+let baseClass = "cal-day-cell relative flex items-center justify-center w-8 h-8 mx-auto rounded-full cursor-pointer transition-colors text-sm font-medium ";
+  if (isToday) baseClass += "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200 dark:ring-1 dark:ring-blue-500 font-bold ";
+  else baseClass += "hover:bg-gray-200 dark:hover:bg-darkhover ";
 
- if (cellDay === d) {
-     baseClass = "cal-day-cell relative flex items-center justify-center w-7 h-7 mx-auto rounded-full cursor-pointer transition-colors text-xs font-bold bg-blue-600 text-white shadow-md ";
+  if (cellDay === d) {
+      baseClass = "cal-day-cell relative flex items-center justify-center w-8 h-8 mx-auto rounded-full cursor-pointer transition-colors text-sm font-bold bg-blue-600 text-white shadow-md ";
  }
 
 cell.className = baseClass;
@@ -306,9 +306,9 @@ if (hasEvent) {
     const dotsHtml = topTypes.map(([type]) => {
       const colors = getEventTypeColor(type);
       const dotColor = cellDay === d ? 'ring-1 ring-white dark:ring-black' : colors.dot;
-      return `<div class="w-1 h-1 ${dotColor} rounded-full"></div>`;
+      return `<div class="w-1.5 h-1.5 ${dotColor} rounded-full"></div>`;
     }).join('');
-    cell.innerHTML = `${cellDay}<div class="absolute -bottom-0.5 flex gap-0.5">${dotsHtml}</div>`;
+    cell.innerHTML = `${cellDay}<div class="absolute -bottom-1 flex gap-1">${dotsHtml}</div>`;
 } else {
     cell.innerHTML = `${cellDay}`;
 }
@@ -542,9 +542,9 @@ for (let i = 0; i < 7; i++) {
   let isToday = curD.toDateString() === new Date().toDateString();
   let isCurMonth = curD.getMonth() === m;
   let bg = isCurMonth ? '' : 'bg-gray-50/50 dark:bg-darksurface/50';
-  html += `<div class="flex-1 border-r border-gray-200 last:border-r-0 dark:border-darkborder ${bg} p-1" onclick="selectDate('${ctx}', ${curD.getFullYear()}, ${curD.getMonth()}, ${curD.getDate()})">
-     <div class="text-[11px] font-bold ${isToday ? 'bg-blue-600 text-white rounded-full w-[22px] h-[22px] mx-auto flex items-center justify-center shadow-md' : 'text-gray-500 dark:text-darkmuted text-center'}">${curD.getDate()}</div>
-  </div>`;
+html += `<div class="flex-1 border-r border-gray-200 last:border-r-0 dark:border-darkborder ${bg} p-1.5" onclick="selectDate('${ctx}', ${curD.getFullYear()}, ${curD.getMonth()}, ${curD.getDate()})">
+      <div class="text-xs font-bold ${isToday ? 'bg-blue-600 text-white rounded-full w-[26px] h-[26px] mx-auto flex items-center justify-center shadow-md' : 'text-gray-500 dark:text-darkmuted text-center'}">${curD.getDate()}</div>
+   </div>`;
 }
 
 html += `<div class="absolute top-8 left-0 right-0 bottom-0 pointer-events-none overflow-hidden">`;
@@ -580,7 +580,7 @@ segments.forEach(seg => {
      else if (seg.eDay === 6) rounded = 'rounded-l-sm';
   }
 
-  html += `<div class="absolute h-[18px] px-1 text-[10px] md:text-[11px] font-bold leading-tight truncate shadow-sm pointer-events-auto cursor-pointer border-b border-black/10 ${color} ${rounded}" style="left: calc(${left}% + 1px); width: calc(${width}% - 2px); top: ${topOffset}px;" onclick="selectDate('${ctx}', ${w.getFullYear()}, ${w.getMonth()}, ${w.getDate() + seg.sDay})" title="${appliedTitle}">${appliedTitle}</div>`;
+  html += `<div class="absolute h-[22px] px-1.5 text-[11px] md:text-[12px] font-bold leading-tight truncate shadow-sm pointer-events-auto cursor-pointer border-b border-black/10 ${color} ${rounded}" style="left: calc(${left}% + 2px); width: calc(${width}% - 4px); top: ${topOffset}px;" onclick="selectDate('${ctx}', ${w.getFullYear()}, ${w.getMonth()}, ${w.getDate() + seg.sDay})" title="${appliedTitle}">${appliedTitle}</div>`;
 });
 html += `</div></div>`; 
 }
@@ -688,9 +688,9 @@ timeStr = `${formatDisplayDate(new Date(l.StartDate))} to ${formatDisplayDate(ne
 let actionBtns = '';
 let compactActionBtns = '';
 if ((String(l.Phone) === String(user.phone) || user.role === 'admin') && l.Status !== 'Cancelled') {
-actionBtns = `<div class="flex space-x-3 mt-3 pt-3 border-t border-gray-200 dark:border-darkborder"><button onclick="triggerEdit('${l.ID}')" class="${C.btnEdit}">Edit</button><button onclick="cancelLeave('${l.ID}', '${l.Phone}')" class="${C.btnCancel}">Cancel</button></div>`;
+actionBtns = `<div class="flex space-x-3 mt-4 pt-4 border-t border-gray-200 dark:border-darkborder"><button onclick="triggerEdit('${l.ID}')" class="${C.btnEdit}">Edit</button><button onclick="cancelLeave('${l.ID}', '${l.Phone}')" class="${C.btnCancel}">Cancel</button></div>`;
 
-compactActionBtns = `<div class="flex space-x-2 mt-2 pt-2 border-t border-blue-200 dark:border-blue-800/50">
+compactActionBtns = `<div class="flex space-x-3 mt-3 pt-3 border-t border-blue-200 dark:border-blue-800/50">
  <button onclick="triggerEdit('${l.ID}')" class="${C.btnEditSm}">Edit</button>
  <button onclick="cancelLeave('${l.ID}', '${l.Phone}')" class="${C.btnCancelSm}">Cancel</button>
 </div>`;
@@ -784,10 +784,10 @@ const hasBody = finalDetailsHtml.trim() !== '' || (isInfoAllContext ? compactAct
 const typeIcon = isEvent ? ICONS.event : ICONS.leave;
  const typeChipHtml = `<span class="${C.agendaTypeChip} ${typeColors.bg} ${typeColors.text}">${typeIcon}${displayType}</span>`;
 
- const nowBadge = isNowActive(l) ? `<span class="text-[10px] md:text-[11px] font-bold px-2 py-0.5 rounded text-center inline-block leading-tight bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200/80 dark:border-green-800 animate-pulse">● Now</span>` : '';
+ const nowBadge = isNowActive(l) ? `<span class="text-[11px] md:text-[12px] font-bold px-2.5 py-1 rounded text-center inline-block leading-tight bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200/80 dark:border-green-800 animate-pulse">● Now</span>` : '';
 
  const metaDataHtml = `
-<div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs text-gray-500 dark:text-darkmuted">
+<div class="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 text-xs text-gray-500 dark:text-darkmuted">
   ${timeStr ? `<span class="inline-flex items-center gap-1">${ICONS.clock}${timeStr}</span>` : ''}
   ${locStr ? `<span class="inline-flex items-center gap-1">${ICONS.location}${applyAcronymsFront(locStr)}</span>` : ''}
   ${attendeesDisplay ? `<span class="inline-flex items-center gap-1">${ICONS.users}${applyAcronymsFront(attendeesDisplay).split(',').length} attendee${attendeesDisplay.split(',').length > 1 ? 's' : ''}</span>` : ''}
@@ -797,32 +797,32 @@ if (isInfoAllContext) {
 return `<div class="${C.agendaCardInfoAll}">
   <div class="flex justify-between items-start ${hasBody ? 'cursor-pointer select-none' : ''}" ${hasBody ? 'onclick="toggleAgendaCard(this)"' : ''}>
     <div class="flex-grow pr-2">
-      <div class="flex items-center gap-2 mb-1">
+      <div class="flex items-center gap-2 mb-2">
         ${typeChipHtml}
       </div>
-      <h3 class="font-bold text-[11px] md:text-xs text-blue-900 dark:text-blue-300">${finalTitle}</h3>
+      <h3 class="font-bold text-xs md:text-sm text-blue-900 dark:text-blue-300">${finalTitle}</h3>
       ${metaDataHtml}
     </div>
     ${hasBody ? `<svg class="w-4 h-4 text-blue-500 transition-transform duration-200 chevron-icon shrink-0 ${isCollapsed ? '' : 'rotate-180'}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>` : ''}
   </div>
   ${hasBody ? `
- <div class="agenda-card-body ${isCollapsed ? 'hidden' : ''}">
-    ${finalDetailsHtml ? `<div class="whitespace-pre-wrap mt-1.5">${finalDetailsHtml}</div>` : ''}
-    ${compactActionBtns}
-  </div>` : ''}
+<div class="agenda-card-body ${isCollapsed ? 'hidden' : ''}">
+     ${finalDetailsHtml ? `<div class="whitespace-pre-wrap mt-2">${finalDetailsHtml}</div>` : ''}
+     ${compactActionBtns}
+   </div>` : ''}
 </div>`;
 }
 
 return `<div class="${C.agendaCard} ${typeColors.accent}">
 <div class="flex justify-between items-start ${hasBody ? 'cursor-pointer select-none' : ''}" ${hasBody ? 'onclick="toggleAgendaCard(this)"' : ''}>
 <div class="flex-grow pr-2 min-w-0">
-<div class="flex items-center gap-2 mb-1 flex-wrap">
+<div class="flex items-center gap-2 mb-2 flex-wrap">
   ${typeChipHtml}
-  ${nowBadge}<span class="text-[10px] md:text-[11px] font-bold px-2 py-0.5 rounded text-center inline-block leading-tight ${getBadgeClass(l.Status)}">${formatStatusBadge(l.Status)}</span>
+  ${nowBadge}<span class="text-[11px] md:text-[12px] font-bold px-2.5 py-1 rounded text-center inline-block leading-tight ${getBadgeClass(l.Status)}">${formatStatusBadge(l.Status)}</span>
 </div>
 <h3 class="font-bold text-sm md:text-base text-gray-900 dark:text-gray-100 leading-tight">${finalTitle}</h3>
 ${metaDataHtml}
-${!isMyCalendar && !isEvent && l.HalfDay !== 'None' && l.HalfDay !== 'NONE' ? `<p class="font-medium text-xs md:text-sm text-gray-700 dark:text-darktext mt-1">(${l.HalfDay})</p>` : ''}
+${!isMyCalendar && !isEvent && l.HalfDay !== 'None' && l.HalfDay !== 'NONE' ? `<p class="font-medium text-xs md:text-sm text-gray-700 dark:text-darktext mt-1.5">(${l.HalfDay})</p>` : ''}
 </div>
 <div class="flex items-center shrink-0 ml-2">
 ${hasBody ? `<svg class="w-5 h-5 text-gray-400 dark:text-darkmuted transition-transform duration-200 chevron-icon shrink-0 ${isCollapsed ? '' : 'rotate-180'}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>` : ''}
@@ -830,7 +830,7 @@ ${hasBody ? `<svg class="w-5 h-5 text-gray-400 dark:text-darkmuted transition-tr
 </div>
 ${hasBody ? `
 <div class="agenda-card-body ${isCollapsed ? 'hidden' : ''}">
-${finalDetailsHtml ? `<div class="whitespace-pre-wrap mt-2">${finalDetailsHtml}</div>` : ''}
+${finalDetailsHtml ? `<div class="whitespace-pre-wrap mt-3">${finalDetailsHtml}</div>` : ''}
 ${actionBtns}
 </div>` : ''}
 </div>`;
@@ -883,15 +883,15 @@ for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
      const mm = String(d.getMonth() + 1).padStart(2, '0');
      const dd = String(d.getDate()).padStart(2, '0');
      const isToday = d.toDateString() === new Date().toDateString();
-     const countBadge = dayEvents.length > 0 ? `<span class="ml-2 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400">${dayEvents.length}</span>` : '';
-     
-     html += `
-     <div class="agenda-day-group mb-6" data-date="${yyyy}-${mm}-${dd}">
-         <div class="${C.sectionHeader} mb-3 flex items-center">
-             <h3 class="font-bold text-sm md:text-base ${isToday ? 'text-blue-700 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'}">${isToday ? 'Today' : formatDisplayDate(d)}</h3>
-             ${countBadge}
-         </div>
-         <div class="space-y-3 px-1">
+const countBadge = dayEvents.length > 0 ? `<span class="ml-2 inline-flex items-center justify-center w-6 h-6 text-[11px] font-bold rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400">${dayEvents.length}</span>` : '';
+      
+      html += `
+      <div class="agenda-day-group mb-6" data-date="${yyyy}-${mm}-${dd}">
+          <div class="${C.sectionHeader} mb-3 flex items-center">
+              <h3 class="font-bold text-sm md:text-base ${isToday ? 'text-blue-700 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'}">${isToday ? 'Today' : formatDisplayDate(d)}</h3>
+              ${countBadge}
+          </div>
+          <div class="space-y-3 px-2">
              ${buildAgendaHtml(dayEvents, ctx === 'my' || (ctx==='dash' && document.getElementById('dash-dept-nav').value==='MY_CALENDAR'), false)}
          </div>
      </div>`;
@@ -920,12 +920,12 @@ if (!group) {
  group.className = 'agenda-day-group mb-6';
  group.dataset.date = dateStr;
  const isToday = targetDateObj.toDateString() === new Date().toDateString();
- group.innerHTML = `
-     <div class="sticky top-0 bg-gray-50 dark:bg-darkinput z-10 py-1.5 border-y border-gray-200 dark:border-darkborder mb-3 shadow-sm px-2 rounded-lg flex items-center">
-         <h3 class="font-bold text-sm md:text-base ${isToday ? 'text-blue-700 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'}">${isToday ? 'Today' : formatDisplayDate(targetDateObj)}</h3>
-         <span class="ml-2 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold rounded-full bg-gray-200 dark:bg-darkborder text-gray-500 dark:text-darkmuted">0</span>
-     </div>
-     <div class="space-y-3 px-1">
+group.innerHTML = `
+      <div class="sticky top-0 bg-gray-50 dark:bg-darkinput z-10 py-2 border-y border-gray-200 dark:border-darkborder mb-3 shadow-sm px-3 rounded-lg flex items-center">
+          <h3 class="font-bold text-sm md:text-base ${isToday ? 'text-blue-700 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'}">${isToday ? 'Today' : formatDisplayDate(targetDateObj)}</h3>
+          <span class="ml-2 inline-flex items-center justify-center w-6 h-6 text-[11px] font-bold rounded-full bg-gray-200 dark:bg-darkborder text-gray-500 dark:text-darkmuted">0</span>
+      </div>
+      <div class="space-y-3 px-2">
          <div class="${C.emptyState} py-8">${ICONS.empty}<p class="${C.emptyStateText} mt-2">No records for this date.</p></div>
      </div>`;
 
