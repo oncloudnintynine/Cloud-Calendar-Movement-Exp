@@ -811,6 +811,7 @@ return `<div class="${C.agendaCardInfoAll}">
     ${compactActionBtns}
   </div>` : ''}
 </div>`;
+}
 
 return `<div class="${C.agendaCard} ${typeColors.accent}">
 <div class="flex justify-between items-start ${hasBody ? 'cursor-pointer select-none' : ''}" ${hasBody ? 'onclick="toggleAgendaCard(this)"' : ''}>
