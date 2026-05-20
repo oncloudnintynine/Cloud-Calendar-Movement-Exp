@@ -367,19 +367,20 @@ function addCustomKahGroup() {
 const input = document.getElementById('new-kah-group-name');
 const name = input.value.trim();
 if (name) {
-if (customKahGroups.some(g => g.name.toLowerCase() === name.toLowerCase())) return alert("Group name already exists.");
-customKahGroups.push({ name: name, members:[] });
-input.value = '';
-renderCustomKahGroups();
-}
-}
+ if (customKahGroups.some(g => g.name.toLowerCase() === name.toLowerCase())) return showToast("Group name already exists.", "warning");
+ customKahGroups.push({ name: name, members:[] });
+ input.value = '';
+ renderCustomKahGroups();
+ }
+ }
 
-function removeCustomKahGroup(idx) {
-if (confirm("Are you sure you want to delete this custom group?")) {
-customKahGroups.splice(idx, 1);
-renderCustomKahGroups();
-}
-}
+ async function removeCustomKahGroup(idx) {
+ const confirmed = await showConfirm("Are you sure you want to delete this custom group?");
+ if (!confirmed) return;
+ customKahGroups.splice(idx, 1);
+ renderCustomKahGroups();
+ showToast("Group deleted.", "success");
+ }
 
 function searchKahGroupMember(idx) {
 const q = document.getElementById(`kah-group-search-${idx}`).value;
@@ -455,32 +456,33 @@ async function confirmUpdateUser() {
 if (!userToManageResource) return;
 const name = document.getElementById('edit-user-name').value.trim();
 const mobile = document.getElementById('edit-user-mobile').value.trim();
-const unit = document.getElementById('edit-user-unit').value;
+ const unit = document.getElementById('edit-user-unit').value;
 
-if (!name || !mobile || !unit) return alert("Please fill in all fields.");
-if (!appData.manageUser.birthdaySelected) return alert("Please select a Birthday.");
+ if (!name || !mobile || !unit) return showToast("Please fill in all fields.", "warning");
+ if (!appData.manageUser.birthdaySelected) return showToast("Please select a Birthday.", "warning");
 
-const bday = appData.manageUser.birthdayD;
-const bdayStr = `${bday.getFullYear()}-${String(bday.getMonth()+1).padStart(2,'0')}-${String(bday.getDate()).padStart(2,'0')}`;
+ const bday = appData.manageUser.birthdayD;
+ const bdayStr = `${bday.getFullYear()}-${String(bday.getMonth()+1).padStart(2,'0')}-${String(bday.getDate()).padStart(2,'0')}`;
 
-showLoader(true);
-try {
-await apiCall('updateUser', { adminPass: user.pass, resourceName: userToManageResource, fullName: name, mobile: mobile, unit: unit, birthday: bdayStr });
-alert("User successfully updated.");
-cancelManageUser(); await loadAdminSettings();
-} catch(e) { alert("Error updating user: " + e.message); } finally { showLoader(false); }
-}
+ showLoader(true);
+ try {
+ await apiCall('updateUser', { adminPass: user.pass, resourceName: userToManageResource, fullName: name, mobile: mobile, unit: unit, birthday: bdayStr });
+ showToast("User successfully updated.", "success");
+ cancelManageUser(); await loadAdminSettings();
+ } catch(e) { showToast("Error updating user: " + e.message, "error"); } finally { showLoader(false); }
+ }
 
-async function confirmDeleteUser() {
-if (!userToManageResource) return;
-if (!confirm("Are you sure you want to permanently remove this user from the system and Google Contacts? This cannot be undone.")) return;
-showLoader(true);
-try {
-await apiCall('deleteUser', { adminPass: user.pass, resourceName: userToManageResource });
-alert("User successfully removed.");
-cancelManageUser(); await loadAdminSettings();
-} catch(e) { alert("Error deleting user: " + e.message); } finally { showLoader(false); }
-}
+ async function confirmDeleteUser() {
+ if (!userToManageResource) return;
+ const confirmed = await showConfirm("Are you sure you want to permanently remove this user from the system and Google Contacts?", "Delete User", { danger: true, dangerText: 'This action cannot be undone.' });
+ if (!confirmed) return;
+ showLoader(true);
+ try {
+ await apiCall('deleteUser', { adminPass: user.pass, resourceName: userToManageResource });
+ showToast("User successfully removed.", "success");
+ cancelManageUser(); await loadAdminSettings();
+ } catch(e) { showToast("Error deleting user: " + e.message, "error"); } finally { showLoader(false); }
+ }
 
 function submitAdminRegister() { handleRegister('admin'); }
 
@@ -502,59 +504,59 @@ adminSectionsOrder: tempAdminSectionsOrder
 };
 
 try {
-await apiCall('saveSettings', payload);
-alert("Settings successfully saved! App will reload to apply UI changes.");
-if(newPass) { user.pass = newPass; localStorage.setItem('user', JSON.stringify(user)); }
-window.location.reload(); 
-} catch (err) { alert("Error: " + err.message); showLoader(false); }
+ await apiCall('saveSettings', payload);
+ showToast("Settings successfully saved! App will reload...", "success");
+ if(newPass) { user.pass = newPass; localStorage.setItem('user', JSON.stringify(user)); }
+ setTimeout(() => window.location.reload(), 1500);
+ } catch (err) { showToast("Error: " + err.message, "error"); showLoader(false); }
+ }
+
+ async function saveEventTemplates() {
+ showLoader(true);
+ const payload = {
+ adminPass: user.pass,
+ typicalEventTypes: tempTypicalEventTypes,
+ gcalTemplate: document.getElementById('set-gcal-template').value.trim(),
+ agendaTemplate: document.getElementById('set-agenda-template').value.trim(),
+ agendaDetailsTemplate: document.getElementById('set-agenda-details-template').value.trim(),
+ infoAllTemplate: document.getElementById('set-infoall-template').value.trim(),
+ infoAllDetailsTemplate: document.getElementById('set-infoall-details-template').value.trim()
+ };
+ try {
+ await apiCall('saveSettings', payload);
+ showToast("Event Types & Templates saved! App will reload...", "success");
+ setTimeout(() => window.location.reload(), 1500);
+ } catch (err) { showToast("Error: " + err.message, "error"); showLoader(false); }
 }
 
-async function saveEventTemplates() {
-showLoader(true);
-const payload = {
-adminPass: user.pass,
-typicalEventTypes: tempTypicalEventTypes,
-gcalTemplate: document.getElementById('set-gcal-template').value.trim(),
-agendaTemplate: document.getElementById('set-agenda-template').value.trim(),
-agendaDetailsTemplate: document.getElementById('set-agenda-details-template').value.trim(),
-infoAllTemplate: document.getElementById('set-infoall-template').value.trim(),
-infoAllDetailsTemplate: document.getElementById('set-infoall-details-template').value.trim()
-};
-try {
-await apiCall('saveSettings', payload);
-alert("Event Types & Templates successfully saved! App will reload to apply changes.");
-window.location.reload();
-} catch (err) { alert("Error: " + err.message); showLoader(false); }
-}
+ async function saveAcronyms() {
+ showLoader(true);
+ const payload = {
+ adminPass: user.pass,
+ acronyms: tempAcronyms
+ };
+ try {
+ await apiCall('saveSettings', payload);
+ showToast("Acronyms saved! App will reload...", "success");
+ setTimeout(() => window.location.reload(), 1500);
+ } catch (err) { showToast("Error: " + err.message, "error"); showLoader(false); }
+ }
 
-async function saveAcronyms() {
-showLoader(true);
-const payload = {
-adminPass: user.pass,
-acronyms: tempAcronyms
-};
-try {
-await apiCall('saveSettings', payload);
-alert("Acronyms successfully saved! App will reload to apply changes.");
-window.location.reload();
-} catch (err) { alert("Error: " + err.message); showLoader(false); }
-}
+ async function saveKahSettings() {
+ showLoader(true);
+ const payload = {
+ adminPass: user.pass,
+ kahLimit: document.getElementById('set-kah-limit').value,
+ approvingAuthority: document.getElementById('set-appr-email').value,
+ kahList: adminKAHList,
+ customKahGroups: customKahGroups,
+ kahEmailSubject: document.getElementById('set-kah-subject').value.trim(),
+ kahEmailBody: document.getElementById('set-kah-body').value.trim()
+ };
 
-async function saveKahSettings() {
-showLoader(true);
-const payload = {
-adminPass: user.pass,
-kahLimit: document.getElementById('set-kah-limit').value,
-approvingAuthority: document.getElementById('set-appr-email').value,
-kahList: adminKAHList,
-customKahGroups: customKahGroups,
-kahEmailSubject: document.getElementById('set-kah-subject').value.trim(),
-kahEmailBody: document.getElementById('set-kah-body').value.trim()
-};
-
-try {
-await apiCall('saveSettings', payload);
-alert("KAH Settings successfully saved! App will reload to apply changes.");
-window.location.reload();
-} catch (err) { alert("Error: " + err.message); showLoader(false); }
-}
+ try {
+ await apiCall('saveSettings', payload);
+ showToast("KAH Settings saved! App will reload...", "success");
+ setTimeout(() => window.location.reload(), 1500);
+ } catch (err) { showToast("Error: " + err.message, "error"); showLoader(false); }
+ }

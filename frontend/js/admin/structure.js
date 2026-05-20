@@ -179,66 +179,91 @@ let html = allUnits.map(u => `
 `).join('');
 
 document.getElementById('reassign-unit-list').innerHTML = html;
-document.getElementById('reassign-modal').classList.remove('hidden');
-document.getElementById('reassign-modal').classList.add('flex');
-}
+ const modal = document.getElementById('reassign-modal');
+ modal.classList.remove('hidden');
+ modal.classList.add('flex');
 
-function confirmReassign(newUnit) {
-if (reassignTargetResource) {
-   pendingStructureChanges[reassignTargetResource] = newUnit;
-   renderStructureUI();
-}
-closeReassignModal();
-}
+ // Focus management - trap focus in modal
+ const closeBtn = modal.querySelector('button[onclick="closeReassignModal()"]');
+ if (closeBtn) setTimeout(() => closeBtn.focus(), 50);
 
-function closeReassignModal() {
-reassignTargetResource = null;
-document.getElementById('reassign-modal').classList.add('hidden');
-document.getElementById('reassign-modal').classList.remove('flex');
-}
+ // Trap focus within modal
+ modal.addEventListener('keydown', function handler(e) {
+   if (e.key === 'Tab') {
+     e.preventDefault();
+     const focusable = modal.querySelectorAll('button, [tabindex]');
+     const currentFocus = document.activeElement;
+     let nextIdx = Array.from(focusable).indexOf(currentFocus) + 1;
+     if (nextIdx >= focusable.length) nextIdx = 0;
+     focusable[nextIdx].focus();
+   }
+   if (e.key === 'Escape') {
+     closeReassignModal();
+     modal.removeEventListener('keydown', handler);
+   }
+ });
+ }
+
+ function confirmReassign(newUnit) {
+ if (reassignTargetResource) {
+    pendingStructureChanges[reassignTargetResource] = newUnit;
+    renderStructureUI();
+ }
+ closeReassignModal();
+ }
+
+ function closeReassignModal() {
+ reassignTargetResource = null;
+ const modal = document.getElementById('reassign-modal');
+ modal.classList.add('hidden');
+ modal.classList.remove('flex');
+ }
 
 function addParentUnit() {
-const input = document.getElementById('new-parent-unit');
-const val = input.value.trim().toUpperCase();
-if (!val) return;
-if (companyStructure.includes(val)) return alert("Parent unit already exists.");
+ const input = document.getElementById('new-parent-unit');
+ const val = input.value.trim().toUpperCase();
+ if (!val) return;
+ if (companyStructure.includes(val)) return showToast("Parent unit already exists.", "warning");
 
-companyStructure.push(val);
-input.value = '';
-renderStructureUI();
-}
+ companyStructure.push(val);
+ input.value = '';
+ renderStructureUI();
+ showToast("Parent unit added.", "success");
+ }
 
-function addChildUnit(parentPath) {
-const input = document.getElementById(`new-child-${parentPath}`);
-const val = input.value.trim().toUpperCase();
-if (!val) return;
+ function addChildUnit(parentPath) {
+ const input = document.getElementById(`new-child-${parentPath}`);
+ const val = input.value.trim().toUpperCase();
+ if (!val) return;
 
-const fullPath = `${parentPath}-${val}`;
-if (companyStructure.includes(fullPath)) return alert("Unit already exists.");
+ const fullPath = `${parentPath}-${val}`;
+ if (companyStructure.includes(fullPath)) return showToast("Unit already exists.", "warning");
 
-companyStructure.push(fullPath);
-renderStructureUI();
-}
+ companyStructure.push(fullPath);
+ renderStructureUI();
+ showToast("Sub-unit added.", "success");
+ }
 
 async function renameUnitPrompt(oldPath, e) {
-if (e) { e.stopPropagation(); e.preventDefault(); }
-const newName = prompt(`Enter new exact name to replace unit path:\n'${oldPath}'`, oldPath);
-if (!newName || newName.trim() === '' || newName === oldPath) return;
+ if (e) { e.stopPropagation(); e.preventDefault(); }
+ const newName = prompt(`Enter new exact name to replace unit path:\n'${oldPath}'`, oldPath);
+ if (!newName || newName.trim() === '' || newName === oldPath) return;
 
-showLoader(true);
-try {
-  await apiCall('renameUnit', { adminPass: user.pass, oldName: oldPath, newName: newName.trim().toUpperCase() });
-  alert("Unit successfully renamed across all platforms!");
-  window.location.reload();
-} catch (err) {
-  alert("Error renaming unit: " + err.message);
-  showLoader(false);
-}
-}
+ showLoader(true);
+ try {
+   await apiCall('renameUnit', { adminPass: user.pass, oldName: oldPath, newName: newName.trim().toUpperCase() });
+   showToast("Unit successfully renamed across all platforms!", "success");
+   setTimeout(() => window.location.reload(), 1500);
+ } catch (err) {
+   showToast("Error renaming unit: " + err.message, "error");
+   showLoader(false);
+ }
+ }
 
-function removeUnit(fullPath, e) {
-if (e) { e.stopPropagation(); e.preventDefault(); }
-if (!confirm(`Are you sure you want to delete ${fullPath} and all its sub-units? Personnel inside will automatically be marked as Unassigned.`)) return;
+ async function removeUnit(fullPath, e) {
+ if (e) { e.stopPropagation(); e.preventDefault(); }
+ const confirmed = await showConfirm(`Are you sure you want to delete ${fullPath} and all its sub-units? Personnel inside will automatically be marked as Unassigned.`, "Delete Unit", { danger: true, dangerText: 'Personnel in this unit will become Unassigned.' });
+ if (!confirmed) return;
 
 const toDelete = companyStructure.filter(p => p === fullPath || p.startsWith(`${fullPath}-`));
 companyContacts.forEach(c => {
@@ -253,55 +278,52 @@ renderStructureUI();
 
 async function saveCompanyStructure() {
 showLoader(true);
-const finalChanges = {};
-for (let resName in pendingStructureChanges) {
-   const originalContact = companyContacts.find(c => c.resourceName === resName);
-   let originalDept = "UNASSIGNED";
-   if (originalContact && originalContact.dept) {
-       originalDept = originalContact.dept.split(',')[0].trim().toUpperCase();
-   }
-   if (originalDept !== pendingStructureChanges[resName]) {
-       finalChanges[resName] = pendingStructureChanges[resName];
-   }
-}
-
-try {
- await apiCall('saveSettings', { adminPass: user.pass, companyStructure: companyStructure });
- if (Object.keys(finalChanges).length > 0) {
-   await apiCall('updateUserUnits', { adminPass: user.pass, changes: finalChanges });
-   alert("Hierarchy and Personnel assignments successfully updated!");
- } else {
-   alert("Hierarchy successfully updated!");
+ const finalChanges = {};
+ for (let resName in pendingStructureChanges) {
+    const originalContact = companyContacts.find(c => c.resourceName === resName);
+    let originalDept = "UNASSIGNED";
+    if (originalContact && originalContact.dept) {
+        originalDept = originalContact.dept.split(',')[0].trim().toUpperCase();
+    }
+    if (originalDept !== pendingStructureChanges[resName]) {
+        finalChanges[resName] = pendingStructureChanges[resName];
+    }
  }
- window.location.reload();
-} catch (err) { alert("Error saving: " + err.message); showLoader(false); }
-}
 
-async function forceOverwriteContacts() {
-if (!confirm("WARNING: This will perform a 100% overwrite of Google Contacts using the current App data. All App users will be renamed and re-tagged to the groups shown here.\n\nProceed only if Google Contacts has drifted from the app.")) return;
+ try {
+  await apiCall('saveSettings', { adminPass: user.pass, companyStructure: companyStructure });
+  const msg = Object.keys(finalChanges).length > 0 ? "Hierarchy and Personnel assignments updated!" : "Hierarchy updated!";
+  showToast(msg, "success");
+  setTimeout(() => window.location.reload(), 1500);
+ } catch (err) { showToast("Error saving: " + err.message, "error"); showLoader(false); }
+ }
 
-showLoader(true);
+ async function forceOverwriteContacts() {
+ const confirmed = await showConfirm("This will perform a 100% overwrite of Google Contacts using the current App data. All App users will be renamed and re-tagged to the groups shown here.\n\nProceed only if Google Contacts has drifted from the app.", "Force Sync Google Contacts", { danger: true, dangerText: 'This action cannot be undone.' });
+ if (!confirmed) return;
 
-const payloadContacts = companyContacts.map(c => {
-    return {
-        resourceName: c.resourceName,
-        name: c.name.replace(/'/g, "\\'"),
-        unit: getEffectiveDept(c)
-    };
-});
+ showLoader(true);
 
-const payload = {
-    adminPass: user.pass,
-    structure: companyStructure,
-    contacts: payloadContacts
-};
+ const payloadContacts = companyContacts.map(c => {
+     return {
+         resourceName: c.resourceName,
+         name: c.name.replace(/'/g, "\\'"),
+         unit: getEffectiveDept(c)
+     };
+ });
 
-try {
-    await apiCall('forceSyncContacts', payload);
-    alert("Google Contacts successfully overwritten & synchronized with App data!");
-    window.location.reload();
-} catch (err) {
-    alert("Error syncing contacts: " + err.message);
+ const payload = {
+     adminPass: user.pass,
+     structure: companyStructure,
+     contacts: payloadContacts
+ };
+
+ try {
+     await apiCall('forceSyncContacts', payload);
+     showToast("Google Contacts synchronized with App data!", "success");
+     setTimeout(() => window.location.reload(), 1500);
+ } catch (err) {
+     showToast("Error syncing contacts: " + err.message, "error");
     showLoader(false);
 }
 }

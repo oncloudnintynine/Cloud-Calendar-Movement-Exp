@@ -55,8 +55,8 @@ try {
  return result.data;
 } catch (err) {
  if(err.message.includes('Failed to fetch')) {
-   alert("Network Error or Google Permissions Expired.\nIf you are the Administrator, please open the script editor and run INITIAL_SETUP().");
+   showToast("Network Error or Google Permissions Expired. If you are the Administrator, please open the script editor and run INITIAL_SETUP().", "error");
  }
  throw err;
-}
-}
+ }
+ }

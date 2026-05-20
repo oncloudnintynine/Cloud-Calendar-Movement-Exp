@@ -2,6 +2,13 @@
 // UI, Navigation, & Formatter Logic
 // ==========================================
 
+window._searchTimeout = null;
+
+function debouncedSearch(callback, delay) {
+ clearTimeout(window._searchTimeout);
+ window._searchTimeout = setTimeout(callback, delay || 300);
+}
+
 function toggleMenu() {
 const menu = document.getElementById('slide-menu');
 const panel = document.getElementById('slide-menu-panel');

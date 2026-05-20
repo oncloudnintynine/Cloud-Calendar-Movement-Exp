@@ -4,17 +4,39 @@
 let activePicker = { ctx: '', field: '', type: 'date', currentVal: new Date() };
 
 function openPicker(type, ctx, field) {
-activePicker = { ctx, field, type, currentVal: new Date(appData[ctx][field + 'D']) };
-document.getElementById('picker-title').innerText = type === 'datetime' ? 'Select Date & Time' : 'Select Date';
-buildWheels();
-document.getElementById('picker-modal').classList.remove('hidden');
-document.getElementById('picker-modal').classList.add('flex');
-}
+ activePicker = { ctx, field, type, currentVal: new Date(appData[ctx][field + 'D']) };
+ document.getElementById('picker-title').innerText = type === 'datetime' ? 'Select Date & Time' : 'Select Date';
+ buildWheels();
+ const modal = document.getElementById('picker-modal');
+ modal.classList.remove('hidden');
+ modal.classList.add('flex');
 
-function closePicker() {
-document.getElementById('picker-modal').classList.add('hidden');
-document.getElementById('picker-modal').classList.remove('flex');
-}
+ // Focus management - trap focus in modal
+ const cancelBtn = modal.querySelector('button[onclick="closePicker()"]');
+ if (cancelBtn) setTimeout(() => cancelBtn.focus(), 50);
+
+ // Trap focus within modal
+ modal.addEventListener('keydown', function handler(e) {
+   if (e.key === 'Tab') {
+     e.preventDefault();
+     const focusable = modal.querySelectorAll('button, [tabindex]');
+     const currentFocus = document.activeElement;
+     let nextIdx = Array.from(focusable).indexOf(currentFocus) + 1;
+     if (nextIdx >= focusable.length) nextIdx = 0;
+     focusable[nextIdx].focus();
+   }
+   if (e.key === 'Escape') {
+     closePicker();
+     modal.removeEventListener('keydown', handler);
+   }
+ });
+ }
+
+ function closePicker() {
+ const modal = document.getElementById('picker-modal');
+ modal.classList.add('hidden');
+ modal.classList.remove('flex');
+ }
 
 function confirmPicker() {
 const wrapper = document.getElementById('picker-wheels-wrapper');

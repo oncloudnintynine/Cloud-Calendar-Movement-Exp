@@ -100,16 +100,16 @@ const bday = appData[ctxObj].birthdayD;
 const bdayStr = `${bday.getFullYear()}-${String(bday.getMonth()+1).padStart(2,'0')}-${String(bday.getDate()).padStart(2,'0')}`;
 
 showLoader(true);
-try {
- await apiCall('registerUser', { fullName: name, mobile: mobile, unit: unit, birthday: bdayStr });
- alert('User successfully registered!');
- if (context === 'self') toggleRegisterView(false);
- 
- document.getElementById(prefix + 'name').value = '';
- document.getElementById(prefix + 'mobile').value = '';
- document.getElementById(prefix + 'unit').value = '';
- initDates(); 
-} catch(e) { alertError(context === 'admin' ? 'admin-alert' : 'register-alert', e.message); } finally { showLoader(false); }
-}
+ try {
+  await apiCall('registerUser', { fullName: name, mobile: mobile, unit: unit, birthday: bdayStr });
+  showToast('User successfully registered!', 'success');
+  if (context === 'self') toggleRegisterView(false);
+  
+  document.getElementById(prefix + 'name').value = '';
+  document.getElementById(prefix + 'mobile').value = '';
+  document.getElementById(prefix + 'unit').value = '';
+  initDates(); 
+ } catch(e) { alertError(context === 'admin' ? 'admin-alert' : 'register-alert', e.message); } finally { showLoader(false); }
+ }
 
 function logout() { localStorage.removeItem('user'); sessionStorage.removeItem('initialData'); user = null; showLogin(); }

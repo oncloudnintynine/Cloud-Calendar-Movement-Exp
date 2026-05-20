@@ -26,7 +26,7 @@ extend: {
    darkinput: '#1e1e1e',
    darkhover: '#2a2a2a',
    darktext: '#f3f4f6',
-   darkmuted: '#9ca3af'
+   darkmuted: '#b0b8c4'
  }
 }
 } 
@@ -34,6 +34,9 @@ extend: {
 </script>
 </head>
 <body class="bg-gray-50 text-gray-900 dark:bg-darkbase dark:text-darktext transition-colors duration-200 h-[100dvh] flex flex-col text-[15px] overflow-hidden">
+
+<!-- Toast Container -->
+<div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-2 pointer-events-none"></div>
 
 <div id="loader" class="fixed inset-0 bg-white dark:bg-darkbase z-[100] flex-col items-center justify-center hidden">
 <div class="spinner mb-3"></div><p id="loader-status" class="font-medium text-lg mb-2">Loading...</p>
@@ -67,7 +70,7 @@ extend: {
 
 <div class="flex items-center space-x-1 shrink-0">
 <span id="nav-user-name" class="font-medium hidden md:block mr-2 text-sm text-gray-600 dark:text-darkmuted"></span>
-<button onclick="toggleTheme()" id="theme-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-darkhover transition text-gray-600 dark:text-darkmuted">
+<button onclick="toggleTheme()" id="theme-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-darkhover transition text-gray-600 dark:text-darkmuted" aria-label="Toggle dark mode" title="Toggle dark mode">
   <svg id="theme-icon-sun" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 4.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
   <svg id="theme-icon-moon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.644 9 9 0 0112 21a9 9 0 01-8.354-5.646z" /></svg>
 </button>
@@ -188,7 +191,7 @@ extend: {
 <div id="view-dashboard" class="tab-content hidden flex-grow flex-col overflow-hidden h-full space-y-2 md:space-y-3">
 
 <div class="flex flex-row items-center space-x-2 w-full shrink-0 overflow-x-auto pb-1 scrollbar-hide">
- <input type="text" id="dash-search" placeholder="Search events, people..." class="flex-grow min-w-[140px] border border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3.5 bg-white dark:bg-darkinput text-gray-900 dark:text-white outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-300 dark:focus:ring-blue-700/50 transition text-sm" onkeyup="window.agendaDirty=true; renderDashboard();">
+ <input type="text" id="dash-search" placeholder="Search events, people..." class="flex-grow min-w-[140px] border border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3.5 bg-white dark:bg-darkinput text-gray-900 dark:text-white outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-300 dark:focus:ring-blue-700/50 transition text-sm" onkeyup="window.agendaDirty=true; debouncedSearch(() => renderDashboard(), 300);" aria-label="Search events, people..." role="searchbox">
   
  <button id="unified-btn-combined" onclick="switchTab('submit-combined')" class="hidden bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition text-xs shrink-0 whitespace-nowrap flex items-center gap-1.5">
   <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
@@ -968,8 +971,8 @@ extend: {
 </div>
 
 </section>
-<div id="picker-modal" class="fixed inset-0 bg-black/70 z-[60] hidden flex-col items-center justify-end md:justify-center p-3 sm:p-0">
-<div class="bg-white dark:bg-darksurface w-full md:w-[400px] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-slide-up md:animate-none border border-gray-200 dark:border-darkborder">
+<div id="picker-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex-col items-center justify-end md:justify-center p-3 sm:p-0">
+<div class="bg-white dark:bg-darksurface w-full md:w-[400px] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-slide-up md:animate-none border border-gray-200 dark:border-darkborder" style="box-shadow: 0 -4px 20px rgba(0,0,0,0.3);">
 
 <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-darkborder bg-gray-50 dark:bg-darkinput">
  <button onclick="closePicker()" class="text-blue-600 dark:text-blue-400 font-bold px-3 py-1.5 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-xl transition">Cancel</button>
@@ -999,12 +1002,14 @@ extend: {
 </main>
 
 <!-- Mobile FAB - Quick Add Action -->
-<button id="mobile-fab" onclick="switchTab('submit-combined')" class="fixed bottom-6 right-6 z-30 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-full shadow-[0_4px_12px_rgba(37,99,235,0.4)] hover:shadow-[0_6px_16px_rgba(37,99,235,0.5)] transition-all duration-200 p-3 md:hidden" title="Add Event / Leave">
+<button id="mobile-fab" onclick="switchTab('submit-combined')" class="fixed bottom-6 right-6 z-30 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-full shadow-[0_4px_12px_rgba(37,99,235,0.4)] hover:shadow-[0_6px_16px_rgba(37,99,235,0.5)] transition-all duration-200 p-3 md:hidden" aria-label="Add Event or Leave" title="Add Event / Leave">
  <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
 </button>
 
 <script src="js/core/config.js?v=56"></script>
 <script src="js/ui/tokens.js?v=56"></script>
+<script src="js/ui/toast.js?v=1"></script>
+<script src="js/ui/confirm.js?v=1"></script>
 <script src="js/core/state.js?v=56"></script>
 <script src="js/core/api.js?v=56"></script>
 <script src="js/core/auth.js?v=56"></script>

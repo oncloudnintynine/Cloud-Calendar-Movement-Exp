@@ -95,16 +95,21 @@ function showFormError(ctx, message) {
  if (!errorEl) {
    errorEl = document.createElement('div');
    errorEl.id = `form-${ctx}-error`;
-   errorEl.className = 'bg-red-50 dark:bg-red-900/20 border border-red-200/80 dark:border-red-800 text-red-700 dark:text-red-400 text-sm p-3 rounded-lg mb-3 flex items-start gap-2 shadow-sm';
-   errorEl.style.animation = 'fadeIn 0.2s ease-out';
+   errorEl.className = 'bg-red-50 dark:bg-red-900/20 border border-red-200/80 dark:border-red-800 text-red-700 dark:text-red-400 text-sm p-4 rounded-lg mb-3 flex items-start gap-3 shadow-md';
+   errorEl.style.animation = 'fadeIn 0.2s ease-out, pulse-red 1s ease-in-out 2';
    const formDiv = document.getElementById(`view-submit-${ctx}`) || document.getElementById(`view-submit-combined`);
    if (formDiv) {
      const form = formDiv.querySelector('form');
      if (form) form.insertBefore(errorEl, form.firstChild);
    }
  }
- errorEl.innerHTML = `<svg class="w-4 h-4 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg><span class="flex-1">${message}</span>`;
+ errorEl.innerHTML = `<svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg><span class="flex-1 font-medium">${message}</span>`;
  errorEl.classList.remove('hidden');
+
+ // Scroll to error for mobile visibility
+ setTimeout(() => {
+   errorEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+ }, 100);
 }
 
 function hideFormError(ctx) {
@@ -250,41 +255,86 @@ document.getElementById(`form-${ctx}-behalf-search`).classList.remove('hidden');
 }
 
 // --- Attendees Form Logic ---
-function searchAttendees(ctx) {
-const inputEl = document.getElementById(`form-${ctx}-attendee-search`);
-const q = inputEl.value;
-const resC = document.getElementById(`${ctx}-attendees-results`);
+ let _attendeeHighlightIdx = -1;
 
-if(!q || !fuseAttendees) { 
- resC.classList.add('hidden'); 
- inputEl.classList.remove('ring-2', 'ring-blue-500');
- return; 
-}
+ function searchAttendees(ctx) {
+ const inputEl = document.getElementById(`form-${ctx}-attendee-search`);
+ const q = inputEl.value;
+ const resC = document.getElementById(`${ctx}-attendees-results`);
 
-inputEl.classList.add('ring-2', 'ring-blue-500');
-const results = fuseAttendees.search(q).slice(0, 6).map(r => r.item);
-if (results.length > 0) {
-resC.innerHTML = results.map(item => `
- <div class="p-3 border-b border-gray-200 dark:border-darkborder cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/30" onclick="selectAttendee('${ctx}', '${item.id}', '${item.name.replace(/'/g, "\\'")}', '${item.dept}', '${item.type}', '${(item.expandedNames || '').replace(/'/g, "\\'")}')">
-   <span class="font-semibold text-blue-800 dark:text-blue-300">${item.name}</span> <span class="text-xs text-gray-500 dark:text-darkmuted ml-1">(${item.dept})</span>
- </div>
-`).join('');
-resC.classList.remove('hidden');
+ if(!q || !fuseAttendees) { 
+  resC.classList.add('hidden'); 
+  inputEl.classList.remove('ring-2', 'ring-blue-500');
+  _attendeeHighlightIdx = -1;
+  return; 
+ }
+
+ inputEl.classList.add('ring-2', 'ring-blue-500');
+ const results = fuseAttendees.search(q).slice(0, 6).map(r => r.item);
+ if (results.length > 0) {
+ resC.innerHTML = results.map((item, idx) => `
+  <div class="p-3 border-b border-gray-200 dark:border-darkborder cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/30 ${idx === _attendeeHighlightIdx ? 'bg-blue-100 dark:bg-blue-800/40' : ''}" onclick="selectAttendee('${ctx}', '${item.id}', '${item.name.replace(/'/g, "\\'")}', '${item.dept}', '${item.type}', '${(item.expandedNames || '').replace(/'/g, "\\'")}')">
+    <span class="font-semibold text-blue-800 dark:text-blue-300">${item.name}</span> <span class="text-xs text-gray-500 dark:text-darkmuted ml-1">(${item.dept})</span>
+  </div>
+ `).join('');
+
+ // Add keyboard navigation
+ resC.setAttribute('role', 'listbox');
+ const items = resC.querySelectorAll('[onclick^="selectAttendee"]');
+ items.forEach((el, i) => {
+   el.setAttribute('role', 'option');
+   if (i === _attendeeHighlightIdx) el.classList.add('bg-blue-100', 'dark:bg-blue-800/40');
+ });
+
+ resC.classList.remove('hidden');
 } else {
-resC.innerHTML = `<div class="p-3 text-gray-500">No match found</div>`; resC.classList.remove('hidden');
-}
-}
+ resC.innerHTML = `<div class="p-3 text-gray-500">No match found</div>`; resC.classList.remove('hidden');
+ _attendeeHighlightIdx = -1;
+ }
+
+ // Keyboard navigation for dropdown
+ inputEl.onkeydown = function(e) {
+   const items = resC.querySelectorAll('[onclick^="selectAttendee"]');
+   if (e.key === 'ArrowDown') {
+     e.preventDefault();
+     _attendeeHighlightIdx = (_attendeeHighlightIdx + 1) % items.length;
+     updateDropdownHighlight(resC, items);
+   } else if (e.key === 'ArrowUp') {
+     e.preventDefault();
+     _attendeeHighlightIdx = (_attendeeHighlightIdx - 1 + items.length) % items.length;
+     updateDropdownHighlight(resC, items);
+   } else if (e.key === 'Enter' && _attendeeHighlightIdx >= 0) {
+     e.preventDefault();
+     items[_attendeeHighlightIdx].click();
+   } else if (e.key === 'Escape') {
+     resC.classList.add('hidden');
+     _attendeeHighlightIdx = -1;
+   }
+ };
+ }
+
+ function updateDropdownHighlight(resC, items) {
+  items.forEach((el, i) => {
+    if (i === _attendeeHighlightIdx) {
+      el.classList.add('bg-blue-100', 'dark:bg-blue-800/40');
+      el.scrollIntoView({ block: 'nearest' });
+    } else {
+      el.classList.remove('bg-blue-100', 'dark:bg-blue-800/40');
+    }
+  });
+ }
 
 function selectAttendee(ctx, id, name, dept, type, expandedNames) {
-if (!eventAttendees.some(a => a.id === id)) { 
-eventAttendees.push({ id, name, dept, type, expandedNames }); 
-renderAttendees(ctx); 
-}
-const inputEl = document.getElementById(`form-${ctx}-attendee-search`);
-inputEl.value = '';
-inputEl.classList.remove('ring-2', 'ring-blue-500');
-document.getElementById(`${ctx}-attendees-results`).classList.add('hidden');
-}
+ if (!eventAttendees.some(a => a.id === id)) { 
+ eventAttendees.push({ id, name, dept, type, expandedNames }); 
+ renderAttendees(ctx); 
+ }
+ _attendeeHighlightIdx = -1;
+ const inputEl = document.getElementById(`form-${ctx}-attendee-search`);
+ inputEl.value = '';
+ inputEl.classList.remove('ring-2', 'ring-blue-500');
+ document.getElementById(`${ctx}-attendees-results`).classList.add('hidden');
+ }
 
 function removeAttendee(ctx, id) { 
 eventAttendees = eventAttendees.filter(a => a.id !== id); 
@@ -492,9 +542,9 @@ targetName = adminBehalfUser.name;
 targetPhone = adminBehalfUser.phone;
 targetDepts = new Set([adminBehalfUser.dept]);
 } else if (user.role === 'admin' && !adminBehalfUser) {
-alert("Admin: Please select a user to submit on behalf of.");
-showLoader(false); return;
-}
+ showToast("Please select a user to submit on behalf of.", "warning");
+ showLoader(false); return;
+ }
 
 const typeValue = document.getElementById(`form-${ctx}-type`) ? document.getElementById(`form-${ctx}-type`).value : document.getElementById(`form-${ctx}-name`).value;
 const typeObj = window.appTypicalEventTypes ? window.appTypicalEventTypes.find(t => t.name === typeValue) : null;
@@ -578,26 +628,30 @@ const action = currentEditId ? 'editLeave' : 'submitLeave';
 const res = await apiCall(action, payload);
 
 await loadLeavesData(); 
-const wasEdit = currentEditId;
-cancelEditMode(); 
+ const wasEdit = currentEditId;
+ cancelEditMode(); 
 
-alert(res.status.includes('Cal Updated') || res.status.includes('Approved') ? `Record successfully ${wasEdit ? 'updated' : 'submitted'}!` : "Record marked as Pending due to constraints. Admin notified.");
-} catch (err) { 
-alert("Error: " + err.message); 
-} finally { 
-showLoader(false); 
-}
-}
+ const successMsg = res.status.includes('Cal Updated') || res.status.includes('Approved') ? `Record successfully ${wasEdit ? 'updated' : 'submitted'}!` : "Record marked as Pending due to constraints. Admin notified.";
+ showToast(successMsg, res.status.includes('Cal Updated') || res.status.includes('Approved') ? 'success' : 'info');
+ } catch (err) { 
+ showToast("Error: " + err.message, "error"); 
+ } finally { 
+ showLoader(false); 
+ }
+ }
 
 async function cancelLeave(id, targetPhone) {
-if(!confirm("Are you sure you want to cancel this record?")) return;
-showLoader(true);
-try { 
-await apiCall('cancelLeave', { id: id, phone: targetPhone || user.phone }); 
-await loadLeavesData(); 
-} catch (err) {
-console.error(err);
-} finally { 
-showLoader(false); 
-}
-}
+ const confirmed = await showConfirm("Are you sure you want to cancel this record?");
+ if(!confirmed) return;
+ showLoader(true);
+ try { 
+ await apiCall('cancelLeave', { id: id, phone: targetPhone || user.phone }); 
+ await loadLeavesData(); 
+ showToast("Record cancelled successfully.", "success");
+ } catch (err) {
+ console.error(err);
+ showToast("Error cancelling record: " + err.message, "error");
+ } finally { 
+ showLoader(false); 
+ }
+ }
