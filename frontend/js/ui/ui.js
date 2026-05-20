@@ -74,18 +74,25 @@ function applyRailState() {
  }
 }
 
-// --- Mobile Admin Menu (opens slide-out for admin deep-links) ---
-function openAdminMenu() {
- const menu = document.getElementById('slide-menu');
- const panel = document.getElementById('slide-menu-panel');
- // Show only admin items in the slide menu when opened from bottom bar
- const primaryItems = menu.querySelectorAll('#menu-dashboard, #menu-parade-state, #menu-my-leaves, #menu-submit-combined');
- primaryItems.forEach(btn => btn.classList.add('hidden'));
+// --- Mobile Admin Bottom Sheet ---
+function openAdminSheet() {
+ const sheet = document.getElementById('admin-bottom-sheet');
+ sheet.classList.remove('hidden');
+ document.body.classList.add('sheet-open');
+ // Focus the first button for accessibility
+ const firstBtn = sheet.querySelector('button, a');
+ if (firstBtn) setTimeout(() => firstBtn.focus(), 300);
+}
 
- if (menu.classList.contains('hidden')) {
-   menu.classList.remove('hidden');
-   setTimeout(() => { panel.classList.remove('-translate-x-full'); }, 10);
- } else closeMenu();
+function closeAdminSheet() {
+ const sheet = document.getElementById('admin-bottom-sheet');
+ sheet.classList.add('hidden');
+ document.body.classList.remove('sheet-open');
+}
+
+// --- Mobile Admin Menu (triggers bottom sheet) ---
+function openAdminMenu() {
+ openAdminSheet();
 }
 
 function toggleMenu() {
@@ -101,10 +108,8 @@ if (menu.classList.contains('hidden')) {
 }
 
 function closeMenu() {
-const menu = document.getElementById('slide-menu');
-const panel = document.getElementById('slide-menu-panel');
-panel.classList.add('-translate-x-full');
-setTimeout(() => { menu.classList.add('hidden'); }, 300); 
+// No-op: slide-out removed in favor of bottom sheet + left rail navigation.
+// Kept for backward compatibility with any legacy references.
 }
 
 function applyMenuOrder(orderArr) {
@@ -141,7 +146,7 @@ if(btnEvent) btnEvent.classList.remove('hidden');
 }
 
 function switchTab(tabId) {
-closeMenu();
+closeAdminSheet();
 document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidden'); el.classList.remove('flex'); });
 
 const view = document.getElementById(`view-${tabId}`);

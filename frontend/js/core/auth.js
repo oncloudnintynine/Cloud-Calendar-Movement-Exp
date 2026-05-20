@@ -8,7 +8,6 @@ function showLogin() {
 document.getElementById('login-view').classList.remove('hidden');
 document.getElementById('app-view').classList.add('hidden');
 document.getElementById('logout-btn').classList.add('hidden');
-document.getElementById('menu-btn').classList.add('hidden');
 document.getElementById('active-tab-title').classList.add('hidden');
 
 const controlsWrapper = document.getElementById('dash-controls-wrapper');

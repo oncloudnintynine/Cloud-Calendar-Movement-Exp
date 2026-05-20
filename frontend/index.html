@@ -109,10 +109,6 @@ extend: {
 
 <nav class="bg-white dark:bg-darksurface border-b border-gray-200/80 dark:border-darkborder px-3 md:px-5 py-2.5 flex justify-between items-center z-40 shrink-0">
 <div class="flex items-center space-x-2 min-w-0 flex-1">
-<!-- Mobile hamburger (only visible on mobile) -->
-<button id="menu-btn" onclick="toggleMenu()" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-darkhover text-gray-600 dark:text-darktext transition shrink-0 md:hidden">
-<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
-</button>
 <!-- Desktop rail toggle (only visible on desktop) -->
 <button onclick="toggleRail()" id="rail-toggle-btn-nav" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-darkhover text-gray-600 dark:text-darktext transition shrink-0 hidden md:block" title="Collapse/Expand menu">
 <svg id="rail-icon-collapse-nav" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
@@ -149,8 +145,59 @@ extend: {
 </div>
 </nav>
 
-<div id="slide-menu" class="fixed inset-0 bg-black/60 z-50 hidden md:hidden" onclick="if(event.target.id === 'slide-menu') closeMenu()">
-<div id="slide-menu-panel" class="bg-white dark:bg-darksurface w-80 h-full shadow-2xl flex flex-col transform -translate-x-full transition-transform duration-300 ease-in-out md:w-72">
+<!-- Admin Bottom Sheet Modal -->
+<div id="admin-bottom-sheet" class="fixed inset-0 bg-black/50 z-[55] hidden flex-col items-center justify-end p-0 sm:p-4" onclick="if(event.target.id === 'admin-bottom-sheet') closeAdminSheet()">
+<div class="bg-white dark:bg-darksurface w-full sm:w-[380px] sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col overflow-hidden animate-slide-up sm:animate-none max-h-[75vh] sm:max-h-[65vh]">
+<!-- Drag handle -->
+<div class="flex justify-center pt-3 pb-1 shrink-0 sm:hidden">
+<div class="w-10 h-1 bg-gray-300 dark:bg-darkborder rounded-full"></div>
+</div>
+<!-- Header -->
+<div class="flex justify-between items-center px-5 pb-3 border-b border-gray-200/80 dark:border-darkborder shrink-0">
+<h3 class="font-bold text-base text-blue-600 dark:text-blue-400 flex items-center gap-2">
+<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 00-1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572-1.065c-.426-1.756-2.924-1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 001.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+Administration
+</h3>
+<button onclick="closeAdminSheet()" class="text-gray-400 hover:text-gray-600 dark:hover:text-darktext p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-darkhover transition"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+</div>
+<!-- Menu Items -->
+<div class="overflow-y-auto flex-grow p-3 pb-4 sm:pb-3 space-y-0.5 scrollbar-hide" id="admin-sheet-items">
+<button onclick="switchTab('admin'); closeAdminSheet();" class="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-700 dark:text-darktext hover:bg-blue-50/80 dark:hover:bg-darkhover transition flex items-center gap-3">
+<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-purple-100/70 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 00-1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572-1.065c-.426-1.756-2.924-1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 001.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></span>
+<span class="text-sm">Admin Settings</span>
+</button>
+<button onclick="switchTab('kah-management'); closeAdminSheet();" class="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-700 dark:text-darktext hover:bg-blue-50/80 dark:hover:bg-darkhover transition flex items-center gap-3">
+<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-100/70 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg></span>
+<span class="text-sm">KAH Management</span>
+</button>
+<button onclick="switchTab('admin-structure'); closeAdminSheet();" class="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-700 dark:text-darktext hover:bg-blue-50/80 dark:hover:bg-darkhover transition flex items-center gap-3">
+<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-100/70 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></span>
+<span class="text-sm">Org Structure</span>
+</button>
+<button onclick="switchTab('admin-event-templates'); closeAdminSheet();" class="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-700 dark:text-darktext hover:bg-blue-50/80 dark:hover:bg-darkhover transition flex items-center gap-3">
+<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-teal-100/70 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg></span>
+<span class="text-sm">Event Templates</span>
+</button>
+<button onclick="switchTab('admin-acronyms'); closeAdminSheet();" class="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-700 dark:text-darktext hover:bg-blue-50/80 dark:hover:bg-darkhover transition flex items-center gap-3">
+<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-100/70 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg></span>
+<span class="text-sm">Acronyms</span>
+</button>
+<div class="border-t border-gray-200 dark:border-darkborder my-2"></div>
+<a href="https://oncloudnintynine.github.io/Fail-Safe-Code-Updater/" target="_blank" onclick="closeAdminSheet()" class="w-full text-left px-4 py-3 rounded-xl font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50/80 dark:hover:bg-indigo-900/20 transition flex items-center gap-3">
+<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-100/70 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6m0 0l8 7m0 0l-8 7m8-7v2"/></svg></span>
+<span class="text-sm">Code Backup / Restore</span> <span class="ml-auto text-xs opacity-60">↗</span>
+</a>
+</div>
+<!-- Footer -->
+<div class="shrink-0 p-4 border-t border-gray-200/80 dark:border-darkborder sm:hidden">
+<button onclick="closeAdminSheet()" class="w-full py-3 rounded-xl font-medium text-gray-600 dark:text-darkmuted hover:bg-gray-100 dark:hover:bg-darkhover transition">Cancel</button>
+</div>
+</div>
+</div>
+
+<!-- Old slide-out menu container (kept for backward compat, hidden on all screens) -->
+<div id="slide-menu" class="fixed inset-0 bg-black/60 z-[55] hidden md:hidden" onclick="if(event.target.id === 'slide-menu') closeMenu()">
+<div id="slide-menu-panel" class="bg-white dark:bg-darksurface w-80 h-full shadow-2xl flex flex-col transform -translate-x-full transition-transform duration-300 ease-in-out md:w-72 hidden">
 <div class="p-5 border-b border-gray-200 dark:border-darkborder flex justify-between items-center bg-gradient-to-r from-blue-50/60 to-transparent dark:from-blue-900/10 dark:to-transparent">
 <span class="font-bold text-blue-600 dark:text-blue-400 text-xl">Menu</span>
 <button onclick="closeMenu()" class="text-gray-500 dark:text-darkmuted p-2 hover:bg-gray-100 dark:hover:bg-darkhover rounded-lg transition"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>

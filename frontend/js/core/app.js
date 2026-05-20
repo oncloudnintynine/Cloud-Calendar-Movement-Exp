@@ -81,7 +81,6 @@ await updateProgress(15, 'Connecting to server...');
 document.getElementById('login-view').classList.add('hidden');
 document.getElementById('app-view').classList.remove('hidden');
 document.getElementById('logout-btn').classList.remove('hidden');
-document.getElementById('menu-btn').classList.remove('hidden');
 document.getElementById('active-tab-title').classList.remove('hidden');
 
 user.departments = user.departments ||[];
