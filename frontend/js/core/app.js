@@ -189,7 +189,23 @@ const typeOptionsHtml = window.appTypicalEventTypes.map(t => `<option value="${t
 });
 
 const mOrder = settings.menuOrder && settings.menuOrder.length ? settings.menuOrder : DEFAULT_MENU;
-applyMenuOrder(mOrder);
+
+// Handle unified buttons visibility based on app mode (replaces applyMenuOrder)
+if (appMode === 'combined') {
+  const btnCombined = document.getElementById('unified-btn-combined');
+  const btnLeave = document.getElementById('unified-btn-leave');
+  const btnEvent = document.getElementById('unified-btn-event');
+  if(btnCombined) btnCombined.classList.remove('hidden');
+  if(btnLeave) btnLeave.classList.add('hidden');
+  if(btnEvent) btnEvent.classList.add('hidden');
+} else {
+  const btnCombined = document.getElementById('unified-btn-combined');
+  const btnLeave = document.getElementById('unified-btn-leave');
+  const btnEvent = document.getElementById('unified-btn-event');
+  if(btnCombined) btnCombined.classList.add('hidden');
+  if(btnLeave) btnLeave.classList.remove('hidden');
+  if(btnEvent) btnEvent.classList.remove('hidden');
+}
 
 if (user.role !== 'admin' && companyContacts.length > 0) {
   const myContact = companyContacts.find(c => c.phone == user.phone);
@@ -234,13 +250,13 @@ if (editUserUnit) editUserUnit.innerHTML = regOptions;
 unitsLoaded = true;
 
 if (user.role === 'admin') {
-document.getElementById('menu-admin-group').classList.remove('hidden');
+document.getElementById('rail-admin-group').classList.remove('hidden');
 document.getElementById('admin-behalf-leave').classList.remove('hidden');
 document.getElementById('admin-behalf-event').classList.remove('hidden');
 document.getElementById('admin-behalf-combined').classList.remove('hidden');
 if(typeof populateAdminSettingsForm === 'function') populateAdminSettingsForm(settings);
 } else {
-document.getElementById('menu-admin-group').classList.add('hidden');
+document.getElementById('rail-admin-group').classList.add('hidden');
 document.getElementById('admin-behalf-leave').classList.add('hidden');
 document.getElementById('admin-behalf-event').classList.add('hidden');
 document.getElementById('admin-behalf-combined').classList.add('hidden');

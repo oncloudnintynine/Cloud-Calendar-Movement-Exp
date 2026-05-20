@@ -95,56 +95,6 @@ function openAdminMenu() {
  openAdminSheet();
 }
 
-function toggleMenu() {
-const menu = document.getElementById('slide-menu');
-const panel = document.getElementById('slide-menu-panel');
-if (menu.classList.contains('hidden')) {
- // Reset visibility - show all items when opening via hamburger
- const primaryItems = menu.querySelectorAll('#menu-dashboard, #menu-parade-state, #menu-my-leaves, #menu-submit-combined');
- primaryItems.forEach(btn => btn.classList.remove('hidden'));
- menu.classList.remove('hidden');
- setTimeout(() => { panel.classList.remove('-translate-x-full'); }, 10);
-} else closeMenu();
-}
-
-function closeMenu() {
-// No-op: slide-out removed in favor of bottom sheet + left rail navigation.
-// Kept for backward compatibility with any legacy references.
-}
-
-function applyMenuOrder(orderArr) {
-const menuContainer = document.getElementById('slide-menu-items');
-const btnCombined = document.getElementById('unified-btn-combined');
-const btnLeave = document.getElementById('unified-btn-leave');
-const btnEvent = document.getElementById('unified-btn-event');
-
-if(menuContainer) {
-orderArr.forEach(id => {
-  const btn = document.getElementById(`menu-${id}`);
-  if (btn) {
-    if (appMode === 'combined' && ['submit-leave', 'submit-event', 'my-leaves'].includes(id)) {
-      btn.classList.add('hidden');
-    } else if (appMode === 'separated' && id === 'submit-combined') {
-      btn.classList.add('hidden');
-    } else {
-      btn.classList.remove('hidden');
-      menuContainer.appendChild(btn);
-    }
-  }
-});
-}
-
-if (appMode === 'combined') {
-if(btnCombined) btnCombined.classList.remove('hidden');
-if(btnLeave) btnLeave.classList.add('hidden');
-if(btnEvent) btnEvent.classList.add('hidden');
-} else {
-if(btnCombined) btnCombined.classList.add('hidden');
-if(btnLeave) btnLeave.classList.remove('hidden');
-if(btnEvent) btnEvent.classList.remove('hidden');
-}
-}
-
 function switchTab(tabId) {
 closeAdminSheet();
 document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidden'); el.classList.remove('flex'); });
