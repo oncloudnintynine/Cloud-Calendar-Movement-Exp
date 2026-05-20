@@ -303,54 +303,68 @@ Administration
 
 <div id="view-dashboard" class="tab-content hidden flex-grow flex-col overflow-hidden h-full space-y-3 md:space-y-4">
 
-<div class="flex flex-row items-center space-x-2 w-full shrink-0 overflow-x-auto pb-1 scrollbar-hide">
+<!-- Primary action bar: search, Add button, Info All toggle -->
+<div class="flex flex-row items-center gap-2 w-full shrink-0 overflow-x-auto pb-1 scrollbar-hide">
  <input type="text" id="dash-search" placeholder="Search events, people..." class="flex-grow min-w-[140px] border border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3.5 bg-white dark:bg-darkinput text-gray-900 dark:text-white outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-300 dark:focus:ring-blue-700/50 transition text-sm" onkeyup="window.agendaDirty=true; debouncedSearch(() => renderDashboard(), 300);" aria-label="Search events, people..." role="searchbox">
-  
- <button id="unified-btn-combined" onclick="switchTab('submit-combined')" class="hidden bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition text-xs shrink-0 whitespace-nowrap flex items-center gap-1.5">
-  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-  Add Event / Leave
- </button>
- <button id="unified-btn-leave" onclick="switchTab('submit-leave')" class="hidden bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition text-xs shrink-0 whitespace-nowrap">Add Leave/MC</button>
- <button id="unified-btn-event" onclick="switchTab('submit-event')" class="hidden bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition text-xs shrink-0 whitespace-nowrap">Add Event</button>
+ <div class="flex items-center gap-1.5 shrink-0">
+  <button id="unified-btn-combined" onclick="switchTab('submit-combined')" class="hidden bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium py-2 px-3 rounded-lg shadow-sm transition text-xs shrink-0 whitespace-nowrap flex items-center gap-1.5">
+   <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+   Add Event / Leave
+  </button>
+  <button id="unified-btn-leave" onclick="switchTab('submit-leave')" class="hidden bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium py-2 px-3 rounded-lg shadow-sm transition text-xs shrink-0 whitespace-nowrap">Add Leave/MC</button>
+  <button id="unified-btn-event" onclick="switchTab('submit-event')" class="hidden bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium py-2 px-3 rounded-lg shadow-sm transition text-xs shrink-0 whitespace-nowrap">Add Event</button>
+  <button id="dash-infoall-toggle-btn" onclick="toggleInfoAllPanel('dash')" class="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 font-medium text-xs text-gray-500 dark:text-darkmuted hover:bg-gray-50 dark:hover:bg-darkhover transition shrink-0 whitespace-nowrap">
+   <svg class="w-3.5 h-3.5 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+   Info All
+  </button>
+ </div>
 </div>
 
+<!-- Quick stats -->
 <div id="dash-quick-stats" class="hidden flex flex-row gap-2 w-full shrink-0 overflow-x-auto pb-1 scrollbar-hide">
 </div>
 
+<!-- Filter chips -->
 <div id="dash-filter-chips" class="hidden flex flex-row gap-1.5 w-full shrink-0 overflow-x-auto pb-1 scrollbar-hide">
 </div>
 
+<!-- Agenda wrapper with collapsible widgets and agenda content -->
 <div id="dash-agenda-wrapper" class="flex flex-col gap-3 flex-grow overflow-hidden">
-  <div id="dash-widgets-container" class="flex flex-row w-full gap-2 shrink-0 max-h-[220px]">
-    <div id="dash-cal-wrapper" class="flex-1 min-w-0 bg-white dark:bg-darksurface rounded-xl border border-gray-200/80 dark:border-darkborder shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3 flex flex-col text-sm transition-all duration-300">
-      <div class="flex justify-between items-center mb-2 shrink-0">
-        <button onclick="changeMonth('dash', -1)" class="p-1.5 hover:bg-gray-100 dark:hover:bg-darkhover rounded-lg font-medium transition text-gray-600 dark:text-darkmuted leading-none">◀</button>
-        <div id="dash-cal-month" class="font-semibold text-sm leading-none whitespace-nowrap overflow-hidden text-ellipsis text-gray-800 dark:text-darktext"></div>
-        <button onclick="changeMonth('dash', 1)" class="p-1.5 hover:bg-gray-100 dark:hover:bg-darkhover rounded-lg font-medium transition text-gray-600 dark:text-darkmuted leading-none">▶</button>
+  <!-- Widgets: mini-calendar + Info All (hidden by default, agenda-first) -->
+  <div id="dash-widgets-container" class="flex flex-row w-full gap-2 shrink-0 max-h-[200px] md:max-h-[240px] transition-all duration-300 overflow-hidden">
+    <!-- Mini calendar - more compact -->
+    <div id="dash-cal-wrapper" class="flex-1 min-w-0 bg-white dark:bg-darksurface rounded-xl border border-gray-200/80 dark:border-darkborder shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-2 flex flex-col text-sm transition-all duration-300">
+      <div class="flex justify-between items-center mb-1 shrink-0">
+        <button onclick="changeMonth('dash', -1)" class="p-1 hover:bg-gray-100 dark:hover:bg-darkhover rounded-md font-medium transition text-gray-600 dark:text-darkmuted leading-none text-[12px]">◀</button>
+        <div id="dash-cal-month" class="font-semibold text-xs leading-none whitespace-nowrap overflow-hidden text-ellipsis text-gray-800 dark:text-darktext"></div>
+        <button onclick="changeMonth('dash', 1)" class="p-1 hover:bg-gray-100 dark:hover:bg-darkhover rounded-md font-medium transition text-gray-600 dark:text-darkmuted leading-none text-[12px]">▶</button>
       </div>
-      <div class="grid grid-cols-7 text-center text-[11px] font-semibold text-gray-400 dark:text-darkmuted mb-2 shrink-0"><div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div></div>
-      <div id="dash-cal-grid" class="grid grid-cols-7 text-center gap-y-1.5 font-medium flex-grow items-start"></div>
+      <div class="grid grid-cols-7 text-center text-[10px] font-semibold text-gray-400 dark:text-darkmuted mb-1 shrink-0"><div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div></div>
+      <div id="dash-cal-grid" class="grid grid-cols-7 text-center gap-y-1 font-medium flex-grow items-start"></div>
     </div>
+    <!-- Info All panel -->
     <div id="dash-infoall-container" class="flex-1 min-w-0 hidden flex flex-col bg-blue-50/60 dark:bg-blue-900/10 rounded-xl border border-blue-200/80 dark:border-blue-800/40 transition-all duration-300">
-      <div class="p-3 pb-1.5 shrink-0">
+      <div class="p-2 pb-1 shrink-0">
         <h4 id="dash-infoall-title" class="font-semibold text-xs text-blue-700 dark:text-blue-400 flex items-center"><svg class="w-3.5 h-3.5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Info All</h4>
       </div>
-      <div id="dash-infoall-list" class="flex-grow overflow-y-auto px-3 pb-3 space-y-2.5 scrollbar-hide"></div>
+      <div id="dash-infoall-list" class="flex-grow overflow-y-auto px-2 pb-2 space-y-2 scrollbar-hide"></div>
     </div>
   </div>
 
+  <!-- Agenda cards -->
   <div class="flex-grow flex flex-col overflow-hidden bg-white dark:bg-darksurface rounded-xl border border-gray-200/80 dark:border-darkborder shadow-[0_1px_3px_rgba(0,0,0,0.06)] min-h-0 relative">
     <div class="flex justify-between items-center mb-3 shrink-0 px-4 pb-3 border-b border-gray-200/80 dark:border-darkborder">
       <h3 class="font-bold text-base text-gray-800 dark:text-darktext">Agenda</h3>
-      <div class="flex gap-1.5">
-        <button id="dash-widgets-toggle-btn" onclick="toggleWidgets('dash')" class="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2.5 py-1.5 rounded-lg transition hover:bg-blue-100 dark:hover:bg-blue-900/30">Hide Widgets</button>
-        <button id="dash-expand-toggle-btn" onclick="toggleAllAgendaCards('dash')" class="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2.5 py-1.5 rounded-lg transition hover:bg-blue-100 dark:hover:bg-blue-900/30">Collapse All</button>
+      <div class="flex gap-1.5 shrink-0 flex-wrap">
+        <button id="dash-widgets-toggle-btn" onclick="toggleWidgets('dash')" class="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2.5 py-1.5 rounded-lg transition hover:bg-blue-100 dark:hover:bg-blue-900/30 whitespace-nowrap">Show Widgets</button>
+        <button id="dash-expand-toggle-btn" onclick="toggleAllAgendaCards('dash')" class="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2.5 py-1.5 rounded-lg transition hover:bg-blue-100 dark:hover:bg-blue-900/30 whitespace-nowrap">Collapse All</button>
       </div>
     </div>
     <div id="dash-agenda" class="flex-1 overflow-y-auto space-y-3 pr-1 pb-12 scrollbar-hide"></div>
   </div>
 </div>
 
+<!-- Month view wrapper -->
 <div id="dash-month-wrapper" class="hidden flex-grow flex-col overflow-hidden bg-white dark:bg-darksurface rounded-xl border border-gray-200/80 dark:border-darkborder shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
    <div class="flex justify-between items-center mb-3 shrink-0 px-4 py-3 border-b border-gray-200/80 dark:border-darkborder">
      <button onclick="changeMonth('dash', -1)" class="p-2 hover:bg-gray-100 dark:hover:bg-darkhover rounded-lg font-medium transition text-sm text-gray-600 dark:text-darkmuted border border-gray-200/80 dark:border-darkborder">◀ Prev</button>
@@ -364,53 +378,58 @@ Administration
 </div>
 </div>
 
-<div id="view-parade-state" class="tab-content hidden flex-grow flex-col overflow-hidden h-full">
-<div class="bg-white dark:bg-darksurface rounded-xl border border-gray-200/80 dark:border-darkborder shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-5 flex-grow flex flex-col min-h-0 h-full">
- <div class="flex justify-between items-center border-b border-gray-200/80 dark:border-darkborder pb-3 mb-4 sticky top-0 bg-white dark:bg-darksurface z-10 shrink-0">
-   <h2 id="parade-state-header" class="text-lg font-bold text-blue-600 dark:text-blue-400 m-0 leading-tight">Overall Parade State</h2>
-   <button type="button" id="btn-parade-target" onclick="openPicker('datetime', 'parade', 'target')" class="border border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3.5 bg-white dark:bg-darkinput hover:bg-gray-50 dark:hover:bg-black font-medium text-xs transition text-gray-700 dark:text-darktext">Change Time</button>
- </div>
- <div id="parade-state-body" class="flex-1 overflow-y-auto space-y-4 pr-1 pb-4"></div>
-</div>
-</div>
-
+<!-- My Calendar (My Leaves) section - same pattern -->
 <div id="view-my-leaves" class="tab-content hidden flex-grow flex-col overflow-hidden h-full space-y-3">
-<div id="my-calendar-quick-add" class="flex space-x-2 w-full shrink-0 overflow-x-auto pb-1 scrollbar-hide"></div>
+<!-- Primary action bar: search, Info All toggle -->
+<div class="flex flex-row items-center gap-2 w-full shrink-0 overflow-x-auto pb-1 scrollbar-hide">
+ <div class="flex items-center gap-1.5 shrink-0">
+  <button id="my-infoall-toggle-btn" onclick="toggleInfoAllPanel('my')" class="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 font-medium text-xs text-gray-500 dark:text-darkmuted hover:bg-gray-50 dark:hover:bg-darkhover transition shrink-0 whitespace-nowrap">
+   <svg class="w-3.5 h-3.5 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+   Info All
+  </button>
+ </div>
+</div>
 
 <div id="my-filter-chips" class="hidden flex flex-row gap-1.5 w-full shrink-0 overflow-x-auto pb-1 scrollbar-hide">
 </div>
 
+<!-- Agenda wrapper with collapsible widgets and agenda content -->
 <div id="my-agenda-wrapper" class="flex flex-col gap-3 flex-grow overflow-hidden">
-  <div id="my-widgets-container" class="flex flex-row w-full gap-2 shrink-0 max-h-[220px]">
-    <div id="my-cal-wrapper" class="flex-1 min-w-0 bg-white dark:bg-darksurface rounded-xl border border-gray-200/80 dark:border-darkborder shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3 flex flex-col text-sm transition-all duration-300">
-      <div class="flex justify-between items-center mb-2 shrink-0">
-        <button onclick="changeMonth('my', -1)" class="p-1.5 hover:bg-gray-100 dark:hover:bg-darkhover rounded-lg font-medium transition text-gray-600 dark:text-darkmuted leading-none">◀</button>
-        <div id="my-cal-month" class="font-semibold text-sm leading-none whitespace-nowrap overflow-hidden text-ellipsis text-gray-800 dark:text-darktext"></div>
-        <button onclick="changeMonth('my', 1)" class="p-1.5 hover:bg-gray-100 dark:hover:bg-darkhover rounded-lg font-medium transition text-gray-600 dark:text-darkmuted leading-none">▶</button>
+  <!-- Widgets: mini-calendar + Info All (hidden by default) -->
+  <div id="my-widgets-container" class="flex flex-row w-full gap-2 shrink-0 max-h-[200px] md:max-h-[240px] transition-all duration-300 overflow-hidden">
+    <!-- Mini calendar - more compact -->
+    <div id="my-cal-wrapper" class="flex-1 min-w-0 bg-white dark:bg-darksurface rounded-xl border border-gray-200/80 dark:border-darkborder shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-2 flex flex-col text-sm transition-all duration-300">
+      <div class="flex justify-between items-center mb-1 shrink-0">
+        <button onclick="changeMonth('my', -1)" class="p-1 hover:bg-gray-100 dark:hover:bg-darkhover rounded-md font-medium transition text-gray-600 dark:text-darkmuted leading-none text-[12px]">◀</button>
+        <div id="my-cal-month" class="font-semibold text-xs leading-none whitespace-nowrap overflow-hidden text-ellipsis text-gray-800 dark:text-darktext"></div>
+        <button onclick="changeMonth('my', 1)" class="p-1 hover:bg-gray-100 dark:hover:bg-darkhover rounded-md font-medium transition text-gray-600 dark:text-darkmuted leading-none text-[12px]">▶</button>
       </div>
-      <div class="grid grid-cols-7 text-center text-[11px] font-semibold text-gray-400 dark:text-darkmuted mb-2 shrink-0"><div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div></div>
-      <div id="my-cal-grid" class="grid grid-cols-7 text-center gap-y-1.5 font-medium flex-grow items-start"></div>
+      <div class="grid grid-cols-7 text-center text-[10px] font-semibold text-gray-400 dark:text-darkmuted mb-1 shrink-0"><div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div></div>
+      <div id="my-cal-grid" class="grid grid-cols-7 text-center gap-y-1 font-medium flex-grow items-start"></div>
     </div>
+    <!-- Info All panel -->
     <div id="my-infoall-container" class="flex-1 min-w-0 hidden flex flex-col bg-blue-50/60 dark:bg-blue-900/10 rounded-xl border border-blue-200/80 dark:border-blue-800/40 transition-all duration-300">
-      <div class="p-3 pb-1.5 shrink-0">
+      <div class="p-2 pb-1 shrink-0">
         <h4 id="my-infoall-title" class="font-semibold text-xs text-blue-700 dark:text-blue-400 flex items-center"><svg class="w-3.5 h-3.5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Info All</h4>
       </div>
-      <div id="my-infoall-list" class="flex-grow overflow-y-auto px-3 pb-3 space-y-2.5 scrollbar-hide"></div>
+      <div id="my-infoall-list" class="flex-grow overflow-y-auto px-2 pb-2 space-y-2.5 scrollbar-hide"></div>
     </div>
   </div>
 
+  <!-- Agenda cards -->
   <div class="flex-grow flex flex-col overflow-hidden bg-white dark:bg-darksurface rounded-xl border border-gray-200/80 dark:border-darkborder shadow-[0_1px_3px_rgba(0,0,0,0.06)] min-h-0 relative">
     <div class="flex justify-between items-center mb-3 shrink-0 px-4 pb-3 border-b border-gray-200/80 dark:border-darkborder">
       <h3 class="font-bold text-base text-gray-800 dark:text-darktext">My Agenda</h3>
-      <div class="flex gap-1.5">
-        <button id="my-widgets-toggle-btn" onclick="toggleWidgets('my')" class="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2.5 py-1.5 rounded-lg transition hover:bg-blue-100 dark:hover:bg-blue-900/30">Hide Widgets</button>
-        <button id="my-expand-toggle-btn" onclick="toggleAllAgendaCards('my')" class="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2.5 py-1.5 rounded-lg transition hover:bg-blue-100 dark:hover:bg-blue-900/30">Collapse All</button>
+      <div class="flex gap-1.5 shrink-0 flex-wrap">
+        <button id="my-widgets-toggle-btn" onclick="toggleWidgets('my')" class="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2.5 py-1.5 rounded-lg transition hover:bg-blue-100 dark:hover:bg-blue-900/30 whitespace-nowrap">Show Widgets</button>
+        <button id="my-expand-toggle-btn" onclick="toggleAllAgendaCards('my')" class="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2.5 py-1.5 rounded-lg transition hover:bg-blue-100 dark:hover:bg-blue-900/30 whitespace-nowrap">Collapse All</button>
       </div>
     </div>
     <div id="my-agenda" class="flex-1 overflow-y-auto space-y-3 pr-1 pb-12 scrollbar-hide"></div>
   </div>
 </div>
 
+<!-- Month view wrapper -->
 <div id="my-month-wrapper" class="hidden flex-grow flex-col overflow-hidden bg-white dark:bg-darksurface rounded-xl border border-gray-200/80 dark:border-darkborder shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
    <div class="flex justify-between items-center mb-3 shrink-0 px-4 py-3 border-b border-gray-200/80 dark:border-darkborder">
      <button onclick="changeMonth('my', -1)" class="p-2 hover:bg-gray-100 dark:hover:bg-darkhover rounded-lg font-medium transition text-sm text-gray-600 dark:text-darkmuted border border-gray-200/80 dark:border-darkborder">◀ Prev</button>
@@ -421,6 +440,16 @@ Administration
        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
    </div>
    <div id="my-month-grid" class="flex-grow overflow-y-auto flex flex-col px-2 pb-2"></div>
+</div>
+</div>
+
+<div id="view-parade-state" class="tab-content hidden flex-grow flex-col overflow-hidden h-full">
+<div class="bg-white dark:bg-darksurface rounded-xl border border-gray-200/80 dark:border-darkborder shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-5 flex-grow flex flex-col min-h-0 h-full">
+ <div class="flex justify-between items-center border-b border-gray-200/80 dark:border-darkborder pb-3 mb-4 sticky top-0 bg-white dark:bg-darksurface z-10 shrink-0">
+   <h2 id="parade-state-header" class="text-lg font-bold text-blue-600 dark:text-blue-400 m-0 leading-tight">Overall Parade State</h2>
+   <button type="button" id="btn-parade-target" onclick="openPicker('datetime', 'parade', 'target')" class="border border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3.5 bg-white dark:bg-darkinput hover:bg-gray-50 dark:hover:bg-black font-medium text-xs transition text-gray-700 dark:text-darktext">Change Time</button>
+ </div>
+ <div id="parade-state-body" class="flex-1 overflow-y-auto space-y-4 pr-1 pb-4"></div>
 </div>
 </div>
 

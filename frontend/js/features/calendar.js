@@ -23,8 +23,8 @@ if (tabId === 'my-leaves' && !window._tabsRendered.myLeaves) {
 
 window.isAgendaCollapsed = { dash: false, my: false };
 window.widgetsCollapsed = {
-  dash: localStorage.getItem('dashWidgetsCollapsed') === 'true',
-  my: localStorage.getItem('myWidgetsCollapsed') === 'true'
+  dash: localStorage.getItem('dashWidgetsCollapsed') !== 'false',
+  my: localStorage.getItem('myWidgetsCollapsed') !== 'false'
 };
 
 window.toggleWidgets = function(ctx) {
@@ -42,6 +42,34 @@ window.toggleWidgets = function(ctx) {
   }
 
   localStorage.setItem(`${ctx}WidgetsCollapsed`, window.widgetsCollapsed[ctx]);
+};
+
+window.toggleInfoAllPanel = function(ctx) {
+  const infoAllContainer = document.getElementById(`${ctx}-infoall-container`);
+  const toggleBtn = document.getElementById(`${ctx}-infoall-toggle-btn`);
+  const widgetsContainer = document.getElementById(`${ctx}-widgets-container`);
+
+  // Toggle Info All panel visibility within the widgets container
+  const isHidden = infoAllContainer.classList.contains('hidden');
+  if (isHidden) {
+    infoAllContainer.classList.remove('hidden');
+    // Ensure widgets container is visible
+    if (window.widgetsCollapsed[ctx]) {
+      window.widgetsCollapsed[ctx] = false;
+      widgetsContainer.classList.remove('hidden');
+      const wBtn = document.getElementById(`${ctx}-widgets-toggle-btn`);
+      if (wBtn) wBtn.innerText = 'Hide Widgets';
+      localStorage.setItem(`${ctx}WidgetsCollapsed`, 'false');
+    }
+    toggleBtn.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+    toggleBtn.classList.remove('border-gray-300', 'dark:border-gray-600', 'text-gray-500', 'dark:text-darkmuted', 'hover:bg-gray-50', 'dark:hover:bg-darkhover');
+  } else {
+    infoAllContainer.classList.add('hidden');
+    toggleBtn.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+    toggleBtn.classList.add('border-gray-300', 'dark:border-gray-600', 'text-gray-500', 'dark:text-darkmuted', 'hover:bg-gray-50', 'dark:hover:bg-darkhover');
+  }
+
+  updateInfoAllDisplay(ctx);
 };
 
 window.applyWidgetsState = function() {

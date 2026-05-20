@@ -357,3 +357,43 @@ button, a, input, select, textarea {
 body.sheet-open {
   overflow: hidden;
 }
+
+/* ===== Dashboard Widget Transitions ===== */
+#dash-widgets-container,
+#my-widgets-container {
+  transition: max-height 0.3s ease-out, opacity 0.2s ease-out, margin-bottom 0.3s ease-out;
+}
+#dash-widgets-container.hidden,
+#my-widgets-container.hidden {
+  max-height: 0 !important;
+  opacity: 0;
+  margin-bottom: 0;
+  overflow: hidden;
+}
+
+/* Info All toggle button active state */
+#dash-infoall-toggle-btn.bg-blue-600,
+#my-infoall-toggle-btn.bg-blue-600 {
+  background-color: #2563eb !important;
+  color: white !important;
+  border-color: #2563eb !important;
+}
+
+/* Compact calendar day cells */
+.cal-day-cell {
+  font-size: 12px !important;
+  width: 28px !important;
+  height: 28px !important;
+}
+
+/* Info All panel compact list items */
+#dash-infoall-list .info-all-item,
+#my-infoall-list .info-all-item {
+  padding: 6px 8px !important;
+}
+
+/* Smooth transition for widgets toggle button text */
+#dash-widgets-toggle-btn,
+#my-widgets-toggle-btn {
+  white-space: nowrap;
+}
