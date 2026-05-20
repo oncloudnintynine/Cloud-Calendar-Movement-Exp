@@ -2,6 +2,30 @@
 
 The backend exposes a single POST endpoint (the Google Apps Script Web App URL). All requests share the same envelope format.
 
+## Table of Contents
+
+- [Request Format](#request-format)
+- [Response Format](#response-format)
+- [Actions](#actions)
+  - [Authentication](#authentication)
+    - [login](#login)
+  - [Records](#records)
+    - [submitLeave](#submitleave)
+    - [editLeave](#editleave)
+    - [getLeaves](#gleaves)
+    - [cancelLeave](#cancelleave)
+  - [User Management](#user-management)
+    - [registerUser](#registeruser)
+    - [updateUser](#updateuser)
+    - [deleteUser](#deleteteuser)
+    - [updateUserUnits](#updateuserunits)
+  - [Configuration](#configuration)
+    - [getSettings](#getsettings)
+    - [saveSettings](#savesettings)
+    - [renameUnit](#renameunit)
+    - [forceSyncContacts](#forcesynccontacts)
+- [Template Variables](#template-variables)
+
 ## Request Format
 
 ```
@@ -35,7 +59,9 @@ On error:
 
 ## Actions
 
-### login
+### Authentication
+
+#### login
 
 Authenticates a user or administrator.
 
@@ -59,7 +85,207 @@ Authenticates a user or administrator.
 
 ---
 
-### getSettings
+### Records
+
+#### submitLeave
+
+Creates a new leave or event record.
+
+**Authentication**: Admin or the user themselves.
+
+**Request data**:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `phone` | string | Yes | Phone number of the person the record is for |
+| `name` | string | Yes | Full name |
+| `departments` | string[] | Yes | Unit assignments |
+| `leaveType` | string | Yes | Type (e.g., "Overseas Leave", "Meeting") |
+| `startDate` | string | Yes | ISO date string |
+| `endDate` | string | Yes | ISO date string |
+| `halfDay` | string | No | `"AM"`, `"PM"`, `"None"`, or recurrence pattern |
+| `remarks` | string | No | Free-text notes |
+| `location` | string | No | Event location |
+| `locationDetails` | string | No | Additional location info |
+| `country` | string | No | For overseas leave |
+| `state` | string | No | For overseas leave |
+| `attendees` | string | No | JSON array of attendee objects |
+| `infoAll` | boolean | No | Whether this is visible to all departments |
+| `isAllDay` | boolean | No | Whether the event is all-day |
+| `untilDate` | string | No | End date for recurring events |
+
+**Response data**:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `status` | string | Record status (e.g., "Cal Updated", "Cal Updated (KAH Limit Crossed for HQ)") |
+
+---
+
+#### editLeave
+
+Updates an existing leave or event record. Deletes old calendar events and creates new ones.
+
+**Authentication**: Admin or the record owner.
+
+**Request data**: Same as `submitLeave`, plus:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | string | Yes | The record's UUID |
+
+**Response data**: Same as `submitLeave`.
+
+---
+
+#### getLeaves
+
+Returns all leave/event records from the database.
+
+**Authentication**: Admin or user credentials.
+
+**Request data**: None beyond credentials.
+
+**Response data**: Array of record objects. Each record contains:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ID` | string | Unique record identifier |
+| `Timestamp` | string | Creation/modification time |
+| `Phone` | string | User's phone number |
+| `Name` | string | User's name |
+| `Department` | string | Comma-separated unit list |
+| `LeaveType` | string | Event/leave type |
+| `StartDate` | string | Start date |
+| `EndDate` | string | End date |
+| `HalfDay` | string | Half-day or recurrence setting |
+| `Country` | string | For overseas leave |
+| `State` | string | For overseas leave |
+| `Remarks` | string | Notes |
+| `Status` | string | Current status |
+| `EventIDs` | string | Comma-separated calendar event references |
+| `Location` | string | Event location |
+| `Attendees` | string | JSON array of attendees |
+| `InfoAll` | string | `"TRUE"` or `"FALSE"` |
+| `IsAllDay` | string | `"TRUE"` or `"FALSE"` |
+| `UntilDate` | string | Recurrence end date |
+| `LocationDetails` | string | Additional location info |
+
+---
+
+#### cancelLeave
+
+Cancels a record and deletes associated calendar events.
+
+**Authentication**: Admin or the record owner.
+
+**Request data**:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | string | Yes | The record's UUID |
+
+**Response data**:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `success` | boolean | Always `true` on success |
+
+---
+
+### User Management
+
+#### registerUser
+
+Creates a new user in Google Contacts.
+
+**Authentication**: None (self-registration).
+
+**Request data**:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `fullName` | string | Yes | User's full name |
+| `mobile` | string | Yes | Phone number |
+| `unit` | string | Yes | Organizational unit |
+| `birthday` | string | No | Date in `YYYY-MM-DD` format |
+
+**Response data**:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `success` | boolean | Always `true` on success |
+| `message` | string | Confirmation message |
+
+---
+
+#### updateUser
+
+Updates an existing user's contact details. Admin only.
+
+**Authentication**: Admin credentials required.
+
+**Request data**:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `resourceName` | string | Yes | Google Contacts resource identifier |
+| `fullName` | string | Yes | Updated name |
+| `mobile` | string | Yes | Updated phone number |
+| `unit` | string | Yes | Updated unit |
+| `birthday` | string | No | Updated birthday in `YYYY-MM-DD` format |
+
+**Response data**:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `success` | boolean | Always `true` on success |
+
+---
+
+#### deleteUser
+
+Permanently removes a user from Google Contacts. Admin only.
+
+**Authentication**: Admin credentials required.
+
+**Request data**:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `resourceName` | string | Yes | Google Contacts resource identifier |
+
+**Response data**:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `success` | boolean | Always `true` on success |
+
+---
+
+#### updateUserUnits
+
+Reassigns users to different organizational units. Admin only.
+
+**Authentication**: Admin credentials required.
+
+**Request data**:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `changes` | object | Yes | Map of `resourceName` to new unit name |
+
+**Response data**:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `success` | boolean | Always `true` on success |
+
+---
+
+### Configuration
+
+#### getSettings
 
 Returns the full application configuration and contact directory.
 
@@ -97,7 +323,7 @@ Returns the full application configuration and contact directory.
 
 ---
 
-### saveSettings
+#### saveSettings
 
 Persists configuration changes. Admin only.
 
@@ -135,201 +361,7 @@ Persists configuration changes. Admin only.
 
 ---
 
-### submitLeave
-
-Creates a new leave or event record.
-
-**Authentication**: Admin or the user themselves.
-
-**Request data**:
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `phone` | string | Yes | Phone number of the person the record is for |
-| `name` | string | Yes | Full name |
-| `departments` | string[] | Yes | Unit assignments |
-| `leaveType` | string | Yes | Type (e.g., "Overseas Leave", "Meeting") |
-| `startDate` | string | Yes | ISO date string |
-| `endDate` | string | Yes | ISO date string |
-| `halfDay` | string | No | `"AM"`, `"PM"`, `"None"`, or recurrence pattern |
-| `remarks` | string | No | Free-text notes |
-| `location` | string | No | Event location |
-| `locationDetails` | string | No | Additional location info |
-| `country` | string | No | For overseas leave |
-| `state` | string | No | For overseas leave |
-| `attendees` | string | No | JSON array of attendee objects |
-| `infoAll` | boolean | No | Whether this is visible to all departments |
-| `isAllDay` | boolean | No | Whether the event is all-day |
-| `untilDate` | string | No | End date for recurring events |
-
-**Response data**:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `status` | string | Record status (e.g., "Cal Updated", "Cal Updated (KAH Limit Crossed for HQ)") |
-
----
-
-### editLeave
-
-Updates an existing leave or event record. Deletes old calendar events and creates new ones.
-
-**Authentication**: Admin or the record owner.
-
-**Request data**: Same as `submitLeave`, plus:
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `id` | string | Yes | The record's UUID |
-
-**Response data**: Same as `submitLeave`.
-
----
-
-### getLeaves
-
-Returns all leave/event records from the database.
-
-**Authentication**: Admin or user credentials.
-
-**Request data**: None beyond credentials.
-
-**Response data**: Array of record objects. Each record contains:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `ID` | string | Unique record identifier |
-| `Timestamp` | string | Creation/modification time |
-| `Phone` | string | User's phone number |
-| `Name` | string | User's name |
-| `Department` | string | Comma-separated unit list |
-| `LeaveType` | string | Event/leave type |
-| `StartDate` | string | Start date |
-| `EndDate` | string | End date |
-| `HalfDay` | string | Half-day or recurrence setting |
-| `Country` | string | For overseas leave |
-| `State` | string | For overseas leave |
-| `Remarks` | string | Notes |
-| `Status` | string | Current status |
-| `EventIDs` | string | Comma-separated calendar event references |
-| `Location` | string | Event location |
-| `Attendees` | string | JSON array of attendees |
-| `InfoAll` | string | `"TRUE"` or `"FALSE"` |
-| `IsAllDay` | string | `"TRUE"` or `"FALSE"` |
-| `UntilDate` | string | Recurrence end date |
-| `LocationDetails` | string | Additional location info |
-
----
-
-### cancelLeave
-
-Cancels a record and deletes associated calendar events.
-
-**Authentication**: Admin or the record owner.
-
-**Request data**:
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `id` | string | Yes | The record's UUID |
-
-**Response data**:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `success` | boolean | Always `true` on success |
-
----
-
-### registerUser
-
-Creates a new user in Google Contacts.
-
-**Authentication**: None (self-registration).
-
-**Request data**:
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `fullName` | string | Yes | User's full name |
-| `mobile` | string | Yes | Phone number |
-| `unit` | string | Yes | Organizational unit |
-| `birthday` | string | No | Date in `YYYY-MM-DD` format |
-
-**Response data**:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `success` | boolean | Always `true` on success |
-| `message` | string | Confirmation message |
-
----
-
-### updateUser
-
-Updates an existing user's contact details. Admin only.
-
-**Authentication**: Admin credentials required.
-
-**Request data**:
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `resourceName` | string | Yes | Google Contacts resource identifier |
-| `fullName` | string | Yes | Updated name |
-| `mobile` | string | Yes | Updated phone number |
-| `unit` | string | Yes | Updated unit |
-| `birthday` | string | No | Updated birthday in `YYYY-MM-DD` format |
-
-**Response data**:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `success` | boolean | Always `true` on success |
-
----
-
-### deleteUser
-
-Permanently removes a user from Google Contacts. Admin only.
-
-**Authentication**: Admin credentials required.
-
-**Request data**:
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `resourceName` | string | Yes | Google Contacts resource identifier |
-
-**Response data**:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `success` | boolean | Always `true` on success |
-
----
-
-### updateUserUnits
-
-Reassigns users to different organizational units. Admin only.
-
-**Authentication**: Admin credentials required.
-
-**Request data**:
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `changes` | object | Yes | Map of `resourceName` to new unit name |
-
-**Response data**:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `success` | boolean | Always `true` on success |
-
----
-
-### renameUnit
+#### renameUnit
 
 Renames an organizational unit across all platforms (Contacts, Calendar, Sheets). Admin only.
 
@@ -350,7 +382,7 @@ Renames an organizational unit across all platforms (Contacts, Calendar, Sheets)
 
 ---
 
-### forceSyncContacts
+#### forceSyncContacts
 
 Overwrites Google Contacts with the app's current state. Admin only.
 
@@ -384,3 +416,9 @@ The following placeholders can be used in calendar and agenda templates:
 | `{Remarks}` | Notes/remarks |
 | `{EventDescription}` | Event description |
 | `{Unit}` | Unit name (KAH email template) |
+
+## See Also
+
+- [Architecture](./architecture.md) — System overview and data flow
+- [Setup Guide](./setup-guide.md) — Deploy the backend that exposes these endpoints
+- [Admin Guide](./admin-guide.md) — Configuration managed via `getSettings`/`saveSettings`

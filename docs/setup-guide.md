@@ -2,6 +2,26 @@
 
 This guide walks you through deploying Cloud Moves from scratch. It is intended for the person who will administer the system for their organization.
 
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Step 1: Create the Backend](#step-1-create-the-backend)
+  - [1.1 Create the Apps Script Project](#11-create-the-apps-script-project)
+  - [1.2 Enable the People API](#12-enable-the-people-api)
+  - [1.3 Import the Backend Code](#13-import-the-backend-code)
+  - [1.4 Initialize the Database](#14-initialize-the-database)
+  - [1.5 Deploy as a Web App](#15-deploy-as-a-web-app)
+- [Step 2: Configure the Frontend](#step-2-configure-the-frontend)
+  - [2.1 Set the API Endpoint](#21-set-the-api-endpoint)
+  - [2.2 Deploy to GitHub Pages](#22-deploy-to-github-pages)
+- [Step 3: Set Up CI/CD](#step-3-set-up-cicd)
+  - [3.1 Generate Clasp Credentials](#31-generate-clasp-credentials)
+  - [3.2 Retrieve Project IDs](#32-retrieve-project-ids)
+  - [3.3 Configure GitHub Secrets](#33-configure-github-secrets)
+  - [3.4 How It Works](#34-how-it-works)
+- [Step 4: Initial Configuration](#step-4-initial-configuration)
+- [Verification](#verification)
+
 ## Prerequisites
 
 - A Google Workspace account (personal Gmail accounts also work)
@@ -10,7 +30,7 @@ This guide walks you through deploying Cloud Moves from scratch. It is intended 
 
 ## Step 1: Create the Backend
 
-### 1.1 Create the Apps Script project
+### 1.1 Create the Apps Script Project
 
 1. Go to [script.google.com](https://script.google.com/) and create a **New Project**
 2. Name it `Cloud Moves Backend`
@@ -20,7 +40,7 @@ This guide walks you through deploying Cloud Moves from scratch. It is intended 
 1. In the left sidebar, click **Services** (the `+` icon)
 2. Find and add the **People API**
 
-### 1.3 Import the backend code
+### 1.3 Import the Backend Code
 
 1. In the Apps Script editor, create the following files with exact names (note the `.gs` extension):
 
@@ -36,7 +56,7 @@ This guide walks you through deploying Cloud Moves from scratch. It is intended 
 3. Open project settings (gear icon) and enable **Show "appsscript.json" manifest file in editor**
 4. Replace the contents of `appsscript.json` with the version from `backend/appsscript.json` in this repository
 
-### 1.4 Initialize the database
+### 1.4 Initialize the Database
 
 1. Open `Code.gs` in the Apps Script editor
 2. Select `INITIAL_SETUP` from the function dropdown in the toolbar
@@ -62,7 +82,7 @@ This creates a Google Sheet named `Company_Leaves_DB` in your Drive and sets all
 
 ## Step 2: Configure the Frontend
 
-### 2.1 Set the API endpoint
+### 2.1 Set the API Endpoint
 
 1. Open `frontend/js/core/config.js` in your editor
 2. Replace the URL values with your Web App URL:
@@ -88,7 +108,7 @@ This creates a Google Sheet named `Company_Leaves_DB` in your Drive and sets all
 
 This step enables automatic backend deployment when you push changes to the `backend/` directory.
 
-### 3.1 Generate Clasp credentials
+### 3.1 Generate Clasp Credentials
 
 You can do this in GitHub Codespaces without installing anything locally:
 
@@ -105,12 +125,12 @@ You can do this in GitHub Codespaces without installing anything locally:
 5. Run `cat ~/.clasprc.json` and copy the entire JSON output
 6. Close and delete the Codespace
 
-### 3.2 Retrieve project IDs
+### 3.2 Retrieve Project IDs
 
 - **Script ID**: Found in Apps Script project settings (gear icon) under "IDs"
 - **Deployment ID**: Found via Deploy > Manage deployments
 
-### 3.3 Configure GitHub secrets
+### 3.3 Configure GitHub Secrets
 
 Go to your repository **Settings** > **Secrets and variables** > **Actions** and add:
 
@@ -120,7 +140,7 @@ Go to your repository **Settings** > **Secrets and variables** > **Actions** and
 | `SCRIPT_ID` | Your Apps Script project ID |
 | `DEPLOYMENT_ID` | Your Web App deployment ID |
 
-### 3.4 How it works
+### 3.4 How It Works
 
 When you push changes to the `backend/` directory on the `main` branch, GitHub Actions runs `.github/workflows/deploy.yml`, which:
 
@@ -151,3 +171,9 @@ After setup, verify the following:
 - [ ] A calendar event appears on the department calendar
 - [ ] The dashboard displays the record
 - [ ] Pushing a change to `backend/` triggers the GitHub Actions workflow
+
+## See Also
+
+- [Architecture](./architecture.md) — System overview and data flow
+- [Admin Guide](./admin-guide.md) — Post-deployment configuration
+- [Maintenance](./maintenance.md) — Ongoing operations and troubleshooting

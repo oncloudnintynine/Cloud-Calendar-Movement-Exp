@@ -2,6 +2,18 @@
 
 Cloud Moves is a serverless application that uses Google Workspace as its entire infrastructure. There are no dedicated servers, databases, or hosting costs beyond a Google account.
 
+## Table of Contents
+
+- [System Overview](#system-overview)
+- [Components](#components)
+  - [Frontend](#frontend)
+  - [Backend](#backend)
+  - [Data Layer](#data-layer)
+- [Data Flow](#data-flow)
+- [Environment Model](#environment-model)
+- [CI/CD Pipeline](#ci/cd-pipeline)
+- [Authentication Model](#authentication-model)
+
 ## System Overview
 
 ```
@@ -102,15 +114,15 @@ Each environment has its own API URL configured in `frontend/js/core/config.js`.
 
 ```
   Developer pushes to main
-         │
-         ▼
-  GitHub Actions (deploy.yml)
-         │
-         ├── Install @google/clasp
-         ├── Inject CLASP_CREDS secret
-         ├── Generate .clasp.json with SCRIPT_ID
-         ├── clasp push --force (overwrite GAS editor)
-         └── clasp deploy -i DEPLOYMENT_ID (new version, same URL)
+          │
+          ▼
+   GitHub Actions (deploy.yml)
+          │
+          ├── Install @google/clasp
+          ├── Inject CLASP_CREDS secret
+          ├── Generate .clasp.json with SCRIPT_ID
+          ├── clasp push --force (overwrite GAS editor)
+          └── clasp deploy -i DEPLOYMENT_ID (new version, same URL)
 ```
 
 The workflow triggers only on changes to the `backend/` directory. The frontend is deployed separately through GitHub Pages.
@@ -123,3 +135,9 @@ The application implements its own authentication layer rather than using Google
 - **User**: Logs in with `{phone_number}{keyword}` (e.g., `12345678peace`). The keyword is configurable in admin settings.
 - **Credential verification**: Every authenticated API call includes `{ phone, pass }` in the `credentials` field. The backend validates against the admin password or looks up the phone number in Google Contacts.
 - **Session persistence**: The user object is stored in `localStorage` and survives page refreshes.
+
+## See Also
+
+- [Setup Guide](./setup-guide.md) — Deploy Cloud Moves from scratch
+- [API Reference](./api-reference.md) — Backend action endpoints and schemas
+- [Maintenance](./maintenance.md) — Ongoing operations and troubleshooting

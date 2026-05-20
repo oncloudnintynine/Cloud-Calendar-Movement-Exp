@@ -1,14 +1,37 @@
 # User Guide
 
-This guide covers how to use Cloud Moves as personnel. For administrator tasks, see the [Admin Guide](admin-guide.md).
+This guide covers how to use Cloud Moves as personnel. For administrator tasks, see the [Admin Guide](./admin-guide.md).
+
+## Table of Contents
+
+- [Logging In](#logging-in)
+  - [First-time Users](#first-time-users)
+  - [Logging In as a User](#logging-in-as-a-user)
+  - [Logging In as an Administrator](#logging-in-as-an-administrator)
+- [Dashboard](#dashboard)
+  - [Views](#views)
+  - [Filtering](#filtering)
+  - [Info All](#info-all)
+- [My Calendar](#my-calendar)
+- [Adding Records](#adding-records)
+  - [Adding a Leave Record](#adding-a-leave-record)
+  - [Adding an Event](#adding-an-event)
+  - [Info All](#info-all-1)
+- [Editing Records](#editing-records)
+- [Canceling Records](#canceling-records)
+- [Parade State](#parade-state)
+  - [Reading the Parade State](#reading-the-parade-state)
+  - [Changing the Reference Time](#changing-the-reference-time)
+  - [Sorting](#sorting)
+- [Understanding Status Indicators](#understanding-status-indicators)
 
 ## Logging In
 
-### First-time users
+### First-time Users
 
 If you are not yet registered, an administrator must register you first, or you can use the self-registration option on the login screen if it is enabled.
 
-### Logging in as a user
+### Logging In as a User
 
 Enter your password in the format:
 
@@ -20,7 +43,7 @@ For example, if your phone number is `12345678` and the keyword is `peace`, your
 
 The keyword is set by your administrator. If unsure, ask your administrator what keyword to use.
 
-### Logging in as an administrator
+### Logging In as an Administrator
 
 Enter the admin password directly. The default password is `P@ssw0rd` but it should have been changed by your administrator.
 
@@ -59,7 +82,7 @@ It has the same agenda and month views as the Dashboard.
 
 Depending on your organization's configuration, you will see either a unified **Add Event / Leave** form or separate **Add Leave/MC** and **Add Event** forms.
 
-### Adding a leave record
+### Adding a Leave Record
 
 1. Select the leave type (e.g., Overseas Leave, Local Leave, Official Trip)
 2. Enter remarks (optional)
@@ -68,7 +91,7 @@ Depending on your organization's configuration, you will see either a unified **
 5. For overseas leave, enter the country and state
 6. Click **Save Record**
 
-### Adding an event
+### Adding an Event
 
 1. Select the event type (e.g., Meeting, Others)
 2. Enter remarks
@@ -104,7 +127,7 @@ The record status changes to "Cancelled" and the associated calendar events are 
 
 The Parade State view shows real-time personnel availability across the organization.
 
-### Reading the parade state
+### Reading the Parade State
 
 - The header shows the overall count: `(in-office / total)`
 - Each unit shows its own count
@@ -112,7 +135,7 @@ The Parade State view shows real-time personnel availability across the organiza
 - Personnel who are away show their location in parentheses (e.g., `(Overseas Leave)`, `(Meeting - Conference Room)`)
 - Key Appointment Holders are marked with a star icon
 
-### Changing the reference time
+### Changing the Reference Time
 
 Click **Change Time** to set a different date/time for the parade state calculation. This is useful for planning future availability.
 
@@ -131,3 +154,9 @@ Within each unit, personnel are sorted:
 | Cal Updated | Record is active and calendar events exist |
 | Cal Updated (KAH Limit Crossed for X) | Record is active but KAH absence threshold was exceeded for the listed unit(s) |
 | Cancelled | Record has been canceled and calendar events removed |
+
+## See Also
+
+- [Admin Guide](./admin-guide.md) — Administrative configuration and management tasks
+- [Architecture](./architecture.md) — System overview and data flow
+- [Setup Guide](./setup-guide.md) — Deployment instructions for new instances

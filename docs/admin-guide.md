@@ -1,6 +1,41 @@
 # Admin Guide
 
-This guide covers administrative configuration and management tasks. For end-user instructions, see the [User Guide](user-guide.md).
+This guide covers administrative configuration and management tasks. For end-user instructions, see the [User Guide](./user-guide.md).
+
+## Table of Contents
+
+- [Accessing Admin Settings](#accessing-admin-settings)
+- [Admin Settings Sections](#admin-settings-sections)
+  - [App Mode](#app-mode)
+  - [Register User](#register-user)
+  - [Manage Users](#manage-users)
+  - [Admin Password](#admin-password)
+  - [User Keyword](#user-keyword)
+  - [Menu Order](#menu-order)
+- [KAH Management](#kah-management)
+  - [KAH Limit](#kah-limit)
+  - [Approving Authority](#approving-authority)
+  - [Email Templates](#email-templates)
+  - [Adding KAH Personnel](#adding-kah-personnel)
+  - [Custom KAH Groups](#custom-kah-groups)
+  - [Removing KAH Personnel](#removing-kah-personnel)
+- [Organisational Structure](#organisational-structure)
+  - [Building the Hierarchy](#building-the-hierarchy)
+  - [Managing Personnel Assignments](#managing-personnel-assignments)
+  - [Renaming a Unit](#renaming-a-unit)
+  - [Deleting a Unit](#deleting-a-unit)
+  - [Force Sync Google Contacts](#force-sync-google-contacts)
+  - [Saving Changes](#saving-changes)
+- [Event Types and Templates](#event-types-and-templates)
+  - [Event Types](#event-types)
+  - [Calendar Title Template](#calendar-title-template)
+  - [Agenda Templates](#agenda-templates)
+  - [Info All Templates](#info-all-templates)
+- [Acronyms / Shortforms](#acronyms--shortforms)
+  - [Adding an Acronym](#adding-an-acronym)
+  - [Toggling an Acronym](#toggling-an-acronym)
+  - [Removing an Acronym](#removing-an-acronym)
+- [Saving Admin Settings](#saving-admin-settings)
 
 ## Accessing Admin Settings
 
@@ -177,20 +212,26 @@ Access via **Menu** > **Acronyms / Shortforms**.
 
 Define acronyms that automatically replace full text in calendar titles and agenda items. For example, `DEFENCE SCIENCE AND TECHNOLOGY AGENCY` can be shortened to `DSTA`.
 
-### Adding an acronym
+### Adding an Acronym
 
 1. Enter the short form (e.g., `DSTA`)
 2. Enter the full text (e.g., `Defence Science and Technology Agency`)
 3. Click **Add**
 
-### Toggling an acronym
+### Toggling an Acronym
 
 Use the toggle switch to enable or disable an acronym without deleting it.
 
-### Removing an acronym
+### Removing an Acronym
 
 Click the delete icon next to the acronym.
 
 ## Saving Admin Settings
 
 Each admin section has its own save button. Changes are not applied until you click save. The app will reload to reflect the new configuration.
+
+## See Also
+
+- [User Guide](./user-guide.md) — End-user instructions for personnel
+- [Setup Guide](./setup-guide.md) — Initial deployment and first-time configuration
+- [Maintenance](./maintenance.md) — Ongoing operations, troubleshooting, and security
