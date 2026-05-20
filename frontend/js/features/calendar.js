@@ -972,79 +972,9 @@ return group;
 }
 
 window._activeFilterDash = 'all';
-window._activeFilterMy = 'all';
+ window._activeFilterMy = 'all';
 
-function renderQuickStats(data) {
-const container = document.getElementById('dash-quick-stats');
-if (!container) return;
-
-const today = new Date();
-today.setHours(0, 0, 0, 0);
-
-let totalRecords = 0;
-let onLeave = 0;
-let onEvent = 0;
-let inOffice = 0;
-const typeCounts = {};
-
-data.forEach(l => {
-  if (l.Status === 'Cancelled') return;
-  const s = new Date(l.StartDate); s.setHours(0, 0, 0, 0);
-  const e = new Date(l.EndDate); e.setHours(0, 0, 0, 0);
-  
-  if (s <= today && e >= today) {
-    totalRecords++;
-    const typeObj = window.appTypicalEventTypes ? window.appTypicalEventTypes.find(t => t.name === l.LeaveType) : null;
-    const isEvent = typeObj ? typeObj.isEvent : false;
-    
-    if (isEvent) {
-      onEvent++;
-    } else {
-      onLeave++;
-    }
-    
-    const t = l.LeaveType || 'Other';
-    typeCounts[t] = (typeCounts[t] || 0) + 1;
-  }
-});
-
-const totalContacts = companyContacts.length || 0;
-inOffice = totalContacts - onLeave - onEvent;
-
-const topTypes = Object.entries(typeCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
-const typeChipsHtml = topTypes.map(([type, count]) => {
-  const colors = getEventTypeColor(type);
-  return `<div class="${C.statCard} min-w-[70px]">
-    <div class="${C.statValue} ${colors.text}">${count}</div>
-    <div class="${C.statLabel} truncate max-w-[65px]">${type}</div>
-  </div>`;
-}).join('');
-
-container.innerHTML = `
-<div class="${C.statCard}">
-  <div class="${C.statValue} text-blue-600 dark:text-blue-400">${totalRecords}</div>
-  <div class="${C.statLabel}">Today</div>
-</div>
-<div class="${C.statCard}">
-  <div class="${C.statValue} text-green-600 dark:text-green-400">${inOffice}</div>
-  <div class="${C.statLabel}">In Office</div>
-</div>
-<div class="${C.statCard}">
-  <div class="${C.statValue} text-orange-600 dark:text-orange-400">${onLeave}</div>
-  <div class="${C.statLabel}">On Leave</div>
-</div>
-<div class="${C.statCard}">
-  <div class="${C.statValue} text-indigo-600 dark:text-indigo-400">${onEvent}</div>
-  <div class="${C.statLabel}">On Event</div>
-</div>
-${typeChipsHtml}
-`;
-
-container.classList.remove('hidden');
-container.classList.add('flex');
-}
-
-function renderFilterChips(data, ctx) {
+ function renderFilterChips(data, ctx) {
 const containerId = ctx === 'my' ? 'my-filter-chips' : 'dash-filter-chips';
 const container = document.getElementById(containerId);
 if (!container) return;
@@ -1155,7 +1085,6 @@ if (window._activeFilterDash && window._activeFilterDash !== 'all') {
   filtered = filtered.filter(l => l.LeaveType === window._activeFilterDash);
 }
 
-renderQuickStats(allLeaves.filter(l => l.Status !== 'Cancelled'));
 renderFilterChips(filtered, 'dash');
 
 window.dashFilteredLeaves = filtered;

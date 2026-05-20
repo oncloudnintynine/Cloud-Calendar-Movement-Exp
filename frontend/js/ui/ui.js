@@ -3,75 +3,10 @@
 // ==========================================
 
 window._searchTimeout = null;
-let railCollapsed = false;
 
 function debouncedSearch(callback, delay) {
  clearTimeout(window._searchTimeout);
  window._searchTimeout = setTimeout(callback, delay || 300);
-}
-
-// --- Rail Toggle (Desktop Left Sidebar) ---
-function toggleRail() {
- const rail = document.getElementById('nav-rail');
- const content = document.getElementById('nav-rail-content');
- const main = document.getElementById('main-content');
- const iconCollapse = document.getElementById('rail-icon-collapse');
- const iconExpand = document.getElementById('rail-icon-expand');
- const iconCollapseNav = document.getElementById('rail-icon-collapse-nav');
- const iconExpandNav = document.getElementById('rail-icon-expand-nav');
-
- railCollapsed = !railCollapsed;
-
- if (railCollapsed) {
-   rail.classList.add('nav-rail-collapsed');
-   content.style.opacity = '0';
-   main.classList.remove('md:ml-[200px]');
-   main.classList.add('md:ml-[48px]');
-   if (iconCollapse) iconCollapse.classList.remove('hidden');
-   if (iconExpand) iconExpand.classList.add('hidden');
-   if (iconCollapseNav) iconCollapseNav.classList.remove('hidden');
-   if (iconExpandNav) iconExpandNav.classList.add('hidden');
- } else {
-   rail.classList.remove('nav-rail-collapsed');
-   content.style.opacity = '1';
-   main.classList.remove('md:ml-[48px]');
-   main.classList.add('md:ml-[200px]');
-   if (iconCollapse) iconCollapse.classList.add('hidden');
-   if (iconExpand) iconExpand.classList.remove('hidden');
-   if (iconCollapseNav) iconCollapseNav.classList.add('hidden');
-   if (iconExpandNav) iconExpandNav.classList.remove('hidden');
- }
- localStorage.setItem('railCollapsed', railCollapsed ? '1' : '0');
-}
-
-function applyRailState() {
- const rail = document.getElementById('nav-rail');
- const content = document.getElementById('nav-rail-content');
- const main = document.getElementById('main-content');
- const iconCollapse = document.getElementById('rail-icon-collapse');
- const iconExpand = document.getElementById('rail-icon-expand');
- const iconCollapseNav = document.getElementById('rail-icon-collapse-nav');
- const iconExpandNav = document.getElementById('rail-icon-expand-nav');
-
- if (railCollapsed) {
-   rail.classList.add('nav-rail-collapsed');
-   content.style.opacity = '0';
-   main.classList.remove('md:ml-[200px]');
-   main.classList.add('md:ml-[48px]');
-   if (iconCollapse) iconCollapse.classList.remove('hidden');
-   if (iconExpand) iconExpand.classList.add('hidden');
-   if (iconCollapseNav) iconCollapseNav.classList.remove('hidden');
-   if (iconExpandNav) iconExpandNav.classList.add('hidden');
- } else {
-   rail.classList.remove('nav-rail-collapsed');
-   content.style.opacity = '1';
-   main.classList.remove('md:ml-[48px]');
-   main.classList.add('md:ml-[200px]');
-   if (iconCollapse) iconCollapse.classList.add('hidden');
-   if (iconExpand) iconExpand.classList.remove('hidden');
-   if (iconCollapseNav) iconCollapseNav.classList.add('hidden');
-   if (iconExpandNav) iconExpandNav.classList.remove('hidden');
- }
 }
 
 // --- Mobile Admin Bottom Sheet ---
@@ -79,7 +14,6 @@ function openAdminSheet() {
  const sheet = document.getElementById('admin-bottom-sheet');
  sheet.classList.remove('hidden');
  document.body.classList.add('sheet-open');
- // Focus the first button for accessibility
  const firstBtn = sheet.querySelector('button, a');
  if (firstBtn) setTimeout(() => firstBtn.focus(), 300);
 }
@@ -96,67 +30,52 @@ function openAdminMenu() {
 }
 
 function switchTab(tabId) {
-closeAdminSheet();
-document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidden'); el.classList.remove('flex'); });
+ closeAdminSheet();
+ document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidden'); el.classList.remove('flex'); });
 
-const view = document.getElementById(`view-${tabId}`);
-if (view) { view.classList.remove('hidden'); view.classList.add('flex'); }
+ const view = document.getElementById(`view-${tabId}`);
+ if (view) { view.classList.remove('hidden'); view.classList.add('flex'); }
 
-// Sync rail active state
-document.querySelectorAll('#nav-rail button[id^="menu-"], #nav-rail a[id^="menu-"]').forEach(btn => {
-btn.classList.remove('nav-rail-item-active', 'bg-blue-50', 'text-blue-600', 'dark:bg-darkhover', 'dark:text-blue-400');
-});
+ // Sync bottom bar active state
+ document.querySelectorAll('.bottom-tab').forEach(tab => {
+  tab.classList.remove('bottom-tab-active', 'text-blue-600', 'dark:text-blue-400');
+ });
 
-const activeMenu = document.getElementById(`menu-${tabId}`);
-if (activeMenu && activeMenu.tagName === 'BUTTON') {
-  activeMenu.classList.add('nav-rail-item-active', 'bg-blue-50', 'text-blue-600', 'dark:bg-darkhover', 'dark:text-blue-400');
-}
-
-// Sync bottom bar active state
-document.querySelectorAll('.bottom-tab').forEach(tab => {
-tab.classList.remove('bottom-tab-active', 'text-blue-600', 'dark:text-blue-400');
-});
-
-const activeBottom = document.getElementById(`bottom-${tabId}`);
-if (activeBottom) {
-  activeBottom.classList.add('bottom-tab-active', 'text-blue-600', 'dark:text-blue-400');
-} else if (tabId.startsWith('admin') || tabId === 'kah-management') {
-  // Admin deep-links highlight the Admin tab
-  const adminTab = document.getElementById('bottom-admin');
-  if (adminTab) adminTab.classList.add('bottom-tab-active', 'text-blue-600', 'dark:text-blue-400');
-}
-
-const titleEl = document.getElementById('active-tab-title');
-if (titleEl) {
- if (currentEditId && tabId.startsWith('submit-')) titleEl.innerText = "Update Record";
- else titleEl.innerText = TAB_NAMES[tabId] || '';
-}
-
-const deptNav = document.getElementById('dash-dept-nav');
-const controlsWrapper = document.getElementById('dash-controls-wrapper');
-
-if (controlsWrapper) {
- if (tabId === 'dashboard' || tabId === 'my-leaves') {
-     if (tabId === 'dashboard') {
-         if (deptNav) deptNav.classList.remove('hidden');
-     } else {
-         if (deptNav) deptNav.classList.add('hidden');
-     }
-     controlsWrapper.classList.remove('hidden');
-     controlsWrapper.classList.add('flex');
- } else {
-     controlsWrapper.classList.add('hidden');
-     controlsWrapper.classList.remove('flex');
+ const activeBottom = document.getElementById(`bottom-${tabId}`);
+ if (activeBottom) {
+   activeBottom.classList.add('bottom-tab-active', 'text-blue-600', 'dark:text-blue-400');
+ } else if (tabId.startsWith('admin') || tabId === 'kah-management') {
+   const adminTab = document.getElementById('bottom-admin');
+   if (adminTab) adminTab.classList.add('bottom-tab-active', 'text-blue-600', 'dark:text-blue-400');
  }
-}
 
-if (tabId === 'parade-state' && typeof renderParadeState === 'function') renderParadeState();
-if (tabId === 'admin-structure' && typeof renderStructureUI === 'function') renderStructureUI();
-if ((tabId === 'dashboard' || tabId === 'my-leaves') && typeof renderTabIfActive === 'function') renderTabIfActive(tabId);
+ const titleEl = document.getElementById('active-tab-title');
+ if (titleEl) {
+  if (currentEditId && tabId.startsWith('submit-')) titleEl.innerText = "Update Record";
+  else titleEl.innerText = TAB_NAMES[tabId] || '';
+ }
 
-// FAB visibility - hidden by default since bottom bar handles Add action
-const fab = document.getElementById('mobile-fab');
-if (fab) fab.classList.add('hidden');
+ const deptNav = document.getElementById('dash-dept-nav');
+ const controlsWrapper = document.getElementById('dash-controls-wrapper');
+
+ if (controlsWrapper) {
+  if (tabId === 'dashboard' || tabId === 'my-leaves') {
+      if (tabId === 'dashboard') {
+          if (deptNav) deptNav.classList.remove('hidden');
+      } else {
+          if (deptNav) deptNav.classList.add('hidden');
+      }
+      controlsWrapper.classList.remove('hidden');
+      controlsWrapper.classList.add('flex');
+  } else {
+      controlsWrapper.classList.add('hidden');
+      controlsWrapper.classList.remove('flex');
+  }
+ }
+
+ if (tabId === 'parade-state' && typeof renderParadeState === 'function') renderParadeState();
+ if (tabId === 'admin-structure' && typeof renderStructureUI === 'function') renderStructureUI();
+ if ((tabId === 'dashboard' || tabId === 'my-leaves') && typeof renderTabIfActive === 'function') renderTabIfActive(tabId);
 }
 
 function toggleTheme() {
@@ -174,7 +93,7 @@ el.type = isPassword ? 'text' : 'password';
 if (btnElement) {
 btnElement.innerHTML = isPassword 
   ? `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>`
-  : `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>`;
+  : `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542 7z" /></svg>`;
 }
 }
 

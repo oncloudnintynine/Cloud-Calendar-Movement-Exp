@@ -112,28 +112,8 @@ paradeMemberCard: 'flex items-center gap-2.5 p-3 rounded-lg border transition-al
    paradeMemberAway: 'bg-orange-50/60 dark:bg-orange-900/10 border border-orange-200/80 dark:border-orange-800/40',
    paradeMemberEvent: 'bg-blue-50/60 dark:bg-blue-900/10 border border-blue-200/80 dark:border-blue-800/40',
 
-   // Agenda section headers (sticky)
+ // Agenda section headers (sticky)
    sectionHeader: 'sticky top-0 bg-white/95 dark:bg-darksurface/95 backdrop-blur-sm z-10 py-2 border-b border-gray-200/80 dark:border-darkborder mb-3 px-2 rounded-lg shadow-sm',
-
-   // Navigation rail (desktop left sidebar)
-   navRail: 'fixed top-0 left-0 h-full w-[200px] bg-white dark:bg-darksurface border-r border-gray-200/80 dark:border-darkborder z-40 flex flex-col transition-all duration-300 overflow-hidden',
-   navRailContent: 'flex flex-col py-3 overflow-y-auto h-full scrollbar-hide',
-   navRailSectionTitle: 'px-4 pb-1 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-darkmuted',
-   navRailItem: 'w-full text-left px-3 py-2 rounded-lg font-medium text-gray-700 dark:text-darktext hover:bg-blue-50/80 dark:hover:bg-darkhover transition flex items-center gap-3 text-sm',
-   navRailItemActive: 'bg-blue-50 text-blue-600 dark:bg-darkhover dark:text-blue-400',
-   navRailIcon: 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-100/70 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
-   navRailDivider: 'my-2 border-t border-gray-200 dark:border-darkborder',
-
-   // Bottom tab bar (mobile)
-   bottomBar: 'fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-darksurface/95 backdrop-blur-sm border-t border-gray-200/80 dark:border-darkborder z-40 md:hidden',
-   bottomBarInner: 'flex items-center justify-around h-[56px] px-1',
-   bottomTab: 'flex flex-col items-center justify-center gap-0.5 px-2 py-1 rounded-lg transition text-gray-500 dark:text-darkmuted min-w-[48px]',
-   bottomTabActive: 'text-blue-600 dark:text-blue-400',
-   bottomTabIcon: 'w-5 h-5',
-   bottomTabLabel: 'text-[10px] font-medium leading-none',
-
-   // Nav toggle button (mobile hamburger)
-   navToggleBtn: 'p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-darkhover text-gray-600 dark:text-darktext transition shrink-0',
 };
 
 // --- HTML Helper Functions ---
