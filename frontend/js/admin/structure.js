@@ -24,11 +24,11 @@ const inactiveClass =['text-gray-500', 'dark:text-darkmuted', 'hover:text-gray-8
 if (mode === 'personnel') {
   btnPersonnel.classList.add(...activeClass); btnPersonnel.classList.remove(...inactiveClass);
   btnTree.classList.remove(...activeClass); btnTree.classList.add(...inactiveClass);
-  if(unassignedBoard) unassignedBoard.classList.remove('hidden-view');
+  if(unassignedBoard) unassignedBoard.classList.remove('hidden');
 } else {
   btnTree.classList.add(...activeClass); btnTree.classList.remove(...inactiveClass);
   btnPersonnel.classList.remove(...activeClass); btnPersonnel.classList.add(...inactiveClass);
-  if(unassignedBoard) unassignedBoard.classList.add('hidden-view');
+  if(unassignedBoard) unassignedBoard.classList.add('hidden');
 }
 
 renderStructureUI();
@@ -179,7 +179,7 @@ let html = allUnits.map(u => `
 `).join('');
 
 document.getElementById('reassign-unit-list').innerHTML = html;
-document.getElementById('reassign-modal').classList.remove('hidden-view');
+document.getElementById('reassign-modal').classList.remove('hidden');
 document.getElementById('reassign-modal').classList.add('flex');
 }
 
@@ -193,7 +193,7 @@ closeReassignModal();
 
 function closeReassignModal() {
 reassignTargetResource = null;
-document.getElementById('reassign-modal').classList.add('hidden-view');
+document.getElementById('reassign-modal').classList.add('hidden');
 document.getElementById('reassign-modal').classList.remove('flex');
 }
 

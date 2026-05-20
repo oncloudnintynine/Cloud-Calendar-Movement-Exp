@@ -46,78 +46,57 @@ const ICONS = {
 // --- Class String Tokens ---
 const C = {
   // Card containers
-  card: 'bg-white dark:bg-darksurface rounded-xl shadow-sm border border-gray-200 dark:border-darkborder',
-  cardInner: 'bg-white dark:bg-darksurface rounded-lg border border-gray-300 dark:border-darkborder shadow-sm',
+  card: 'bg-white dark:bg-darksurface rounded-xl border border-gray-200/80 dark:border-darkborder shadow-[0_1px_3px_rgba(0,0,0,0.06)]',
+  cardInner: 'bg-white dark:bg-darksurface rounded-lg border border-gray-200 dark:border-darkborder shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
   cardHover: 'transition-all duration-200 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600',
 
   // Form inputs — standard
-  input: 'w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800/50 transition text-sm',
+  input: 'w-full border border-gray-300 dark:border-gray-600 rounded-lg py-2.5 px-3.5 bg-white dark:bg-darkinput text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-300 dark:focus:ring-blue-700/50 transition text-sm',
   // Compact (admin register, admin manage)
-  inputSm: 'w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm',
+  inputSm: 'w-full border border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3.5 bg-white dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-300 dark:focus:ring-blue-700/50 transition text-sm',
   // Dark variant (edit-user, manage-user detail fields)
-  inputDark: 'w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-black text-sm py-1.5 px-2 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition',
+  inputDark: 'w-full border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-black text-sm py-2 px-3 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-300 dark:focus:ring-blue-700/50 transition',
   // Date picker trigger buttons
-  inputBtn: 'w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200',
+  inputBtn: 'w-full border border-gray-300 dark:border-gray-600 rounded-lg py-2.5 px-3.5 bg-white dark:bg-darkinput hover:bg-gray-50 dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-300 dark:focus:ring-blue-700/50',
 
   // Labels
-  label: 'block font-semibold mb-1 text-sm',
-  labelSm: 'block font-semibold mb-1 text-xs',
+  label: 'block font-medium mb-2 text-sm text-gray-700 dark:text-darkmuted',
+  labelSm: 'block font-medium mb-1.5 text-xs text-gray-600 dark:text-darkmuted',
 
   // Primary action button
-  btnPrimary: 'w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow-md transition text-base',
-  btnPrimarySm: 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg shadow transition text-xs',
+  btnPrimary: 'w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-2.5 rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.1)] transition text-base',
+  btnPrimarySm: 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-2 rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.08)] transition text-xs',
 
   // Secondary / cancel button
-  btnSecondary: 'w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2.5 rounded-lg shadow transition text-base',
+  btnSecondary: 'w-full bg-gray-500 hover:bg-gray-600 active:bg-gray-700 text-white font-semibold py-2.5 rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.08)] transition text-base',
 
-  // Dropdown search results
-  dropdown: 'absolute z-30 w-full bg-white dark:bg-darksurface border-2 border-blue-400 dark:border-blue-600 rounded-lg shadow-2xl hidden-view max-h-40 overflow-y-auto mt-1',
-  dropdownEmerald: 'absolute z-30 w-full bg-white dark:bg-darksurface border-2 border-emerald-400 dark:border-emerald-700 rounded-lg shadow-2xl hidden-view max-h-48 overflow-y-auto mt-1',
-
-  // Sticky section headers (agenda day groups)
-  sectionHeader: 'sticky top-0 bg-gray-50 dark:bg-darkinput z-10 py-1.5 border-y border-gray-200 dark:border-darkborder mb-3 shadow-sm px-2 rounded-lg',
-
-  // Form footer (sticky save button area)
-  formFooter: 'shrink-0 p-3 border-t border-gray-200 dark:border-darkborder bg-gray-100 dark:bg-darkinput z-10',
-  formFooterShadow: 'shrink-0 p-3 bg-white dark:bg-darksurface border-t border-gray-200 dark:border-darkborder shadow-[0_-4px_6px_rgba(0,0,0,0.1)] z-20',
-
-  // Attendee chip
-  chip: 'inline-flex items-center bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-300 rounded-lg px-2 py-1 text-sm font-semibold shadow-sm',
-
-  // Agenda card
-  agendaCard: 'border border-gray-200 dark:border-darkborder p-3 md:p-4 rounded-xl shadow-sm bg-white dark:bg-darksurface flex flex-col transition-all duration-200 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 border-l-4 border-l-gray-400',
-  agendaCardInfoAll: 'p-2.5 rounded-lg border border-blue-200 dark:border-blue-800/60 bg-white/60 dark:bg-black/20 flex flex-col border-l-4 border-l-blue-400',
-  agendaTypeChip: 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold',
-
-  // Action buttons inside agenda cards
-  btnEdit: 'font-bold bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 px-4 py-1.5 rounded-lg transition',
-  btnCancel: 'font-bold bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 px-4 py-1.5 rounded-lg transition',
-  btnEditSm: 'font-bold bg-blue-200/50 dark:bg-blue-800/40 hover:bg-blue-300/50 dark:hover:bg-blue-800/60 text-blue-800 dark:text-blue-300 border border-blue-300 dark:border-blue-700 px-3 py-1 rounded-lg transition text-xs',
-  btnCancelSm: 'font-bold bg-red-100/80 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 px-3 py-1 rounded-lg transition text-xs',
+// Dropdown search results
+   dropdown: 'absolute z-30 w-full bg-white dark:bg-darksurface border border-gray-200 dark:border-darkborder rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.1)] hidden max-h-40 overflow-y-auto mt-1',
+   dropdownEmerald: 'absolute z-30 w-full bg-white dark:bg-darksurface border border-gray-200 dark:border-darkborder rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.1)] hidden max-h-48 overflow-y-auto mt-1',
 
   // List item (KAH, menu order, acronym rows)
-  listItem: 'flex justify-between items-center bg-white dark:bg-darksurface p-2 rounded-lg border border-gray-300 dark:border-darkborder shadow-sm',
+  listItem: 'flex justify-between items-center bg-white dark:bg-darksurface p-3 rounded-lg border border-gray-200/80 dark:border-darkborder shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
 
   // Admin section card
-  adminSection: 'bg-white dark:bg-darksurface rounded-xl shadow border border-gray-200 dark:border-darkborder p-4',
+  adminSection: 'bg-white dark:bg-darksurface rounded-xl border border-gray-200/80 dark:border-darkborder shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-5',
 
   // Status badges
-  badgePending: 'inline-flex items-center gap-1 bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border border-orange-200 dark:border-orange-800',
-  badgeCancelled: 'inline-flex items-center gap-1 bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800',
-  badgeApproved: 'inline-flex items-center gap-1 bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800',
+  badgePending: 'inline-flex items-center gap-1 bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border border-orange-200/80 dark:border-orange-800',
+  badgeCancelled: 'inline-flex items-center gap-1 bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200/80 dark:border-red-800',
+  badgeApproved: 'inline-flex items-center gap-1 bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200/80 dark:border-green-800',
 
   // Quick stat cards
-  statCard: 'flex flex-col items-center justify-center p-1.5 sm:p-2 md:p-2.5 rounded-lg sm:rounded-xl bg-white dark:bg-darksurface border border-gray-200 dark:border-darkborder shadow-sm',
+  statCard: 'flex flex-col items-center justify-center p-2 sm:p-3 md:p-4 rounded-xl bg-white dark:bg-darksurface border border-gray-200/80 dark:border-darkborder shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
   statValue: 'text-sm sm:text-base md:text-lg font-bold leading-tight',
   statLabel: 'text-[9px] sm:text-[10px] font-medium text-gray-500 dark:text-darkmuted uppercase tracking-wide mt-0.5',
 
   // Filter chips
-  filterChip: 'inline-flex items-center gap-0.5 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold border transition cursor-pointer select-none whitespace-nowrap',
+  filterChip: 'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-medium border transition cursor-pointer select-none whitespace-nowrap',
   filterChipActive: 'bg-blue-600 text-white border-blue-600 shadow-sm',
-  filterChipInactive: 'bg-white dark:bg-darksurface text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-darkhover',
+  filterChipInactive: 'bg-white dark:bg-darksurface text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-darkborder hover:bg-gray-50 dark:hover:bg-darkhover',
 
   // Empty state
-  emptyState: 'flex flex-col items-center justify-center py-12 px-4 text-center',
+  emptyState: 'flex flex-col items-center justify-center py-16 px-4 text-center',
   emptyStateIcon: 'text-gray-300 dark:text-gray-600 mb-3',
   emptyStateText: 'text-gray-500 dark:text-darkmuted text-sm font-medium',
 
@@ -128,10 +107,13 @@ const C = {
   skeletonTextSm: 'animate-pulse bg-gray-200 dark:bg-darkborder rounded h-2 w-24',
 
   // Parade state member cards
-  paradeMemberCard: 'flex items-center gap-2 p-2 rounded-lg border transition-all duration-150 hover:shadow-sm',
-  paradeMemberInOffice: 'bg-green-50/50 dark:bg-green-900/10 border-green-200 dark:border-green-800/40',
-  paradeMemberAway: 'bg-orange-50/50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800/40',
-  paradeMemberEvent: 'bg-blue-50/50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800/40',
+paradeMemberCard: 'flex items-center gap-2.5 p-3 rounded-lg border transition-all duration-150 hover:shadow-sm',
+   paradeMemberInOffice: 'bg-green-50/60 dark:bg-green-900/10 border border-green-200/80 dark:border-green-800/40',
+   paradeMemberAway: 'bg-orange-50/60 dark:bg-orange-900/10 border border-orange-200/80 dark:border-orange-800/40',
+   paradeMemberEvent: 'bg-blue-50/60 dark:bg-blue-900/10 border border-blue-200/80 dark:border-blue-800/40',
+
+   // Agenda section headers (sticky)
+   sectionHeader: 'sticky top-0 bg-white/95 dark:bg-darksurface/95 backdrop-blur-sm z-10 py-1.5 border-b border-gray-200/80 dark:border-darkborder mb-3 px-1 rounded-lg shadow-sm',
 };
 
 // --- HTML Helper Functions ---
@@ -207,7 +189,7 @@ function formFooterHtml(buttonText, cancelId) {
   var html = '<div class="' + C.formFooter + '">' +
     '<button type="submit" class="' + C.btnPrimary + '">' + buttonText + '</button>';
   if (cancelId) {
-    html += '<button type="button" id="' + cancelId + '" onclick="cancelEditMode()" class="' + C.btnSecondary + ' hidden-view mt-2">Cancel Record</button>';
+    html += '<button type="button" id="' + cancelId + '" onclick="cancelEditMode()" class="' + C.btnSecondary + ' hidden mt-2">Cancel Record</button>';
   }
   html += '</div>';
   return html;

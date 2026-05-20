@@ -264,20 +264,20 @@ renderAcronyms();
 function searchKAH() {
 const q = document.getElementById('kah-search').value;
 const resC = document.getElementById('kah-results');
-if(!q || !fuseAllContacts) { resC.classList.add('hidden-view'); return; }
+if(!q || !fuseAllContacts) { resC.classList.add('hidden'); return; }
 const results = fuseAllContacts.search(q).slice(0, 5).map(r => r.item);
 if(results.length > 0) {
 resC.innerHTML = results.map(c => `<div class="p-3 border-b dark:border-darkborder cursor-pointer hover:bg-gray-100 dark:hover:bg-darkhover" onclick="addKAH('${c.phone}', '${c.name.replace(/'/g, "\\'")}', '${c.dept}')">${c.name} <span class="text-xs text-gray-500 ml-1">(${c.dept})</span></div>`).join('');
-resC.classList.remove('hidden-view');
+resC.classList.remove('hidden');
 } else {
-resC.innerHTML = `<div class="p-3 text-gray-500">No match found</div>`; resC.classList.remove('hidden-view');
+resC.innerHTML = `<div class="p-3 text-gray-500">No match found</div>`; resC.classList.remove('hidden');
 }
 }
 
 function addKAH(phone, name, dept) {
 if(!adminKAHList.some(k => k.phone === phone)) { adminKAHList.push({ phone, name, dept }); renderKAHSelected(); }
 document.getElementById('kah-search').value = '';
-document.getElementById('kah-results').classList.add('hidden-view');
+document.getElementById('kah-results').classList.add('hidden');
 }
 
 function removeKAH(phone) { adminKAHList = adminKAHList.filter(k => k.phone !== phone); renderKAHSelected(); }
@@ -384,14 +384,14 @@ renderCustomKahGroups();
 function searchKahGroupMember(idx) {
 const q = document.getElementById(`kah-group-search-${idx}`).value;
 const resC = document.getElementById(`kah-group-results-${idx}`);
-if(!q || !fuseAllContacts) { resC.classList.add('hidden-view'); return; }
+if(!q || !fuseAllContacts) { resC.classList.add('hidden'); return; }
 
 const results = fuseAllContacts.search(q).slice(0, 4).map(r => r.item);
 if(results.length > 0) {
 resC.innerHTML = results.map(c => `<div class="p-2 border-b dark:border-darkborder cursor-pointer hover:bg-gray-100 dark:hover:bg-darkhover text-sm" onclick="addKahGroupMember(${idx}, '${c.phone}')"><span class="font-semibold">${c.name}</span> <span class="text-xs text-gray-500 ml-1">(${c.dept})</span></div>`).join('');
-resC.classList.remove('hidden-view');
+resC.classList.remove('hidden');
 } else {
-resC.innerHTML = `<div class="p-2 text-gray-500 text-sm">No match found</div>`; resC.classList.remove('hidden-view');
+resC.innerHTML = `<div class="p-2 text-gray-500 text-sm">No match found</div>`; resC.classList.remove('hidden');
 }
 }
 
@@ -410,14 +410,14 @@ renderCustomKahGroups();
 function searchUserToManage() {
 const q = document.getElementById('admin-manage-search').value;
 const resC = document.getElementById('admin-manage-results');
-if(!q || !fuseAllContacts) { resC.classList.add('hidden-view'); return; }
+if(!q || !fuseAllContacts) { resC.classList.add('hidden'); return; }
 
 const results = fuseAllContacts.search(q).slice(0, 5).map(r => r.item);
 if(results.length > 0) {
 resC.innerHTML = results.map(c => `<div class="p-3 border-b dark:border-darkborder cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-700 dark:text-blue-400" onclick="selectUserToManage('${c.resourceName}', '${c.name.replace(/'/g, "\\'")}', '${c.phone}', '${c.dept}', '${c.birthday || ''}')"><span class="font-semibold">${c.name}</span> <span class="text-xs opacity-75 ml-1">(${c.dept})</span></div>`).join('');
-resC.classList.remove('hidden-view');
+resC.classList.remove('hidden');
 } else {
-resC.innerHTML = `<div class="p-3 text-gray-500">No match found</div>`; resC.classList.remove('hidden-view');
+resC.innerHTML = `<div class="p-3 text-gray-500">No match found</div>`; resC.classList.remove('hidden');
 }
 }
 
@@ -439,16 +439,16 @@ appData.manageUser.birthdaySelected = false;
 }
 updateButtonLabels();
 
-document.getElementById('user-to-manage-container').classList.remove('hidden-view');
+document.getElementById('user-to-manage-container').classList.remove('hidden');
 document.getElementById('admin-manage-search').value = '';
-document.getElementById('admin-manage-search').classList.add('hidden-view');
-document.getElementById('admin-manage-results').classList.add('hidden-view');
+document.getElementById('admin-manage-search').classList.add('hidden');
+document.getElementById('admin-manage-results').classList.add('hidden');
 }
 
 function cancelManageUser() {
 userToManageResource = null;
-document.getElementById('user-to-manage-container').classList.add('hidden-view');
-document.getElementById('admin-manage-search').classList.remove('hidden-view');
+document.getElementById('user-to-manage-container').classList.add('hidden');
+document.getElementById('admin-manage-search').classList.remove('hidden');
 }
 
 async function confirmUpdateUser() {

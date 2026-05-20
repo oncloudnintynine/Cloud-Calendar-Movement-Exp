@@ -5,8 +5,8 @@
 function toggleMenu() {
 const menu = document.getElementById('slide-menu');
 const panel = document.getElementById('slide-menu-panel');
-if (menu.classList.contains('hidden-view')) {
-menu.classList.remove('hidden-view');
+if (menu.classList.contains('hidden')) {
+menu.classList.remove('hidden');
 setTimeout(() => { panel.classList.remove('-translate-x-full'); }, 10);
 } else closeMenu();
 }
@@ -15,7 +15,7 @@ function closeMenu() {
 const menu = document.getElementById('slide-menu');
 const panel = document.getElementById('slide-menu-panel');
 panel.classList.add('-translate-x-full');
-setTimeout(() => { menu.classList.add('hidden-view'); }, 300); 
+setTimeout(() => { menu.classList.add('hidden'); }, 300); 
 }
 
 function applyMenuOrder(orderArr) {
@@ -53,10 +53,10 @@ if(btnEvent) btnEvent.classList.remove('hidden');
 
 function switchTab(tabId) {
 closeMenu();
-document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidden-view'); el.classList.remove('flex'); });
+document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidden'); el.classList.remove('flex'); });
 
 const view = document.getElementById(`view-${tabId}`);
-if (view) { view.classList.remove('hidden-view'); view.classList.add('flex'); }
+if (view) { view.classList.remove('hidden'); view.classList.add('flex'); }
 
 document.querySelectorAll('#slide-menu-panel button[id^="menu-"]').forEach(btn => {
 btn.classList.remove('bg-blue-50', 'text-blue-600', 'dark:bg-darkhover', 'dark:text-blue-400');
@@ -92,6 +92,16 @@ if (tabId === 'dashboard' || tabId === 'my-leaves') {
 if (tabId === 'parade-state' && typeof renderParadeState === 'function') renderParadeState();
 if (tabId === 'admin-structure' && typeof renderStructureUI === 'function') renderStructureUI();
 if ((tabId === 'dashboard' || tabId === 'my-leaves') && typeof renderTabIfActive === 'function') renderTabIfActive(tabId);
+
+// FAB visibility - hide when on submit-combined form
+const fab = document.getElementById('mobile-fab');
+if (fab) {
+  if (tabId === 'submit-combined') {
+    fab.classList.add('hidden');
+  } else {
+    fab.classList.remove('hidden');
+  }
+}
 }
 
 function toggleTheme() {

@@ -34,10 +34,10 @@ window.toggleWidgets = function(ctx) {
   window.widgetsCollapsed[ctx] = !window.widgetsCollapsed[ctx];
 
   if (window.widgetsCollapsed[ctx]) {
-    wrapper.classList.add('hidden-view');
+    wrapper.classList.add('hidden');
     btn.innerText = 'Show Widgets';
   } else {
-    wrapper.classList.remove('hidden-view');
+    wrapper.classList.remove('hidden');
     btn.innerText = 'Hide Widgets';
   }
 
@@ -49,13 +49,13 @@ window.applyWidgetsState = function() {
     const wrapper = document.getElementById(`${ctx}-widgets-container`);
     const btn = document.getElementById(`${ctx}-widgets-toggle-btn`);
     if (wrapper && btn) {
-      if (window.widgetsCollapsed[ctx]) {
-        wrapper.classList.add('hidden-view');
-        btn.innerText = 'Show Widgets';
-      } else {
-        wrapper.classList.remove('hidden-view');
-        btn.innerText = 'Hide Widgets';
-      }
+if (window.widgetsCollapsed[ctx]) {
+      wrapper.classList.add('hidden');
+      btn.innerText = 'Show Widgets';
+    } else {
+      wrapper.classList.remove('hidden');
+      btn.innerText = 'Hide Widgets';
+    }
     }
   });
 };
@@ -66,11 +66,11 @@ const body = card.querySelector('.agenda-card-body');
 const chevron = card.querySelector('.chevron-icon');
 if(!body) return;
 
-if(body.classList.contains('hidden-view')) {
-    body.classList.remove('hidden-view');
+if(body.classList.contains('hidden')) {
+    body.classList.remove('hidden');
     if(chevron) chevron.classList.add('rotate-180');
 } else {
-    body.classList.add('hidden-view');
+    body.classList.add('hidden');
     if(chevron) chevron.classList.remove('rotate-180');
 }
 };
@@ -90,10 +90,9 @@ const updateNodes = (parent) => {
     const cards = parent.querySelectorAll('.agenda-card-body');
     const chevrons = parent.querySelectorAll('.chevron-icon');
     if (window.isAgendaCollapsed[ctx]) {
-        cards.forEach(b => b.classList.add('hidden-view'));
-        chevrons.forEach(c => c.classList.remove('rotate-180'));
+       cards.forEach(b => b.classList.add('hidden'));
     } else {
-        cards.forEach(b => b.classList.remove('hidden-view'));
+        cards.forEach(b => b.classList.remove('hidden'));
         chevrons.forEach(c => c.classList.add('rotate-180'));
     }
 };
@@ -153,28 +152,32 @@ const activeClass =['bg-white', 'dark:bg-darksurface', 'shadow', 'text-blue-600'
 const inactiveClass =['text-gray-500', 'dark:text-darkmuted', 'hover:text-gray-800', 'dark:hover:text-gray-200', 'bg-transparent'];
 
 if (mode === 'agenda') {
-btnAgenda.classList.add(...activeClass); btnAgenda.classList.remove(...inactiveClass);
-btnMonth.classList.remove(...activeClass); btnMonth.classList.add(...inactiveClass);
+btnAgenda.classList.add(...activeClass);
+  btnAgenda.classList.remove(...inactiveClass);
+  btnMonth.classList.remove(...activeClass);
+  btnMonth.classList.add(...inactiveClass);
 
-if (dashWrapAgenda) dashWrapAgenda.classList.remove('hidden-view');
-if (dashWrapMonth) dashWrapMonth.classList.add('hidden-view');
-if (myWrapAgenda) myWrapAgenda.classList.remove('hidden-view');
-if (myWrapMonth) myWrapMonth.classList.add('hidden-view');
+ if (dashWrapAgenda) dashWrapAgenda.classList.remove('hidden');
+ if (dashWrapMonth) dashWrapMonth.classList.add('hidden');
+ if (myWrapAgenda) myWrapAgenda.classList.remove('hidden');
+ if (myWrapMonth) myWrapMonth.classList.add('hidden');
 } else {
-btnMonth.classList.add(...activeClass); btnMonth.classList.remove(...inactiveClass);
-btnAgenda.classList.remove(...activeClass); btnAgenda.classList.add(...inactiveClass);
+  btnMonth.classList.add(...activeClass);
+  btnMonth.classList.remove(...inactiveClass);
+  btnAgenda.classList.remove(...activeClass);
+  btnAgenda.classList.add(...inactiveClass);
 
-if (dashWrapMonth) {
-dashWrapMonth.classList.remove('hidden-view');
-dashWrapMonth.classList.add('flex');
-}
-if (dashWrapAgenda) dashWrapAgenda.classList.add('hidden-view');
+ if (dashWrapMonth) {
+ dashWrapMonth.classList.remove('hidden');
+ dashWrapMonth.classList.add('flex');
+ }
+ if (dashWrapAgenda) dashWrapAgenda.classList.add('hidden');
 
-if (myWrapMonth) {
-myWrapMonth.classList.remove('hidden-view');
-myWrapMonth.classList.add('flex');
-}
-if (myWrapAgenda) myWrapAgenda.classList.add('hidden-view');
+ if (myWrapMonth) {
+ myWrapMonth.classList.remove('hidden');
+ myWrapMonth.classList.add('flex');
+ }
+ if (myWrapAgenda) myWrapAgenda.classList.add('hidden');
 }
 
 window.agendaDirty = true;
@@ -199,7 +202,7 @@ try {
   renderMyLeaves();
 
   const paradeView = document.getElementById('view-parade-state');
-if(paradeView && !paradeView.classList.contains('hidden-view') && typeof renderParadeState === 'function') {
+if(paradeView && !paradeView.classList.contains('hidden') && typeof renderParadeState === 'function') {
 renderParadeState(); 
 }
 } catch (err) { console.error("Error loading leaves data: ", err); }
@@ -276,13 +279,13 @@ cells.forEach(cell => {
 const cellDay = parseInt(cell.dataset.day);
 const isToday = cell.dataset.istoday === 'true';
 
-let baseClass = "cal-day-cell relative flex items-center justify-center w-5 h-5 mx-auto rounded-full cursor-pointer transition-colors text-[10px] font-medium ";
-if (isToday) baseClass += "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200 dark:ring-1 dark:ring-blue-500 font-bold ";
-else baseClass += "hover:bg-gray-200 dark:hover:bg-darkhover ";
+let baseClass = "cal-day-cell relative flex items-center justify-center w-7 h-7 mx-auto rounded-full cursor-pointer transition-colors text-xs font-medium ";
+ if (isToday) baseClass += "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200 dark:ring-1 dark:ring-blue-500 font-bold ";
+ else baseClass += "hover:bg-gray-200 dark:hover:bg-darkhover ";
 
-if (cellDay === d) {
-    baseClass = "cal-day-cell relative flex items-center justify-center w-5 h-5 mx-auto rounded-full cursor-pointer transition-colors text-[10px] font-bold bg-blue-600 text-white shadow-md ";
-}
+ if (cellDay === d) {
+     baseClass = "cal-day-cell relative flex items-center justify-center w-7 h-7 mx-auto rounded-full cursor-pointer transition-colors text-xs font-bold bg-blue-600 text-white shadow-md ";
+ }
 
 cell.className = baseClass;
 
@@ -433,10 +436,10 @@ const isToday = current.toDateString() === new Date().toDateString();
 const dayEvents = data.filter(l => isEventOnDate(l, current));
 const hasEvent = dayEvents.length > 0;
 
-let baseClass = "cal-day-cell relative flex items-center justify-center w-5 h-5 mx-auto rounded-full cursor-pointer transition-colors text-[10px] font-medium ";
-if (isSelected) baseClass += "bg-blue-600 text-white font-bold shadow-md ";
-else if (isToday) baseClass += "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200 dark:ring-1 dark:ring-blue-500 font-bold ";
-else baseClass += "hover:bg-gray-200 dark:hover:bg-darkhover ";
+let baseClass = "cal-day-cell relative flex items-center justify-center w-7 h-7 mx-auto rounded-full cursor-pointer transition-colors text-xs font-medium ";
+ if (isSelected) baseClass += "bg-blue-600 text-white font-bold shadow-md ";
+ else if (isToday) baseClass += "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200 dark:ring-1 dark:ring-blue-500 font-bold ";
+ else baseClass += "hover:bg-gray-200 dark:hover:bg-darkhover ";
 
 let dotsHtml = '';
 if (hasEvent) {
@@ -538,7 +541,7 @@ for (let i = 0; i < 7; i++) {
   let curD = new Date(w); curD.setDate(curD.getDate() + i);
   let isToday = curD.toDateString() === new Date().toDateString();
   let isCurMonth = curD.getMonth() === m;
-  let bg = isCurMonth ? '' : 'bg-gray-50/50 dark:bg-[#151515]';
+  let bg = isCurMonth ? '' : 'bg-gray-50/50 dark:bg-darksurface/50';
   html += `<div class="flex-1 border-r border-gray-200 last:border-r-0 dark:border-darkborder ${bg} p-1" onclick="selectDate('${ctx}', ${curD.getFullYear()}, ${curD.getMonth()}, ${curD.getDate()})">
      <div class="text-[11px] font-bold ${isToday ? 'bg-blue-600 text-white rounded-full w-[22px] h-[22px] mx-auto flex items-center justify-center shadow-md' : 'text-gray-500 dark:text-darkmuted text-center'}">${curD.getDate()}</div>
   </div>`;
@@ -550,7 +553,7 @@ segments.forEach(seg => {
   const isMultiDay = seg.len > 1;
   const color = seg.isLeave 
     ? `${typeColors.dot} text-white` 
-    : (isMultiDay ? 'bg-[#f4c264] dark:bg-[#d6a54d] text-gray-900' : `${typeColors.dot} text-white`);
+    : (isMultiDay ? 'bg-amber-400 dark:bg-amber-600 text-gray-900' : `${typeColors.dot} text-white`);
   
   let locStr = seg.l.Location || '';
   if (seg.l.LocationDetails) locStr += ` - ${seg.l.LocationDetails}`;
@@ -643,12 +646,24 @@ return validLines.join('');
 }
 
 function buildAgendaHtml(items, isMyCalendar, isInfoAllContext) {
-if (!items || items.length === 0) return isInfoAllContext ? '' : `<p class="text-gray-500 dark:text-darkmuted text-center italic mt-2">No records for this date.</p>`;
+ if (!items || items.length === 0) return isInfoAllContext ? '' : `<p class="text-gray-500 dark:text-darkmuted text-center italic mt-2">No records for this date.</p>`;
 
-const ctx = isMyCalendar ? 'my' : 'dash';
-const isCollapsed = window.isAgendaCollapsed[ctx];
+ const ctx = isMyCalendar ? 'my' : 'dash';
+ const isCollapsed = window.isAgendaCollapsed[ctx];
 
-return items.map(l => {
+ const isNowActive = (item) => {
+    try {
+      const now = new Date();
+      const start = new Date(item.StartDate.replace('T', ' '));
+      const end = new Date(item.EndDate.replace('T', ' '));
+      if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+        return now >= start && now <= end;
+      }
+    } catch(e) {}
+    return false;
+  };
+
+ return items.map(l => {
 const typeObj = window.appTypicalEventTypes ? window.appTypicalEventTypes.find(t => t.name === l.LeaveType) : null;
 const isEvent = typeObj ? typeObj.isEvent : false;
 const typeColors = getEventTypeColor(l.LeaveType);
@@ -767,9 +782,11 @@ const finalDetailsHtml = detailsRaw ? parseAndCleanTemplate(detailsRaw, tplVars)
 const hasBody = finalDetailsHtml.trim() !== '' || (isInfoAllContext ? compactActionBtns !== '' : actionBtns !== '');
 
 const typeIcon = isEvent ? ICONS.event : ICONS.leave;
-const typeChipHtml = `<span class="${C.agendaTypeChip} ${typeColors.bg} ${typeColors.text}">${typeIcon}${displayType}</span>`;
+ const typeChipHtml = `<span class="${C.agendaTypeChip} ${typeColors.bg} ${typeColors.text}">${typeIcon}${displayType}</span>`;
 
-const metaDataHtml = `
+ const nowBadge = isNowActive(l) ? `<span class="text-[10px] md:text-[11px] font-bold px-2 py-0.5 rounded text-center inline-block leading-tight bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200/80 dark:border-green-800 animate-pulse">● Now</span>` : '';
+
+ const metaDataHtml = `
 <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs text-gray-500 dark:text-darkmuted">
   ${timeStr ? `<span class="inline-flex items-center gap-1">${ICONS.clock}${timeStr}</span>` : ''}
   ${locStr ? `<span class="inline-flex items-center gap-1">${ICONS.location}${applyAcronymsFront(locStr)}</span>` : ''}
@@ -789,19 +806,18 @@ return `<div class="${C.agendaCardInfoAll}">
     ${hasBody ? `<svg class="w-4 h-4 text-blue-500 transition-transform duration-200 chevron-icon shrink-0 ${isCollapsed ? '' : 'rotate-180'}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>` : ''}
   </div>
   ${hasBody ? `
-  <div class="agenda-card-body ${isCollapsed ? 'hidden-view' : ''}">
+ <div class="agenda-card-body ${isCollapsed ? 'hidden' : ''}">
     ${finalDetailsHtml ? `<div class="whitespace-pre-wrap mt-1.5">${finalDetailsHtml}</div>` : ''}
     ${compactActionBtns}
   </div>` : ''}
 </div>`;
-}
 
 return `<div class="${C.agendaCard} ${typeColors.accent}">
 <div class="flex justify-between items-start ${hasBody ? 'cursor-pointer select-none' : ''}" ${hasBody ? 'onclick="toggleAgendaCard(this)"' : ''}>
 <div class="flex-grow pr-2 min-w-0">
 <div class="flex items-center gap-2 mb-1 flex-wrap">
   ${typeChipHtml}
-  <span class="text-[10px] md:text-[11px] font-bold px-2 py-0.5 rounded text-center inline-block leading-tight ${getBadgeClass(l.Status)}">${formatStatusBadge(l.Status)}</span>
+  ${nowBadge}<span class="text-[10px] md:text-[11px] font-bold px-2 py-0.5 rounded text-center inline-block leading-tight ${getBadgeClass(l.Status)}">${formatStatusBadge(l.Status)}</span>
 </div>
 <h3 class="font-bold text-sm md:text-base text-gray-900 dark:text-gray-100 leading-tight">${finalTitle}</h3>
 ${metaDataHtml}
@@ -812,7 +828,7 @@ ${hasBody ? `<svg class="w-5 h-5 text-gray-400 dark:text-darkmuted transition-tr
 </div>
 </div>
 ${hasBody ? `
-<div class="agenda-card-body ${isCollapsed ? 'hidden-view' : ''}">
+<div class="agenda-card-body ${isCollapsed ? 'hidden' : ''}">
 ${finalDetailsHtml ? `<div class="whitespace-pre-wrap mt-2">${finalDetailsHtml}</div>` : ''}
 ${actionBtns}
 </div>` : ''}
@@ -843,9 +859,9 @@ const infoAllEvents = data.filter(l => {
 if (infoAllEvents.length > 0) {
    infoAllEvents.sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate));
    infoAllList.innerHTML = buildAgendaHtml(infoAllEvents, ctx === 'my', true);
-   infoAllContainer.classList.remove('hidden-view');
+    infoAllContainer.classList.remove('hidden');
 } else {
-   infoAllContainer.classList.add('hidden-view');
+    infoAllContainer.classList.add('hidden');
 }
 }
 

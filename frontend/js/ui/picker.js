@@ -7,12 +7,12 @@ function openPicker(type, ctx, field) {
 activePicker = { ctx, field, type, currentVal: new Date(appData[ctx][field + 'D']) };
 document.getElementById('picker-title').innerText = type === 'datetime' ? 'Select Date & Time' : 'Select Date';
 buildWheels();
-document.getElementById('picker-modal').classList.remove('hidden-view');
+document.getElementById('picker-modal').classList.remove('hidden');
 document.getElementById('picker-modal').classList.add('flex');
 }
 
 function closePicker() {
-document.getElementById('picker-modal').classList.add('hidden-view');
+document.getElementById('picker-modal').classList.add('hidden');
 document.getElementById('picker-modal').classList.remove('flex');
 }
 

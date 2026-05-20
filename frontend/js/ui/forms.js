@@ -19,73 +19,97 @@ function toggleInfoAll(forceState) {
 }
 
 function validateForm(ctx) {
-let isValid = true;
-let errors = [];
+ let isValid = true;
+ let errors = [];
 
-const typeEl = document.getElementById(`form-${ctx}-type`);
-if (typeEl && !typeEl.value) {
-  errors.push('Please select an event/leave type');
-  typeEl.classList.add('input-error');
-  isValid = false;
-} else if (typeEl) {
-  typeEl.classList.remove('input-error');
-}
+ const clearFieldError = (el) => {
+   if (!el) return;
+   el.classList.remove('input-error');
+   const errorId = el.id + '-error';
+   const errorEl = document.getElementById(errorId);
+   if (errorEl) errorEl.remove();
+ };
 
-const startBtn = document.getElementById(`btn-${ctx}-start`) || document.getElementById(`btn-${ctx}-leave-start`);
-if (!appData[ctx].startD) {
-  errors.push('Please select a start date');
-  if (startBtn) startBtn.classList.add('input-error');
-  isValid = false;
-} else if (startBtn) {
-  startBtn.classList.remove('input-error');
-}
+ const showFieldError = (el, message) => {
+   if (!el) return;
+   el.classList.add('input-error');
+   const errorId = el.id + '-error';
+   let errorEl = document.getElementById(errorId);
+   if (!errorEl) {
+     errorEl = document.createElement('div');
+     errorEl.id = errorId;
+     errorEl.className = 'field-error-msg';
+     errorEl.innerHTML = `<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span></span>`;
+     errorEl.querySelector('span').textContent = message;
+     el.parentElement.insertBefore(errorEl, el.nextSibling);
+   }
+ };
 
-const remarksEl = document.getElementById(`form-${ctx}-remarks`);
-if (remarksEl && remarksEl.required && !remarksEl.value.trim()) {
-  errors.push('Remarks are required');
-  remarksEl.classList.add('input-error');
-  isValid = false;
-} else if (remarksEl) {
-  remarksEl.classList.remove('input-error');
-}
+ const typeEl = document.getElementById(`form-${ctx}-type`);
+ if (typeEl && !typeEl.value) {
+   errors.push('Please select an event/leave type');
+   showFieldError(typeEl, 'Required');
+   isValid = false;
+ } else if (typeEl) {
+   clearFieldError(typeEl);
+ }
 
-const countryEl = document.getElementById(`form-${ctx}-country`);
-if (countryEl && countryEl.required && !countryEl.value.trim()) {
-  errors.push('Country is required');
-  countryEl.classList.add('input-error');
-  isValid = false;
-} else if (countryEl) {
-  countryEl.classList.remove('input-error');
-}
+ const startBtn = document.getElementById(`btn-${ctx}-start`) || document.getElementById(`btn-${ctx}-leave-start`);
+ if (!appData[ctx].startD) {
+   errors.push('Please select a start date');
+   if (startBtn) showFieldError(startBtn, 'Required');
+   isValid = false;
+ } else if (startBtn) {
+   clearFieldError(startBtn);
+ }
 
-if (!isValid && errors.length > 0) {
-  showFormError(ctx, errors.join('<br>'));
-} else {
-  hideFormError(ctx);
-}
+ const remarksEl = document.getElementById(`form-${ctx}-remarks`);
+ if (remarksEl && remarksEl.required && !remarksEl.value.trim()) {
+   errors.push('Remarks are required');
+   showFieldError(remarksEl, 'Required');
+   isValid = false;
+ } else if (remarksEl) {
+   clearFieldError(remarksEl);
+ }
 
-return isValid;
+ const countryEl = document.getElementById(`form-${ctx}-country`);
+ if (countryEl && countryEl.required && !countryEl.value.trim()) {
+   errors.push('Country is required');
+   showFieldError(countryEl, 'Required');
+   isValid = false;
+ } else if (countryEl) {
+   clearFieldError(countryEl);
+ }
+
+ if (!isValid && errors.length > 0) {
+   showFormError(ctx, errors.join('<br>'));
+ } else {
+   hideFormError(ctx);
+ }
+
+ return isValid;
 }
 
 function showFormError(ctx, message) {
-let errorEl = document.getElementById(`form-${ctx}-error`);
-if (!errorEl) {
-  errorEl = document.createElement('div');
-  errorEl.id = `form-${ctx}-error`;
-  errorEl.className = 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm p-3 rounded-lg mb-3 flex items-center gap-2';
-  const formDiv = document.getElementById(`view-submit-${ctx}`) || document.getElementById(`view-submit-combined`);
-  if (formDiv) {
-    const form = formDiv.querySelector('form');
-    if (form) form.insertBefore(errorEl, form.firstChild);
-  }
-}
-errorEl.innerHTML = `<svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg><span>${message}</span>`;
-errorEl.classList.remove('hidden-view');
+ let errorEl = document.getElementById(`form-${ctx}-error`);
+ if (!errorEl) {
+   errorEl = document.createElement('div');
+   errorEl.id = `form-${ctx}-error`;
+   errorEl.className = 'bg-red-50 dark:bg-red-900/20 border border-red-200/80 dark:border-red-800 text-red-700 dark:text-red-400 text-sm p-3 rounded-lg mb-3 flex items-start gap-2 shadow-sm';
+   errorEl.style.animation = 'fadeIn 0.2s ease-out';
+   const formDiv = document.getElementById(`view-submit-${ctx}`) || document.getElementById(`view-submit-combined`);
+   if (formDiv) {
+     const form = formDiv.querySelector('form');
+     if (form) form.insertBefore(errorEl, form.firstChild);
+   }
+ }
+ errorEl.innerHTML = `<svg class="w-4 h-4 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg><span class="flex-1">${message}</span>`;
+ errorEl.classList.remove('hidden');
 }
 
 function hideFormError(ctx) {
 const errorEl = document.getElementById(`form-${ctx}-error`);
-if (errorEl) errorEl.classList.add('hidden-view');
+if (errorEl) errorEl.classList.add('hidden');
 }
 
 function toggleEventAllDay() {
@@ -105,8 +129,8 @@ openPicker(appData.event.isAllDay ? 'date' : 'datetime', 'event', field);
 function toggleRepeatUntil(ctx = 'event') {
 const val = document.getElementById(`form-${ctx}-repeat`).value;
 const container = document.getElementById(`${ctx}-until-container`);
-if(val === 'NONE') container.classList.add('hidden-view');
-else container.classList.remove('hidden-view');
+if(val === 'NONE') container.classList.add('hidden');
+else container.classList.remove('hidden');
 }
 
 function toggleCombinedRepeatUntil() {
@@ -114,30 +138,30 @@ toggleRepeatUntil('combined');
 }
 
 function toggleCombinedFields() {
-const typeInput = document.getElementById('form-combined-type');
-if(!typeInput) return;
-const val = typeInput.value;
-const typeObj = window.appTypicalEventTypes ? window.appTypicalEventTypes.find(t => t.name === val) : null;
-const isEvent = typeObj ? typeObj.isEvent : true;
+ const typeInput = document.getElementById('form-combined-type');
+ if(!typeInput) return;
+ const val = typeInput.value;
+ const typeObj = window.appTypicalEventTypes ? window.appTypicalEventTypes.find(t => t.name === val) : null;
+ const isEvent = typeObj ? typeObj.isEvent : true;
 
-const eventFields = document.getElementById('combined-event-fields');
-const leaveFields = document.getElementById('combined-leave-fields');
-const locationInput = document.getElementById('form-combined-location');
-const btnInfoAll = document.getElementById('form-combined-infoall-btn');
-const remarksInput = document.getElementById('form-combined-remarks');
-const remarksLabel = document.getElementById('label-combined-remarks');
-const attWrap = document.getElementById('combined-attendees-wrapper');
+ const eventFields = document.getElementById('combined-event-fields');
+ const leaveFields = document.getElementById('combined-leave-fields');
+ const locationInput = document.getElementById('form-combined-location');
+ const btnInfoAll = document.getElementById('form-combined-infoall-btn');
+ const remarksInput = document.getElementById('form-combined-remarks');
+ const remarksLabel = document.getElementById('label-combined-remarks');
+ const attWrap = document.getElementById('combined-attendees-wrapper');
 
-if (isEvent || val === 'Official Trip') {
-attWrap.classList.remove('hidden-view');
-} else {
-attWrap.classList.add('hidden-view');
-}
+ if (isEvent || val === 'Official Trip') {
+  attWrap.classList.remove('hidden');
+ } else {
+ attWrap.classList.add('hidden');
+ }
 
-if (isEvent) {
-eventFields.classList.remove('hidden-view');
-leaveFields.classList.add('hidden-view');
-btnInfoAll.classList.remove('hidden-view');
+ if (isEvent) {
+ eventFields.classList.remove('hidden');
+ leaveFields.classList.add('hidden');
+btnInfoAll.classList.remove('hidden');
 
 if (!locationInput.value || locationInput.value.trim() === '') {
  locationInput.value = typeObj && typeObj.defaultLoc ? typeObj.defaultLoc : 'Office';
@@ -153,30 +177,30 @@ if (val === 'Meeting') {
    remarksLabel.innerHTML = 'Remarks <span class="text-[10px] font-normal text-gray-500">(Optional)</span>';
 }
 } else {
-eventFields.classList.add('hidden-view');
-leaveFields.classList.remove('hidden-view');
-btnInfoAll.classList.add('hidden-view');
-remarksInput.required = false;
-remarksInput.placeholder = "";
-remarksLabel.innerHTML = 'Remarks <span class="text-[10px] font-normal text-gray-500">(Optional)</span>';
+ eventFields.classList.add('hidden');
+leaveFields.classList.remove('hidden');
+  btnInfoAll.classList.add('hidden');
+ remarksInput.required = false;
+ remarksInput.placeholder = "";
+ remarksLabel.innerHTML = 'Remarks <span class="text-[10px] font-normal text-gray-500">(Optional)</span>';
 
-const overseas = document.getElementById('combined-overseas-fields');
-const cInput = document.getElementById('form-combined-country');
+ const overseas = document.getElementById('combined-overseas-fields');
+ const cInput = document.getElementById('form-combined-country');
 if (val === 'Overseas Leave' || val === 'Official Trip') { 
- overseas.classList.remove('hidden-view'); cInput.required = true; 
-} else { 
- overseas.classList.add('hidden-view'); cInput.required = false; 
-}
+   overseas.classList.remove('hidden'); cInput.required = true; 
+  } else { 
+  overseas.classList.add('hidden'); cInput.required = false; 
+ }
 
-const leaveTimeStart = document.getElementById('combined-leave-time-start');
-const leaveTimeEnd = document.getElementById('combined-leave-time-end');
-if (val === 'Official Trip') {
-   if(leaveTimeStart) leaveTimeStart.classList.add('hidden-view');
-   if(leaveTimeEnd) leaveTimeEnd.classList.add('hidden-view');
+ const leaveTimeStart = document.getElementById('combined-leave-time-start');
+ const leaveTimeEnd = document.getElementById('combined-leave-time-end');
+ if (val === 'Official Trip') {
+    if(leaveTimeStart) leaveTimeStart.classList.add('hidden');
+    if(leaveTimeEnd) leaveTimeEnd.classList.add('hidden');
 } else {
-   if(leaveTimeStart) leaveTimeStart.classList.remove('hidden-view');
-   if(leaveTimeEnd) leaveTimeEnd.classList.remove('hidden-view');
-}
+     if(leaveTimeStart) leaveTimeStart.classList.remove('hidden');
+     if(leaveTimeEnd) leaveTimeEnd.classList.remove('hidden');
+  }
 }
 }
 
@@ -187,7 +211,7 @@ const q = inputEl.value;
 const resC = document.getElementById(`behalf-results-${ctx}`);
 
 if(!q || !fuseAllContacts) { 
- resC.classList.add('hidden-view'); 
+ resC.classList.add('hidden'); 
  inputEl.classList.remove('ring-2', 'ring-emerald-500');
  return; 
 }
@@ -200,9 +224,9 @@ resC.innerHTML = results.map(c => `
    <span class="font-semibold text-emerald-800 dark:text-emerald-300">${c.name}</span> <span class="text-xs text-gray-500 dark:text-darkmuted ml-1">(${c.dept})</span>
  </div>
 `).join('');
-resC.classList.remove('hidden-view');
+resC.classList.remove('hidden');
 } else {
-resC.innerHTML = `<div class="p-3 text-gray-500">No match found</div>`; resC.classList.remove('hidden-view');
+resC.innerHTML = `<div class="p-3 text-gray-500">No match found</div>`; resC.classList.remove('hidden');
 }
 }
 
@@ -214,15 +238,15 @@ document.getElementById(`selected-behalf-${ctx}`).innerHTML = `
 `;
 const inputEl = document.getElementById(`form-${ctx}-behalf-search`);
 inputEl.value = '';
-inputEl.classList.add('hidden-view');
+inputEl.classList.add('hidden');
 inputEl.classList.remove('ring-2', 'ring-emerald-500');
-document.getElementById(`behalf-results-${ctx}`).classList.add('hidden-view');
+document.getElementById(`behalf-results-${ctx}`).classList.add('hidden');
 }
 
 function clearBehalf(ctx) {
 adminBehalfUser = null;
 document.getElementById(`selected-behalf-${ctx}`).innerHTML = '';
-document.getElementById(`form-${ctx}-behalf-search`).classList.remove('hidden-view');
+document.getElementById(`form-${ctx}-behalf-search`).classList.remove('hidden');
 }
 
 // --- Attendees Form Logic ---
@@ -232,7 +256,7 @@ const q = inputEl.value;
 const resC = document.getElementById(`${ctx}-attendees-results`);
 
 if(!q || !fuseAttendees) { 
- resC.classList.add('hidden-view'); 
+ resC.classList.add('hidden'); 
  inputEl.classList.remove('ring-2', 'ring-blue-500');
  return; 
 }
@@ -245,9 +269,9 @@ resC.innerHTML = results.map(item => `
    <span class="font-semibold text-blue-800 dark:text-blue-300">${item.name}</span> <span class="text-xs text-gray-500 dark:text-darkmuted ml-1">(${item.dept})</span>
  </div>
 `).join('');
-resC.classList.remove('hidden-view');
+resC.classList.remove('hidden');
 } else {
-resC.innerHTML = `<div class="p-3 text-gray-500">No match found</div>`; resC.classList.remove('hidden-view');
+resC.innerHTML = `<div class="p-3 text-gray-500">No match found</div>`; resC.classList.remove('hidden');
 }
 }
 
@@ -259,7 +283,7 @@ renderAttendees(ctx);
 const inputEl = document.getElementById(`form-${ctx}-attendee-search`);
 inputEl.value = '';
 inputEl.classList.remove('ring-2', 'ring-blue-500');
-document.getElementById(`${ctx}-attendees-results`).classList.add('hidden-view');
+document.getElementById(`${ctx}-attendees-results`).classList.add('hidden');
 }
 
 function removeAttendee(ctx, id) { 
@@ -349,7 +373,7 @@ updateTimeSliderVisual('start', start, ctx); updateTimeSliderVisual('end', end, 
 
 document.getElementById(`form-${ctx}-remarks`).value = l.Remarks || '';
 document.getElementById(`submit-${ctx}-btn`).innerText = "Update Record";
-document.getElementById(`cancel-edit-${ctx}-btn`).classList.remove('hidden-view');
+document.getElementById(`cancel-edit-${ctx}-btn`).classList.remove('hidden');
 
 updateButtonLabels();
 switchTab(`submit-${ctx}`);
@@ -399,7 +423,7 @@ renderAttendees('combined');['leave', 'event', 'combined'].forEach(ctx => {
  const btn = document.getElementById(`submit-${ctx}-btn`);
  const cancelBtn = document.getElementById(`cancel-edit-${ctx}-btn`);
  if (btn) btn.innerText = "Save Record";
- if (cancelBtn) cancelBtn.classList.add('hidden-view');
+ if (cancelBtn) cancelBtn.classList.add('hidden');
 });
 
 switchTab(appMode === 'combined' ? 'dashboard' : 'my-leaves');
@@ -436,19 +460,19 @@ const timeStart = document.getElementById(`${ctx}-time-start`);
 const timeEnd = document.getElementById(`${ctx}-time-end`);
 
 if (type === 'Overseas Leave' || type === 'Official Trip') { 
-el.classList.remove('hidden-view'); cInput.required = true; 
+el.classList.remove('hidden'); cInput.required = true; 
 } else { 
-el.classList.add('hidden-view'); cInput.required = false; cInput.value = ''; document.getElementById(`form-${ctx}-state`).value = ''; 
+el.classList.add('hidden'); cInput.required = false; cInput.value = ''; document.getElementById(`form-${ctx}-state`).value = ''; 
 }
 
 if (type === 'Official Trip') {
-if(attWrap) attWrap.classList.remove('hidden-view');
-if(timeStart) timeStart.classList.add('hidden-view');
-if(timeEnd) timeEnd.classList.add('hidden-view');
+if(attWrap) attWrap.classList.remove('hidden');
+if(timeStart) timeStart.classList.add('hidden');
+if(timeEnd) timeEnd.classList.add('hidden');
 } else {
-if(attWrap) attWrap.classList.add('hidden-view');
-if(timeStart) timeStart.classList.remove('hidden-view');
-if(timeEnd) timeEnd.classList.remove('hidden-view');
+if(attWrap) attWrap.classList.add('hidden');
+if(timeStart) timeStart.classList.remove('hidden');
+if(timeEnd) timeEnd.classList.remove('hidden');
 }
 }
 

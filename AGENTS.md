@@ -1,88 +1,189 @@
-# AGENTS.md — Cloud Moves
+# AGENTS.md
 
-## Project Summary
+This file provides guidance to AI coding agents (Claude Code, Cursor, Copilot, Antigravity, etc.) when working with code in this repository.
 
-Serverless PWA for personnel availability, leave records, and calendar events. Frontend hosted on GitHub Pages (vanilla JS + TailwindCSS CDN). Backend is Google Apps Script acting as a REST API. Data stored in Google Sheets, Contacts, Calendar, and Gmail.
+## Repository Overview
 
-## Repo Structure
+A collection of skills for Claude.ai and Claude Code for senior software engineers. Skills are packaged instructions and scripts that extend Claude and your coding agents capabilities.
+
+## OpenCode Integration
+
+OpenCode uses a **skill-driven execution model** powered by the `skill` tool and this repository's `/skills` directory.
+
+### Core Rules
+
+- If a task matches a skill, you MUST invoke it
+- Skills are located in `skills/<skill-name>/SKILL.md`
+- Never implement directly if a skill applies
+- Always follow the skill instructions exactly (do not partially apply them)
+
+### Intent → Skill Mapping
+
+The agent should automatically map user intent to skills:
+
+- Feature / new functionality → `spec-driven-development`, then `incremental-implementation`, `test-driven-development`
+- Planning / breakdown → `planning-and-task-breakdown`
+- Bug / failure / unexpected behavior → `debugging-and-error-recovery`
+- Code review → `code-review-and-quality`
+- Refactoring / simplification → `code-simplification`
+- API or interface design → `api-and-interface-design`
+- UI work → `frontend-ui-engineering`
+
+### Lifecycle Mapping (Implicit Commands)
+
+OpenCode does not support slash commands like `/spec` or `/plan`.
+
+Instead, the agent must internally follow this lifecycle:
+
+- DEFINE → `spec-driven-development`
+- PLAN → `planning-and-task-breakdown`
+- BUILD → `incremental-implementation` + `test-driven-development`
+- VERIFY → `debugging-and-error-recovery`
+- REVIEW → `code-review-and-quality`
+- SHIP → `shipping-and-launch`
+
+### Execution Model
+
+For every request:
+
+1. Determine if any skill applies (even 1% chance)
+2. Invoke the appropriate skill using the `skill` tool
+3. Follow the skill workflow strictly
+4. Only proceed to implementation after required steps (spec, plan, etc.) are complete
+
+### Anti-Rationalization
+
+The following thoughts are incorrect and must be ignored:
+
+- "This is too small for a skill"
+- "I can just quickly implement this"
+- "I’ll gather context first"
+
+Correct behavior:
+
+- Always check for and use skills first
+
+This ensures OpenCode behaves similarly to Claude Code with full workflow enforcement.
+
+## Orchestration: Personas, Skills, and Commands
+
+This repo has three composable layers. They have different jobs and should not be confused:
+
+- **Skills** (`skills/<name>/SKILL.md`) — workflows with steps and exit criteria. The *how*. Mandatory hops when an intent matches.
+- **Personas** (`agents/<role>.md`) — roles with a perspective and an output format. The *who*.
+- **Slash commands** (`.claude/commands/*.md`) — user-facing entry points. The *when*. The orchestration layer.
+
+Composition rule: **the user (or a slash command) is the orchestrator. Personas do not invoke other personas.** A persona may invoke skills.
+
+The only multi-persona orchestration pattern this repo endorses is **parallel fan-out with a merge step** — used by `/ship` to run `code-reviewer`, `security-auditor`, and `test-engineer` concurrently and synthesize their reports. Do not build a "router" persona that decides which other persona to call; that's the job of slash commands and intent mapping.
+
+See [agents/README.md](agents/README.md) for the decision matrix and [references/orchestration-patterns.md](references/orchestration-patterns.md) for the full pattern catalog.
+
+**Claude Code interop:** the personas in `agents/` work as Claude Code subagents (auto-discovered from this plugin's `agents/` directory) and as Agent Teams teammates (referenced by name when spawning). Two platform constraints align with our rules: subagents cannot spawn other subagents, and teams cannot nest. Plugin agents silently ignore the `hooks`, `mcpServers`, and `permissionMode` frontmatter fields.
+
+## Creating a New Skill
+
+### Directory Structure
 
 ```
-backend/          # Google Apps Script source (.js files → .gs in GAS editor)
-frontend/         # Static PWA (HTML, CSS, vanilla JS)
-frontend/js/core/     # app.js (entry), api.js, auth.js, state.js, config.js
-frontend/js/features/ # Dashboard, calendar, parade state rendering
-frontend/js/ui/       # Form rendering, date picker
-frontend/js/admin/    # Admin settings, KAH, org structure
-docs/             # Architecture, setup, API reference, user/admin guides
-.github/workflows/deploy.yml  # CI/CD: clasp push + deploy on backend/ changes
+skills/
+  {skill-name}/           # kebab-case directory name
+    SKILL.md              # Required: skill definition
+    scripts/              # Required: executable scripts
+      {script-name}.sh    # Bash scripts (preferred)
+  {skill-name}.zip        # Required: packaged for distribution
 ```
 
-## Developer Commands
+### Naming Conventions
 
-There is **no build system, no npm, no test framework, no linter**. This is a vanilla static frontend + Google Apps Script backend.
+- **Skill directory**: `kebab-case` (e.g. `web-quality`)
+- **SKILL.md**: Always uppercase, always this exact filename
+- **Scripts**: `kebab-case.sh` (e.g., `deploy.sh`, `fetch-logs.sh`)
+- **Zip file**: Must match directory name exactly: `{skill-name}.zip`
 
-- **Frontend**: Open `frontend/index.html` directly in a browser or serve via any static server.
-- **Backend changes**: Push to `main` branch → GitHub Actions auto-deploys via Clasp (only triggers on `backend/` path changes).
-- **Manual backend deploy**: Requires `@google/clasp` installed, `~/.clasprc.json` credentials, and `.clasp.json` with `scriptId` and `rootDir: "backend"`. Then `clasp push --force && clasp deploy -i <DEPLOYMENT_ID>`.
+### SKILL.md Format
 
-## Environment Switching
+```markdown
+---
+name: {skill-name}
+description: {One sentence describing what the skill does, followed by one or more "Use when" trigger conditions. Include trigger phrases like "Deploy my app" or "Check logs" when helpful.}
+---
 
-Three separate environments, each with its own GAS project and Sheet. Switch by editing `frontend/js/core/config.js`:
+# {Skill Title}
 
-```js
-const ENV = 'Exp';  // 'Exp' | 'Dev' | 'Prod'
+{Brief overview of what the skill does and why it matters.}
+
+## How It Works
+
+{Numbered list explaining the skill's workflow}
+
+Equivalent headings like `Workflow`, `Core Process`, or `When to Use` are fine when they communicate the same structure clearly.
+
+## Usage (Optional)
+
+Include this section only if the skill ships runnable helpers under `scripts/`. Markdown-only skills can omit both the section and the directory entirely.
+
+```bash
+bash /mnt/skills/user/{skill-name}/scripts/{script}.sh [args]
 ```
 
-The `ENV` constant selects the corresponding `*_URL`. The frontend is a single codebase; only this constant changes between environments.
+**Arguments:**
+- `arg1` - Description (defaults to X)
 
-## Backend File Mapping
+**Examples:**
+{Show 2-3 common usage patterns}
 
-Repo `.js` files map to Google Apps Script `.gs` files (same name, different extension):
+## Output
 
-| Repo file | GAS file |
-|-----------|----------|
-| `backend/Code.js` | `Code.gs` (router, INITIAL_SETUP, schema verification) |
-| `backend/Auth.js` | `Auth.gs` (login, Contacts integration) |
-| `backend/Leaves.js` | `Leaves.gs` (leave CRUD, KAH limit checking) |
-| `backend/Calendar.js` | `Calendar.gs` (Calendar event creation) |
-| `backend/Settings.js` | `Settings.gs` (admin settings, unit management, contact sync) |
+{Show example output users will see}
 
-## API Contract
+## Present Results to User
 
-Single POST endpoint (GAS Web App URL). All requests use:
-```json
-{ "action": "<action>", "data": { ... }, "credentials": { "phone": "...", "pass": "..." } }
+{Template for how Claude should format results when presenting to users}
+
+## Troubleshooting
+
+{Common issues and solutions, especially network/permissions errors}
 ```
-Content-Type: `text/plain`. See `docs/api-reference.md` for all actions.
 
-## Authentication
+### Best Practices for Context Efficiency
 
-- **Admin**: Password stored in GAS `PropertiesService`. Default: `P@ssw0rd` (change after first login).
-- **User**: `{phone_number}{keyword}` (e.g., `12345678peace`). Keyword is configurable in admin settings.
-- **Session**: User object stored in `localStorage`. Every API call sends credentials.
+Skills are loaded on-demand — only the skill name and description are loaded at startup. The full `SKILL.md` loads into context only when the agent decides the skill is relevant. To minimize context usage:
 
-## CI/CD Secrets Required
+- **Keep SKILL.md under 500 lines** — put detailed reference material in separate files
+- **Write specific descriptions** — helps the agent know exactly when to activate the skill
+- **Use progressive disclosure** — reference supporting files that get read only when needed
+- **Prefer scripts over inline code** — script execution doesn't consume context (only output does)
+- **File references work one level deep** — link directly from SKILL.md to supporting files
 
-GitHub repo secrets for `.github/workflows/deploy.yml`:
-- `CLASP_CREDS` — JSON from `~/.clasprc.json`
-- `SCRIPT_ID` — Apps Script project ID
-- `DEPLOYMENT_ID` — Web App deployment ID (keeps URL stable across deploys)
+### Script Requirements
 
-## Key Gotchas
+- Use `#!/bin/bash` shebang
+- Use `set -e` for fail-fast behavior
+- Write status messages to stderr: `echo "Message" >&2`
+- Write machine-readable output (JSON) to stdout
+- Include a cleanup trap for temp files
+- Reference the script path as `/mnt/skills/user/{skill-name}/scripts/{script}.sh`
 
-- **GAS People API**: Must be enabled as an advanced service in the Apps Script project (see `appsscript.json` dependencies).
-- **Contacts propagation delay**: Google Contacts takes ~1 minute to reflect new users.
-- **INITIAL_SETUP**: Must be run manually once from the GAS editor to create the `Company_Leaves_DB` sheet and default properties.
-- **clasp push --force**: Overwrites the GAS editor completely. The deploy workflow uses `--force`.
-- **No local test infrastructure**: Verification is done by deploying and testing in the browser against the live GAS endpoint.
+### Creating the Zip Package
 
-## Docs Reference
+After creating or updating a skill:
 
-| Document | Path |
-|----------|------|
-| Architecture | `docs/architecture.md` |
-| Setup Guide | `docs/setup-guide.md` |
-| API Reference | `docs/api-reference.md` |
-| User Guide | `docs/user-guide.md` |
-| Admin Guide | `docs/admin-guide.md` |
-| Maintenance | `docs/maintenance.md` |
+```bash
+cd skills
+zip -r {skill-name}.zip {skill-name}/
+```
+
+### End-User Installation
+
+Document these two installation methods for users:
+
+**Claude Code:**
+```bash
+cp -r skills/{skill-name} ~/.claude/skills/
+```
+
+**claude.ai:**
+Add the skill to project knowledge or paste SKILL.md contents into the conversation.
+
+If the skill requires network access, instruct users to add required domains at `claude.ai/settings/capabilities`.

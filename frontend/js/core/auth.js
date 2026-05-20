@@ -5,8 +5,8 @@
 let unitsLoaded = false;
 
 function showLogin() {
-document.getElementById('login-view').classList.remove('hidden-view');
-document.getElementById('app-view').classList.add('hidden-view');
+document.getElementById('login-view').classList.remove('hidden');
+document.getElementById('app-view').classList.add('hidden');
 document.getElementById('logout-btn').classList.add('hidden');
 document.getElementById('menu-btn').classList.add('hidden');
 document.getElementById('active-tab-title').classList.add('hidden');
@@ -20,8 +20,8 @@ if (controlsWrapper) {
 
 function toggleRegisterView(show) {
 if (show) {
- document.getElementById('login-form-container').classList.add('hidden-view');
- document.getElementById('register-form-container').classList.remove('hidden-view');
+ document.getElementById('login-form-container').classList.add('hidden');
+ document.getElementById('register-form-container').classList.remove('hidden');
  
  if (!unitsLoaded) {
    apiCall('getSettings', { adminPass: null }).then(settings => {
@@ -57,8 +57,8 @@ if (show) {
    }).catch(e => console.error("Error loading units", e));
  }
 } else {
- document.getElementById('login-form-container').classList.remove('hidden-view');
- document.getElementById('register-form-container').classList.add('hidden-view');
+ document.getElementById('login-form-container').classList.remove('hidden');
+ document.getElementById('register-form-container').classList.add('hidden');
 }
 }
 

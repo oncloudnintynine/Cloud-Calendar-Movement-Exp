@@ -37,35 +37,35 @@ document.getElementById('login-pass').addEventListener('keypress', e => e.key ==
 document.addEventListener('click', function(e) {
 if(!e.target.closest('#form-event-attendee-search') && !e.target.closest('#event-attendees-results')) {
 const resA = document.getElementById('event-attendees-results');
-if(resA) resA.classList.add('hidden-view');
+if(resA) resA.classList.add('hidden');
 }
 if(!e.target.closest('#form-combined-attendee-search') && !e.target.closest('#combined-attendees-results')) {
 const resCA = document.getElementById('combined-attendees-results');
-if(resCA) resCA.classList.add('hidden-view');
+if(resCA) resCA.classList.add('hidden');
 }
 if(!e.target.closest('#form-leave-attendee-search') && !e.target.closest('#leave-attendees-results')) {
 const resLA = document.getElementById('leave-attendees-results');
-if(resLA) resLA.classList.add('hidden-view');
+if(resLA) resLA.classList.add('hidden');
 }
 if(!e.target.closest('#kah-search') && !e.target.closest('#kah-results')) {
 const resK = document.getElementById('kah-results');
-if(resK) resK.classList.add('hidden-view');
+if(resK) resK.classList.add('hidden');
 }
 if(!e.target.closest('#form-leave-behalf-search') && !e.target.closest('#behalf-results-leave')) {
 const resBHL = document.getElementById('behalf-results-leave');
-if(resBHL) resBHL.classList.add('hidden-view');
+if(resBHL) resBHL.classList.add('hidden');
 }
 if(!e.target.closest('#form-event-behalf-search') && !e.target.closest('#behalf-results-event')) {
 const resBHE = document.getElementById('behalf-results-event');
-if(resBHE) resBHE.classList.add('hidden-view');
+if(resBHE) resBHE.classList.add('hidden');
 }
 if(!e.target.closest('#form-combined-behalf-search') && !e.target.closest('#behalf-results-combined')) {
 const resBHC = document.getElementById('behalf-results-combined');
-if(resBHC) resBHC.classList.add('hidden-view');
+if(resBHC) resBHC.classList.add('hidden');
 }
 if(!e.target.closest('#admin-manage-search') && !e.target.closest('#admin-manage-results')) {
 const resM = document.getElementById('admin-manage-results');
-if(resM) resM.classList.add('hidden-view');
+if(resM) resM.classList.add('hidden');
 }
 });
 
@@ -74,8 +74,8 @@ initDates();
 
 async function showApp() {
 await updateProgress(15, 'Connecting to server...');
-document.getElementById('login-view').classList.add('hidden-view');
-document.getElementById('app-view').classList.remove('hidden-view');
+document.getElementById('login-view').classList.add('hidden');
+document.getElementById('app-view').classList.remove('hidden');
 document.getElementById('logout-btn').classList.remove('hidden');
 document.getElementById('menu-btn').classList.remove('hidden');
 document.getElementById('active-tab-title').classList.remove('hidden');
@@ -232,15 +232,15 @@ unitsLoaded = true;
 
 if (user.role === 'admin') {
 document.getElementById('menu-admin-group').classList.remove('hidden');
-document.getElementById('admin-behalf-leave').classList.remove('hidden-view');
-document.getElementById('admin-behalf-event').classList.remove('hidden-view');
-document.getElementById('admin-behalf-combined').classList.remove('hidden-view');
+document.getElementById('admin-behalf-leave').classList.remove('hidden');
+document.getElementById('admin-behalf-event').classList.remove('hidden');
+document.getElementById('admin-behalf-combined').classList.remove('hidden');
 if(typeof populateAdminSettingsForm === 'function') populateAdminSettingsForm(settings);
 } else {
 document.getElementById('menu-admin-group').classList.add('hidden');
-document.getElementById('admin-behalf-leave').classList.add('hidden-view');
-document.getElementById('admin-behalf-event').classList.add('hidden-view');
-document.getElementById('admin-behalf-combined').classList.add('hidden-view');
+document.getElementById('admin-behalf-leave').classList.add('hidden');
+document.getElementById('admin-behalf-event').classList.add('hidden');
+document.getElementById('admin-behalf-combined').classList.add('hidden');
 }
 
   if (typeof toggleCombinedFields === 'function') toggleCombinedFields();
