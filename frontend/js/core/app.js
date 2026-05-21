@@ -35,29 +35,13 @@ showLogin();
 document.getElementById('login-pass').addEventListener('keypress', e => e.key === 'Enter' && handleLogin());
 
 document.addEventListener('click', function(e) {
-if(!e.target.closest('#form-event-attendee-search') && !e.target.closest('#event-attendees-results')) {
-const resA = document.getElementById('event-attendees-results');
-if(resA) resA.classList.add('hidden');
-}
 if(!e.target.closest('#form-combined-attendee-search') && !e.target.closest('#combined-attendees-results')) {
 const resCA = document.getElementById('combined-attendees-results');
 if(resCA) resCA.classList.add('hidden');
 }
-if(!e.target.closest('#form-leave-attendee-search') && !e.target.closest('#leave-attendees-results')) {
-const resLA = document.getElementById('leave-attendees-results');
-if(resLA) resLA.classList.add('hidden');
-}
 if(!e.target.closest('#kah-search') && !e.target.closest('#kah-results')) {
 const resK = document.getElementById('kah-results');
 if(resK) resK.classList.add('hidden');
-}
-if(!e.target.closest('#form-leave-behalf-search') && !e.target.closest('#behalf-results-leave')) {
-const resBHL = document.getElementById('behalf-results-leave');
-if(resBHL) resBHL.classList.add('hidden');
-}
-if(!e.target.closest('#form-event-behalf-search') && !e.target.closest('#behalf-results-event')) {
-const resBHE = document.getElementById('behalf-results-event');
-if(resBHE) resBHE.classList.add('hidden');
 }
 if(!e.target.closest('#form-combined-behalf-search') && !e.target.closest('#behalf-results-combined')) {
 const resBHC = document.getElementById('behalf-results-combined');
@@ -179,10 +163,9 @@ window.appCustomKahGroups = settings.customKahGroups ||[];
 companyStructure = settings.companyStructure ? (Array.isArray(settings.companyStructure) ? settings.companyStructure : Object.keys(settings.companyStructure)) :[];
 companyContacts = settings.allContacts ||[];
 
-const typeOptionsHtml = window.appTypicalEventTypes.map(t => `<option value="${t.name}">${t.name}</option>`).join('');['form-leave-type', 'form-event-type', 'form-combined-type'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.innerHTML = typeOptionsHtml;
-});
+const typeOptionsHtml = window.appTypicalEventTypes.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+const combinedTypeEl = document.getElementById('form-combined-type');
+if (combinedTypeEl) combinedTypeEl.innerHTML = typeOptionsHtml;
 
 const mOrder = settings.menuOrder && settings.menuOrder.length ? settings.menuOrder : DEFAULT_MENU;
 
@@ -229,13 +212,9 @@ if (editUserUnit) editUserUnit.innerHTML = regOptions;
 unitsLoaded = true;
 
 if (user.role === 'admin') {
-document.getElementById('admin-behalf-leave').classList.remove('hidden');
-document.getElementById('admin-behalf-event').classList.remove('hidden');
 document.getElementById('admin-behalf-combined').classList.remove('hidden');
 if(typeof populateAdminSettingsForm === 'function') populateAdminSettingsForm(settings);
 } else {
-document.getElementById('admin-behalf-leave').classList.add('hidden');
-document.getElementById('admin-behalf-event').classList.add('hidden');
 document.getElementById('admin-behalf-combined').classList.add('hidden');
 }
 

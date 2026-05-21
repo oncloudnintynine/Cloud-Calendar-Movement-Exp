@@ -28,13 +28,11 @@ let adminBehalfUser = null;
 let dashViewMode = 'agenda'; 
 
 let appData = {
-leave: { startD: new Date(), endD: new Date(), startAMPM: 'AM', endAMPM: 'PM' },
-event: { startD: new Date(), endD: new Date(), untilD: new Date(), isAllDay: false },
-combined: { startD: new Date(), endD: new Date(), untilD: new Date(), startAMPM: 'AM', endAMPM: 'PM', isAllDay: false },
-parade: { targetD: new Date() },
-register: { birthdayD: new Date(2000, 0, 1), birthdaySelected: false },
-adminRegister: { birthdayD: new Date(2000, 0, 1), birthdaySelected: false },
-manageUser: { birthdayD: new Date(2000, 0, 1), birthdaySelected: false }
+ combined: { startD: new Date(), endD: new Date(), untilD: new Date(), startAMPM: 'AM', endAMPM: 'PM', isAllDay: false },
+ parade: { targetD: new Date() },
+ register: { birthdayD: new Date(2000, 0, 1), birthdaySelected: false },
+ adminRegister: { birthdayD: new Date(2000, 0, 1), birthdaySelected: false },
+ manageUser: { birthdayD: new Date(2000, 0, 1), birthdaySelected: false }
 };
 
 let dashDate = new Date(); dashDate.setHours(0,0,0,0);
@@ -48,8 +46,6 @@ const TAB_NAMES = {
 'dashboard': 'Dashboard',
 'parade-state': 'Parade State',
 'my-leaves': 'My Calendar',
-'submit-leave': 'Add Leave/MC/OIL (Classic)',
-'submit-event': 'Add Event (Classic)',
 'submit-combined': 'Add Event / Leave',
 'admin': 'Admin Settings',
 'kah-management': 'KAH Management',

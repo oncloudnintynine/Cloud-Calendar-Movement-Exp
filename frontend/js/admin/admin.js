@@ -7,6 +7,58 @@ let userToManageResource = null;
 
 const FIXED_TYPICAL_EVENTS =["Meeting", "Others", "Official Trip", "Overseas Leave", "Local Leave"];
 
+// --- Accordion Helpers ---
+function toggleAdminSection(sectionId) {
+  const content = document.getElementById('admin-section-content-' + sectionId);
+  const chevron = document.getElementById('admin-section-chevron-' + sectionId);
+  if (!content || !chevron) return;
+  const isOpen = content.classList.contains('open');
+  content.classList.toggle('open', !isOpen);
+  chevron.parentElement.setAttribute('aria-expanded', String(!isOpen));
+}
+
+function toggleAccordionGroup(groupName, index) {
+  const container = document.getElementById('admin-accordion-group-' + groupName);
+  if (!container) return;
+  const items = container.querySelectorAll('.admin-accordion-item');
+  items.forEach((item, i) => {
+    const content = item.querySelector('.admin-accordion-content');
+    const chevron = item.querySelector('.admin-accordion-chevron');
+    if (!content || !chevron) return;
+    const isOpen = content.classList.contains('open');
+    if (i === index) {
+      content.classList.toggle('open', !isOpen);
+      chevron.parentElement.setAttribute('aria-expanded', String(!isOpen));
+    } else {
+      content.classList.add('open');
+      chevron.parentElement.setAttribute('aria-expanded', 'true');
+    }
+  });
+}
+
+function openFirstAccordion(groupId) {
+  const group = document.getElementById('admin-accordion-group-' + groupId);
+  if (!group) return;
+  const items = group.querySelectorAll('.admin-accordion-item');
+  items.forEach((item, i) => {
+    const content = item.querySelector('.admin-accordion-content');
+    const chevron = item.querySelector('.admin-accordion-chevron');
+    if (!content || !chevron) return;
+    const isFirst = (i === 0);
+    content.classList.toggle('open', isFirst);
+    chevron.parentElement.setAttribute('aria-expanded', String(isFirst));
+  });
+}
+
+function initAdminAccordions() {
+  // Make all admin sections open by default
+  document.querySelectorAll('[id^="admin-section-content-"]').forEach(el => el.classList.add('open'));
+  document.querySelectorAll('[id^="admin-section-chevron-"]').forEach(el => el.parentElement.setAttribute('aria-expanded', 'true'));
+  
+  openFirstAccordion('display-templates');
+  openFirstAccordion('kah-management');
+}
+
 // --- TEMPLATE CHIPS HELPER ---
 function insertAtCursor(inputId, text) {
 const input = document.getElementById(inputId);
@@ -36,11 +88,6 @@ safeSet('set-agenda-details-template', settings.agendaDetailsTemplate || 'Time: 
 safeSet('set-infoall-template', settings.infoAllTemplate || '{EventType} - {Name} ({Department})');
 safeSet('set-infoall-details-template', settings.infoAllDetailsTemplate || 'Time: {Time}\nLocation: {Location}\nEvent Description: {EventDescription}');
 
-const radios = document.getElementsByName('app-mode');
-if (radios) {
-    radios.forEach(r => { if(r.value === appMode) r.checked = true; });
-}
-
 tempMenuOrder = settings.menuOrder && settings.menuOrder.length ? settings.menuOrder : DEFAULT_MENU;
 renderMenuOrder();
 
@@ -64,7 +111,7 @@ renderCustomKahGroups();
 
 tempAdminSectionsOrder = (settings.adminSectionsOrder && settings.adminSectionsOrder.length 
 ? settings.adminSectionsOrder 
-:['app-mode', 'register-user', 'manage-users', 'admin-pass', 'user-keyword', 'menu-order']).filter(s => s !== 'code-backup');
+:['register-user', 'manage-users', 'admin-pass', 'user-keyword', 'menu-order']).filter(s => s !== 'code-backup');
 
 const container = document.getElementById('admin-sections-container');
 if (container) {
@@ -93,7 +140,6 @@ console.error("Error populating admin form:", e);
 async function loadAdminSettings() {
 try {
 const settings = await apiCall('getSettings', { adminPass: user.pass });
-appMode = settings.appMode || 'combined';
 companyStructure = settings.companyStructure || {};
 populateAdminSettingsForm(settings);
 
@@ -101,6 +147,8 @@ if(settings.allContacts) {
 companyContacts = settings.allContacts;
 fuseAllContacts = new Fuse(settings.allContacts, { keys:['name', 'dept', 'phone'], threshold: 0.3 });
 }
+
+requestAnimationFrame(initAdminAccordions);
 } catch (err) { alertError('login-alert', err.message); }
 }
 
@@ -493,11 +541,9 @@ function submitAdminRegister() { handleRegister('admin'); }
 async function saveAdminSettings() {
 showLoader(true);
 const newPass = document.getElementById('set-admin-pass').value || null;
-let selectedMode = 'combined';
-document.getElementsByName('app-mode').forEach(r => { if(r.checked) selectedMode = r.value; });
 
 const payload = {
-adminPass: user.pass, newAdminPass: newPass, appMode: selectedMode,
+adminPass: user.pass, newAdminPass: newPass,
 userKeyword: document.getElementById('set-user-keyword').value.trim() || 'peace',
 menuOrder: tempMenuOrder,
 adminSectionsOrder: tempAdminSectionsOrder

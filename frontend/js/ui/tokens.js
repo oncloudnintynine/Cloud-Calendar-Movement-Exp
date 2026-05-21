@@ -54,57 +54,58 @@ const C = {
   input: 'w-full border border-gray-300 dark:border-gray-600 rounded-lg py-2.5 px-3.5 bg-white dark:bg-darkinput text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-300 dark:focus:ring-blue-700/50 transition text-sm',
   // Compact (admin register, admin manage)
   inputSm: 'w-full border border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3.5 bg-white dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-300 dark:focus:ring-blue-700/50 transition text-sm',
-  // Dark variant (edit-user, manage-user detail fields)
-  inputDark: 'w-full border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-black text-sm py-2 px-3 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-300 dark:focus:ring-blue-700/50 transition',
   // Date picker trigger buttons
   inputBtn: 'w-full border border-gray-300 dark:border-gray-600 rounded-lg py-2.5 px-3.5 bg-white dark:bg-darkinput hover:bg-gray-50 dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-300 dark:focus:ring-blue-700/50',
 
   // Labels
   label: 'block font-medium mb-2 text-sm text-gray-700 dark:text-darkmuted',
-  labelSm: 'block font-medium mb-1.5 text-xs text-gray-600 dark:text-darkmuted',
-
   // Primary action button
   btnPrimary: 'w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-2.5 rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.1)] transition text-base',
-  btnPrimarySm: 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-2 rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.08)] transition text-xs',
-
-  // Secondary / cancel button
-  btnSecondary: 'w-full bg-gray-500 hover:bg-gray-600 active:bg-gray-700 text-white font-semibold py-2.5 rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.08)] transition text-base',
-
-// Dropdown search results
+ // Dropdown search results
    dropdown: 'absolute z-30 w-full bg-white dark:bg-darksurface border border-gray-200 dark:border-darkborder rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.1)] hidden max-h-40 overflow-y-auto mt-1',
-   dropdownEmerald: 'absolute z-30 w-full bg-white dark:bg-darksurface border border-gray-200 dark:border-darkborder rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.1)] hidden max-h-48 overflow-y-auto mt-1',
-
   // List item (KAH, menu order, acronym rows)
   listItem: 'flex justify-between items-center bg-white dark:bg-darksurface p-3 rounded-lg border border-gray-200/80 dark:border-darkborder shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
 
   // Admin section card
   adminSection: 'bg-white dark:bg-darksurface rounded-xl border border-gray-200/80 dark:border-darkborder shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-5',
 
-  // Status badges
+ // Status badges
   badgePending: 'inline-flex items-center gap-1 bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border border-orange-200/80 dark:border-orange-800',
   badgeCancelled: 'inline-flex items-center gap-1 bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200/80 dark:border-red-800',
   badgeApproved: 'inline-flex items-center gap-1 bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200/80 dark:border-green-800',
 
-  // Quick stat cards
-  statCard: 'flex flex-col items-center justify-center p-3 sm:p-4 md:p-5 rounded-xl bg-white dark:bg-darksurface border border-gray-200/80 dark:border-darkborder shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
-  statValue: 'text-sm sm:text-base md:text-lg font-bold leading-tight',
-  statLabel: 'text-[10px] sm:text-[11px] font-medium text-gray-500 dark:text-darkmuted uppercase tracking-wide mt-1',
+  // Agenda card containers
+  agendaCard: 'bg-white dark:bg-darksurface rounded-xl border-l-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4',
+  agendaCardInfoAll: 'bg-blue-50/60 dark:bg-blue-900/10 rounded-xl border border-blue-200/80 dark:border-blue-800/40 p-3',
+  agendaTypeChip: 'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] md:text-xs font-medium',
 
-  // Filter chips
+  // Action buttons (agenda cards)
+  btnEdit: 'bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1.5 px-4 rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.1)] transition text-sm',
+  btnCancel: 'bg-gray-500 hover:bg-gray-600 text-white font-semibold py-1.5 px-4 rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.08)] transition text-sm',
+  btnEditSm: 'bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1.5 px-3 rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.1)] transition text-xs',
+  btnCancelSm: 'bg-gray-500 hover:bg-gray-600 text-white font-semibold py-1.5 px-3 rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.08)] transition text-xs',
+
+  // Filter chips (dashboard filter bar)
   filterChip: 'inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[12px] sm:text-xs font-medium border transition cursor-pointer select-none whitespace-nowrap',
   filterChipActive: 'bg-blue-600 text-white border-blue-600 shadow-sm',
   filterChipInactive: 'bg-white dark:bg-darksurface text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-darkborder hover:bg-gray-50 dark:hover:bg-darkhover',
 
-  // Empty state
-  emptyState: 'flex flex-col items-center justify-center py-16 px-4 text-center',
-  emptyStateIcon: 'text-gray-300 dark:text-gray-600 mb-3',
-  emptyStateText: 'text-gray-500 dark:text-darkmuted text-sm font-medium',
+  // Chip tag (attendee chips)
+  chip: 'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+
+  // Alert boxes
+  alertError: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200/80 dark:border-red-800',
+  alertWarning: 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-200/80 dark:border-yellow-800',
+
+  // Admin behalf input (amber variant)
+  inputBehalf: 'w-full border border-amber-300/80 dark:border-amber-700 rounded-lg py-2.5 px-3.5 bg-amber-50/60 dark:bg-amber-900/10 focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-300 dark:focus:ring-amber-700/50 transition text-sm font-medium',
+  badgeApproved: 'inline-flex items-center gap-1 bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200/80 dark:border-green-800',
 
   // Skeleton loader
   skeleton: 'animate-pulse bg-gray-200 dark:bg-darkborder rounded',
-  skeletonCard: 'animate-pulse bg-gray-200 dark:bg-darkborder rounded-xl h-20',
-  skeletonText: 'animate-pulse bg-gray-200 dark:bg-darkborder rounded h-3',
-  skeletonTextSm: 'animate-pulse bg-gray-200 dark:bg-darkborder rounded h-2 w-24',
+
+  // Agenda section headers (sticky)
+  sectionHeader: 'sticky top-0 bg-white/95 dark:bg-darksurface/95 backdrop-blur-sm z-10 py-2 border-b border-gray-200/80 dark:border-darkborder mb-3 px-2 rounded-lg shadow-sm',
 
   // Parade state member cards
 paradeMemberCard: 'flex items-center gap-2.5 p-3 rounded-lg border transition-all duration-150 hover:shadow-sm',
@@ -112,15 +113,13 @@ paradeMemberCard: 'flex items-center gap-2.5 p-3 rounded-lg border transition-al
    paradeMemberAway: 'bg-orange-50/60 dark:bg-orange-900/10 border border-orange-200/80 dark:border-orange-800/40',
    paradeMemberEvent: 'bg-blue-50/60 dark:bg-blue-900/10 border border-blue-200/80 dark:border-blue-800/40',
 
- // Agenda section headers (sticky)
-   sectionHeader: 'sticky top-0 bg-white/95 dark:bg-darksurface/95 backdrop-blur-sm z-10 py-2 border-b border-gray-200/80 dark:border-darkborder mb-3 px-2 rounded-lg shadow-sm',
 };
 
 // --- HTML Helper Functions ---
 
 function labelHtml(text, opts) {
   opts = opts || {};
-  var cls = opts.small ? C.labelSm : C.label;
+  var cls = C.label;
   var extra = '';
   if (opts.required) extra = ' <span class="text-red-500">*</span>';
   if (opts.optional) extra = ' <span class="text-[10px] font-normal text-gray-500">(Optional)</span>';
@@ -133,7 +132,7 @@ function inputHtml(opts) {
   var type = opts.type || 'text';
   var value = opts.value !== undefined ? 'value="' + opts.value + '"' : '';
   var placeholder = opts.placeholder ? 'placeholder="' + opts.placeholder + '"' : '';
-  var cls = opts.compact ? C.inputSm : (opts.dark ? C.inputDark : C.input);
+  var cls = opts.compact ? C.inputSm : C.input;
   var extra = opts.extra || '';
   var required = opts.required ? 'required' : '';
   var disabled = opts.disabled ? 'disabled' : '';
@@ -178,22 +177,24 @@ function searchDropdownHtml(opts) {
     ? 'border-2 border-emerald-400 dark:border-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 placeholder-emerald-600/50 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:focus:ring-emerald-800/50'
     : 'border-2 border-blue-300 dark:border-blue-700 bg-blue-50/50 dark:bg-blue-900/10 placeholder-blue-400 dark:placeholder-blue-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800/50';
   var onkeyup = opts.onkeyup || '';
-  var dropdownCls = opts.emerald ? C.dropdownEmerald : C.dropdown;
   return '<div class="relative">' +
     '<input type="text" id="' + inputId + '" class="w-full ' + C.inputSm + ' ' + borderCls + ' font-semibold" placeholder="' + placeholder + '" autocomplete="off" onkeyup="' + onkeyup + '">' +
-    '<div id="' + resultsId + '" class="' + dropdownCls + '"></div>' +
+    '<div id="' + resultsId + '" class="' + C.dropdown + '"></div>' +
     '</div>';
 }
 
 function formFooterHtml(buttonText, cancelId) {
-  var html = '<div class="' + C.formFooter + '">' +
+  var html = '<div class="shrink-0 p-4 md:p-5 border-t border-gray-200/80 dark:border-darkborder bg-gray-50/60 dark:bg-darkinput/95 backdrop-blur-sm z-10">' +
     '<button type="submit" class="' + C.btnPrimary + '">' + buttonText + '</button>';
   if (cancelId) {
-    html += '<button type="button" id="' + cancelId + '" onclick="cancelEditMode()" class="' + C.btnSecondary + ' hidden mt-2">Cancel Record</button>';
+    html += '<button type="button" id="' + cancelId + '" onclick="cancelEditMode()" class="w-full bg-gray-500 hover:bg-gray-600 active:bg-gray-700 text-white font-medium py-2 rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.08)] hidden mt-2 transition text-sm">Cancel Edit</button>';
   }
   html += '</div>';
   return html;
 }
+
+
+function adminSectionHtml(title, color, content, reorderable) {
 
 function adminSectionHtml(title, color, content, reorderable) {
   var handle = reorderable

@@ -73,9 +73,10 @@ function switchTab(tabId) {
   }
  }
 
- if (tabId === 'parade-state' && typeof renderParadeState === 'function') renderParadeState();
- if (tabId === 'admin-structure' && typeof renderStructureUI === 'function') renderStructureUI();
- if ((tabId === 'dashboard' || tabId === 'my-leaves') && typeof renderTabIfActive === 'function') renderTabIfActive(tabId);
+if (tabId === 'parade-state' && typeof renderParadeState === 'function') renderParadeState();
+  if (tabId === 'admin-structure' && typeof renderStructureUI === 'function') renderStructureUI();
+  if ((tabId.startsWith('admin') || tabId === 'kah-management') && typeof initAdminAccordions === 'function') initAdminAccordions();
+  if ((tabId === 'dashboard' || tabId === 'my-leaves') && typeof renderTabIfActive === 'function') renderTabIfActive(tabId);
 }
 
 function toggleTheme() {
@@ -111,8 +112,6 @@ function initDates() {
 const now = new Date();
 const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
 
-appData.leave.startD = new Date(now); appData.leave.endD = new Date(now);
-appData.event.startD = new Date(now); appData.event.endD = new Date(oneHourLater);
 appData.combined.startD = new Date(now); appData.combined.endD = new Date(oneHourLater);
 appData.parade.targetD = new Date(now);
 
@@ -129,13 +128,6 @@ updateButtonLabels();
 
 function updateButtonLabels() {
 const checkAndUpdate = (id, text) => { const el = document.getElementById(id); if (el) el.innerText = text; };
-
-checkAndUpdate('btn-leave-start', formatDisplayDate(appData.leave.startD));
-checkAndUpdate('btn-leave-end', formatDisplayDate(appData.leave.endD));
-
-checkAndUpdate('btn-event-start', appData.event.isAllDay ? formatDisplayDate(appData.event.startD) : formatDisplayDateTime(appData.event.startD));
-checkAndUpdate('btn-event-end', appData.event.isAllDay ? formatDisplayDate(appData.event.endD) : formatDisplayDateTime(appData.event.endD));
-checkAndUpdate('btn-event-until', formatDisplayDate(appData.event.untilD));
 
 checkAndUpdate('btn-combined-event-start', appData.combined.isAllDay ? formatDisplayDate(appData.combined.startD) : formatDisplayDateTime(appData.combined.startD));
 checkAndUpdate('btn-combined-event-end', appData.combined.isAllDay ? formatDisplayDate(appData.combined.endD) : formatDisplayDateTime(appData.combined.endD));

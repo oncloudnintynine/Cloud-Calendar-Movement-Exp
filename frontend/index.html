@@ -432,187 +432,21 @@ Administration
 </form>
 </div>
 
-<div id="view-submit-leave" class="tab-content hidden flex-col max-w-2xl mx-auto w-full h-full pb-2 md:pb-6">
-<form id="leave-form" onsubmit="event.preventDefault(); submitForm('leave');" class="flex flex-col h-full bg-white dark:bg-darksurface rounded-xl shadow border border-gray-200 dark:border-darkborder overflow-hidden">
- <div class="flex-grow overflow-y-auto p-4 space-y-4">
-   <div id="admin-behalf-leave" class="hidden relative mb-3 pb-4 border-b-2 border-dashed border-gray-200 dark:border-darkborder">
-     <label class="block font-bold mb-1 text-sm text-emerald-600 dark:text-emerald-400">Submit on behalf of (Admin Only)</label>
-     <input type="text" id="form-leave-behalf-search" class="w-full border-2 border-emerald-400 dark:border-emerald-600 rounded-lg py-2 px-3 bg-emerald-50 dark:bg-emerald-900/20 focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm placeholder-emerald-600/50 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:focus:ring-emerald-800/50 transition text-sm font-semibold" placeholder="Search for user to apply for..." autocomplete="off" onkeyup="searchBehalf('leave')">
-     <div id="behalf-results-leave" class="absolute z-30 w-full bg-white dark:bg-darksurface border-2 border-emerald-400 dark:border-emerald-700 rounded-lg shadow-2xl hidden max-h-48 overflow-y-auto mt-1"></div>
-     <div id="selected-behalf-leave" class="mt-2 font-bold text-emerald-700 dark:text-emerald-400 text-sm flex items-center justify-between empty:hidden"></div>
-   </div>
-   <div>
-     <label class="block font-semibold mb-1 text-sm">Leave/MC/OIL Type</label>
-     <select id="form-leave-type" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition cursor-pointer" onchange="toggleOverseasFields('leave')" required></select>
-   </div>
-
-   <div>
-     <label class="block font-semibold mb-1 text-sm">Remarks</label>
-     <textarea id="form-leave-remarks" rows="2" oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px';" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm overflow-hidden resize-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm"></textarea>
-   </div>
-   
-   <div id="leave-attendees-wrapper" class="relative hidden">
-     <label class="block font-semibold mb-1 text-sm text-blue-700 dark:text-blue-400">Attendees <span class="text-[10px] font-normal text-blue-500 dark:text-blue-500">(Optional)</span></label>
-     <div id="leave-attendees-chip-container" class="flex flex-wrap gap-1.5 mb-1.5 empty:hidden"></div>
-     <input type="text" id="form-leave-attendee-search" class="w-full border-2 border-blue-300 dark:border-blue-700 rounded-lg py-2 px-3 bg-blue-50/50 dark:bg-blue-900/10 focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm placeholder-blue-400 dark:placeholder-blue-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800/50 transition text-sm font-semibold" placeholder="Search person or department..." autocomplete="off" onkeyup="searchAttendees('leave')">
-     <div id="leave-attendees-results" class="absolute z-30 w-full bg-white dark:bg-darksurface border-2 border-blue-400 dark:border-blue-600 rounded-lg shadow-2xl hidden max-h-40 overflow-y-auto mt-1"></div>
-   </div>
-
-   <div class="flex space-x-2" id="leave-time-start">
-     <div class="flex-grow">
-       <label class="block font-semibold mb-1 text-sm">Start Date</label>
-       <button type="button" id="btn-leave-start" onclick="openPicker('date', 'leave', 'start')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select Date</button>
-     </div>
-    <div class="w-32 shrink-0" id="leave-ampm-start">
-        <label class="block font-medium mb-1.5 text-center text-xs text-gray-600 dark:text-darkmuted">Time</label>
-         <div class="relative flex bg-white dark:bg-black border border-gray-200/80 dark:border-darkborder rounded-lg p-1 h-[42px] cursor-pointer select-none shadow-sm" onclick="toggleAMPM('start', 'leave')">
-           <div id="start-leave-slider" class="absolute top-1 bottom-1 left-1 w-[calc(50%-6px)] bg-gradient-to-r from-blue-500 to-blue-600 rounded-md shadow-sm transition-all duration-200 ease-out"></div>
-          <div class="relative z-10 flex-1 flex items-center justify-center font-semibold text-xs tracking-wide transition-all duration-200" id="start-leave-am">AM</div>
-          <div class="relative z-10 flex-1 flex items-center justify-center font-semibold text-xs tracking-wide transition-all duration-200" id="start-leave-pm">PM</div>
-        </div>
-      </div>
-   </div>
-   <div class="flex space-x-2" id="leave-time-end">
-     <div class="flex-grow">
-       <label class="block font-semibold mb-1 text-sm">End Date</label>
-       <button type="button" id="btn-leave-end" onclick="openPicker('date', 'leave', 'end')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select Date</button>
-     </div>
-     <div class="w-32 shrink-0" id="leave-ampm-end">
-        <label class="block font-medium mb-1.5 text-center text-xs text-gray-600 dark:text-darkmuted">Time</label>
-        <div class="relative flex bg-white dark:bg-black border border-gray-200/80 dark:border-darkborder rounded-lg p-1 h-[42px] cursor-pointer select-none shadow-sm" onclick="toggleAMPM('end', 'leave')">
-           <div id="end-leave-slider" class="absolute top-1 bottom-1 left-1 w-[calc(50%-6px)] bg-gradient-to-r from-blue-500 to-blue-600 rounded-md shadow-sm transition-all duration-200 ease-out translate-x-full"></div>
-          <div class="relative z-10 flex-1 flex items-center justify-center font-semibold text-xs tracking-wide transition-all duration-200" id="end-leave-am">AM</div>
-          <div class="relative z-10 flex-1 flex items-center justify-center font-semibold text-xs tracking-wide transition-all duration-200" id="end-leave-pm">PM</div>
-        </div>
-      </div>
-   </div>
-   
-    <div id="leave-overseas-fields" class="hidden grid grid-cols-2 gap-3 p-3 bg-gray-100 dark:bg-darkinput rounded-lg border border-gray-300 dark:border-darkborder mt-2">
-      <div><label class="block font-semibold mb-1 text-sm">Country <span class="text-red-500">*</span></label><input type="text" id="form-leave-country" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-white dark:bg-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-sm transition"></div>
-      <div><label class="block font-semibold mb-1 text-sm text-gray-500">State</label><input type="text" id="form-leave-state" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-white dark:bg-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-sm transition"></div>
-    </div>
-
- </div>
- <div class="shrink-0 p-3 border-t border-gray-200 dark:border-darkborder bg-gray-100 dark:bg-darkinput z-10">
-    <button type="submit" id="submit-leave-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow-md transition">Save Record</button>
-    <button type="button" id="cancel-edit-leave-btn" onclick="cancelEditMode()" class="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 rounded-lg shadow hidden mt-2 transition">Cancel Edit</button>
- </div>
-</form>
-</div>
-
-<div id="view-submit-event" class="tab-content hidden flex-col max-w-2xl mx-auto w-full h-full pb-2 md:pb-6">
-<form id="event-form" onsubmit="event.preventDefault(); submitForm('event');" class="flex flex-col h-full bg-white dark:bg-darksurface rounded-xl shadow border border-gray-200 dark:border-darkborder overflow-hidden">
- <div class="flex-grow overflow-y-auto p-4 space-y-4">
-   <div id="admin-behalf-event" class="hidden relative mb-3 pb-4 border-b-2 border-dashed border-gray-200 dark:border-darkborder">
-     <label class="block font-bold mb-1 text-sm text-emerald-600 dark:text-emerald-400">Submit on behalf of (Admin Only)</label>
-     <input type="text" id="form-event-behalf-search" class="w-full border-2 border-emerald-400 dark:border-emerald-600 rounded-lg py-2 px-3 bg-emerald-50 dark:bg-emerald-900/20 focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm placeholder-emerald-600/50 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:focus:ring-emerald-800/50 transition text-sm font-semibold" placeholder="Search for user to apply for..." autocomplete="off" onkeyup="searchBehalf('event')">
-     <div id="behalf-results-event" class="absolute z-30 w-full bg-white dark:bg-darksurface border-2 border-emerald-400 dark:border-emerald-700 rounded-lg shadow-2xl hidden max-h-48 overflow-y-auto mt-1"></div>
-     <div id="selected-behalf-event" class="mt-2 font-bold text-emerald-700 dark:text-emerald-400 text-sm flex items-center justify-between empty:hidden"></div>
-   </div>
-
-   <div class="flex space-x-2 items-end">
-     <div class="flex-grow">
-       <label class="block font-semibold mb-1 text-sm">Event Type</label>
-       <select id="form-event-type" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition cursor-pointer" required></select>
-     </div>
-     <button type="button" id="form-event-infoall-btn" onclick="toggleInfoAll()" class="shrink-0 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 font-bold text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-darkhover transition">Info All</button>
-   </div>
-
-   <div>
-     <label id="label-event-remarks" class="block font-semibold mb-1 text-sm">Remarks</label>
-     <textarea id="form-event-remarks" rows="2" oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px';" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm overflow-hidden resize-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm"></textarea>
-   </div>
-   
-   <div class="relative">
-     <label class="block font-semibold mb-1 text-sm text-blue-700 dark:text-blue-400">Attendees <span class="text-[10px] font-normal text-blue-500 dark:text-blue-500">(Optional)</span></label>
-     <div id="event-attendees-chip-container" class="flex flex-wrap gap-1.5 mb-1.5 empty:hidden"></div>
-     <input type="text" id="form-event-attendee-search" class="w-full border-2 border-blue-300 dark:border-blue-700 rounded-lg py-2 px-3 bg-blue-50/50 dark:bg-blue-900/10 focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm placeholder-blue-400 dark:placeholder-blue-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800/50 transition text-sm font-semibold" placeholder="Search person or department..." autocomplete="off" onkeyup="searchAttendees('event')">
-     <div id="event-attendees-results" class="absolute z-30 w-full bg-white dark:bg-darksurface border-2 border-blue-400 dark:border-blue-600 rounded-lg shadow-2xl hidden max-h-40 overflow-y-auto mt-1"></div>
-   </div>
-
-   <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-     <div>
-       <label class="block font-semibold mb-1 text-sm">Location</label>
-       <input type="text" id="form-event-location" value="Office" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm" required>
-     </div>
-     <div>
-       <label class="block font-semibold mb-1 text-sm">Location Details <span class="text-[10px] font-normal text-gray-500 dark:text-gray-400">(Optional)</span></label>
-       <input type="text" id="form-event-location-details" placeholder="e.g. Room 302" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm">
-     </div>
-   </div>
-
-   <div class="flex items-center space-x-2 mt-1">
-     <input type="checkbox" id="form-event-allday" class="w-4 h-4 cursor-pointer text-blue-600" onchange="toggleEventAllDay()">
-     <label for="form-event-allday" class="font-bold text-sm cursor-pointer select-none">All Day Event</label>
-   </div>
-   
-   <div class="relative pl-6 py-1 border-l-2 border-gray-200 dark:border-darkborder ml-2 space-y-3">
-     <div class="relative">
-       <div class="absolute -left-[30px] top-1.5 w-3.5 h-3.5 rounded-full bg-blue-500 ring-4 ring-white dark:ring-darksurface"></div>
-       <label class="block font-bold text-[10px] text-gray-500 dark:text-darkmuted uppercase tracking-wider mb-1">Start</label>
-       <button type="button" id="btn-event-start" onclick="openPicker(appData.event.isAllDay ? 'date' : 'datetime', 'event', 'start')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select Date & Time</button>
-     </div>
-     <div class="relative">
-       <div class="absolute -left-[30px] top-1.5 w-3.5 h-3.5 rounded-full bg-red-500 ring-4 ring-white dark:ring-darksurface"></div>
-       <label class="block font-bold text-[10px] text-gray-500 dark:text-darkmuted uppercase tracking-wider mb-1">End</label>
-       <button type="button" id="btn-event-end" onclick="openPicker(appData.event.isAllDay ? 'date' : 'datetime', 'event', 'end')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput hover:bg-white dark:hover:bg-black text-left outline-none font-medium transition text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200">Select Date & Time</button>
-     </div>
-     <div id="event-until-container" class="relative hidden pt-1">
-       <div class="absolute -left-[30px] top-3 w-3.5 h-3.5 rounded-full bg-purple-500 ring-4 ring-white dark:ring-darksurface"></div>
-       <label class="block font-bold text-[10px] text-purple-600 dark:text-purple-400 uppercase tracking-wider mb-1">Repeat Until</label>
-       <button type="button" id="btn-event-until" onclick="openPicker('date', 'event', 'until')" class="w-full border-2 border-purple-300 dark:border-purple-800 rounded-lg py-2 px-3 bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 text-left outline-none font-medium transition text-sm text-purple-900 dark:text-purple-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200">Select Date</button>
-     </div>
-   </div>
-
-   <div>
-     <label class="block font-semibold mb-1 text-sm">Repeat Event</label>
-     <select id="form-event-repeat" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition cursor-pointer text-sm" onchange="toggleRepeatUntil('event')">
-       <option value="NONE">Does not repeat</option>
-       <option value="DAILY">Daily</option>
-       <option value="WEEKLY">Weekly</option>
-       <option value="MONTHLY">Monthly</option>
-       <option value="ANNUALLY">Annually</option>
-       <option value="WEEKDAY">Every weekday (Mon-Fri)</option>
-     </select>
-   </div>
-
- </div>
-
- <div class="shrink-0 p-3 border-t border-gray-200 dark:border-darkborder bg-gray-100 dark:bg-darkinput z-10">
-    <button type="submit" id="submit-event-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow-md transition text-base">Save Event</button>
-    <button type="button" id="cancel-edit-event-btn" onclick="cancelEditMode()" class="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 rounded-lg shadow hidden mt-2 transition text-sm">Cancel Edit</button>
- </div>
-
-</form>
-</div>
 
 <div id="view-admin" class="tab-content hidden flex-col max-w-2xl mx-auto w-full h-full pb-2 md:pb-6 relative">
 <div id="admin-sections-container" class="flex-grow overflow-y-auto space-y-4 pb-4 px-1 pt-1">
- 
- <div data-section="app-mode" class="bg-white dark:bg-darksurface rounded-xl shadow border border-gray-200 dark:border-darkborder p-4">
-   <div class="flex justify-between items-center mb-3">
-     <h3 class="font-bold text-base text-purple-600 dark:text-purple-400">App Interface Mode</h3>
-     <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted cursor-grab section-handle" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>
-   </div>
-   <div class="flex flex-col space-y-1.5 bg-purple-50 dark:bg-purple-900/20 p-2.5 rounded-lg border border-purple-200 dark:border-purple-800">
-     <label class="flex items-center space-x-2 cursor-pointer text-sm">
-       <input type="radio" name="app-mode" value="combined" class="w-3.5 h-3.5 text-purple-600 focus:ring-purple-500 cursor-pointer">
-       <span class="font-medium">Unified Mode (Combined Form Interface)</span>
-     </label>
-     <label class="flex items-center space-x-2 cursor-pointer text-sm">
-       <input type="radio" name="app-mode" value="separated" class="w-3.5 h-3.5 text-purple-600 focus:ring-purple-500 cursor-pointer">
-       <span class="font-medium">Separated Mode (Classic Dashboard & Forms)</span>
-     </label>
-   </div>
- </div>
 
- <div data-section="register-user" class="bg-white dark:bg-darksurface rounded-xl shadow border border-gray-200 dark:border-darkborder p-4">
-   <div class="flex justify-between items-center mb-3">
-     <h3 class="font-bold text-base text-emerald-600 dark:text-emerald-400">Register New User</h3>
-     <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted cursor-grab section-handle" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>
-   </div>
-   <div id="admin-alert" class="hidden bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs p-2 rounded-lg mb-3 text-center"></div>
-   <div class="space-y-3">
+<div data-section="register-user" class="admin-section-card bg-white dark:bg-darksurface rounded-xl shadow border border-gray-200 dark:border-darkborder overflow-hidden">
+    <div class="admin-accordion-header flex justify-between items-center px-4 py-3 cursor-pointer select-none hover:bg-gray-50 dark:hover:bg-darkhover transition" onclick="toggleAdminSection('register-user')" aria-expanded="true">
+      <h3 class="font-bold text-base text-emerald-600 dark:text-emerald-400">Register New User</h3>
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted admin-accordion-chevron transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+        <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted cursor-grab section-handle hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>
+      </div>
+    </div>
+    <div id="admin-section-content-register-user" class="admin-accordion-content px-4 pb-4">
+    <div id="admin-alert" class="hidden bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs p-2 rounded-lg mb-3 text-center"></div>
+    <div class="space-y-3">
      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
        <div>
          <label class="block font-semibold mb-1 text-xs">Full Name</label>
@@ -633,15 +467,20 @@ Administration
          <button type="button" id="btn-admin-register-birthday" onclick="openPicker('date', 'adminRegister', 'birthday')" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-darkinput text-left outline-none font-medium text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">Select...</button>
        </div>
      </div>
-     <button onclick="submitAdminRegister()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg shadow-sm transition text-sm">Register User</button>
-   </div>
- </div>
+<button onclick="submitAdminRegister()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg shadow-sm transition text-sm">Register User</button>
+    </div>
+    </div>
+  </div>
 
- <div data-section="manage-users" class="bg-white dark:bg-darksurface rounded-xl shadow border border-gray-200 dark:border-darkborder p-4">
-   <div class="flex justify-between items-center mb-3">
-     <h3 class="font-bold text-base text-red-600 dark:text-red-400">Edit / Remove Users</h3>
-     <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted cursor-grab section-handle" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>
-   </div>
+  <div data-section="manage-users" class="admin-section-card bg-white dark:bg-darksurface rounded-xl shadow border border-gray-200 dark:border-darkborder overflow-hidden">
+    <div class="admin-accordion-header flex justify-between items-center px-4 py-3 cursor-pointer select-none hover:bg-gray-50 dark:hover:bg-darkhover transition" onclick="toggleAdminSection('manage-users')" aria-expanded="true">
+      <h3 class="font-bold text-base text-red-600 dark:text-red-400">Edit / Remove Users</h3>
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted admin-accordion-chevron transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+        <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted cursor-grab section-handle hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>
+      </div>
+    </div>
+    <div id="admin-section-content-manage-users" class="admin-accordion-content px-4 pb-4">
    <div class="relative mb-2">
      <input type="text" id="admin-manage-search" placeholder="Search user to edit or remove..." class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-darkinput text-sm outline-none shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" autocomplete="off" onkeyup="searchUserToManage()">
      <div id="admin-manage-results" class="absolute z-50 w-full bg-white dark:bg-darksurface border-2 border-blue-400 dark:border-blue-600 rounded-lg shadow-xl hidden max-h-40 overflow-y-auto mt-1"></div>
@@ -676,16 +515,21 @@ Administration
      
      <div class="flex space-x-2 pt-2 border-t border-gray-300 dark:border-darkborder">
        <button onclick="confirmUpdateUser()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg shadow transition text-xs">Update User</button>
-       <button onclick="confirmDeleteUser()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg shadow transition text-xs">Remove User</button>
-     </div>
-   </div>
- </div>
+<button onclick="confirmDeleteUser()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg shadow transition text-xs">Remove User</button>
+      </div>
+    </div>
+    </div>
+  </div>
 
- <div data-section="admin-pass" class="bg-white dark:bg-darksurface rounded-xl shadow border border-gray-200 dark:border-darkborder p-4">
-   <div class="flex justify-between items-center mb-3">
-     <h3 class="font-bold text-base text-blue-600 dark:text-blue-400">Admin Password</h3>
-     <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted cursor-grab section-handle" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>
-   </div>
+  <div data-section="admin-pass" class="admin-section-card bg-white dark:bg-darksurface rounded-xl shadow border border-gray-200 dark:border-darkborder overflow-hidden">
+    <div class="admin-accordion-header flex justify-between items-center px-4 py-3 cursor-pointer select-none hover:bg-gray-50 dark:hover:bg-darkhover transition" onclick="toggleAdminSection('admin-pass')" aria-expanded="true">
+      <h3 class="font-bold text-base text-blue-600 dark:text-blue-400">Admin Password</h3>
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted admin-accordion-chevron transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+        <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted cursor-grab section-handle hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>
+      </div>
+    </div>
+    <div id="admin-section-content-admin-pass" class="admin-accordion-content px-4 pb-4">
    <div class="relative">
      <input type="password" id="set-admin-pass" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 pr-10 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm" placeholder="Leave blank to keep current">
      <button onclick="togglePassword('set-admin-pass', this)" class="absolute right-2 top-2 text-gray-500 dark:text-darkmuted p-1">
@@ -694,24 +538,34 @@ Administration
    </div>
  </div>
 
- <div data-section="user-keyword" class="bg-white dark:bg-darksurface rounded-xl shadow border border-gray-200 dark:border-darkborder p-4">
-   <div class="flex justify-between items-center mb-3">
-     <h3 class="font-bold text-base text-blue-600 dark:text-blue-400">User Login Keyword</h3>
-     <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted cursor-grab section-handle" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>
-   </div>
-   <div>
-     <input type="text" id="set-user-keyword" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm" placeholder="e.g. peace">
-     <p class="text-[10px] text-gray-500 mt-1 leading-tight">Users will log in with their mobile number followed by this keyword.</p>
-   </div>
- </div>
+<div data-section="user-keyword" class="admin-section-card bg-white dark:bg-darksurface rounded-xl shadow border border-gray-200 dark:border-darkborder overflow-hidden">
+    <div class="admin-accordion-header flex justify-between items-center px-4 py-3 cursor-pointer select-none hover:bg-gray-50 dark:hover:bg-darkhover transition" onclick="toggleAdminSection('user-keyword')" aria-expanded="true">
+      <h3 class="font-bold text-base text-blue-600 dark:text-blue-400">User Login Keyword</h3>
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted admin-accordion-chevron transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+        <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted cursor-grab section-handle hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>
+      </div>
+    </div>
+    <div id="admin-section-content-user-keyword" class="admin-accordion-content px-4 pb-4">
+    <div>
+      <input type="text" id="set-user-keyword" class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 bg-gray-50 dark:bg-darkinput focus:bg-white dark:focus:bg-black text-gray-900 dark:text-white outline-none placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm" placeholder="e.g. peace">
+      <p class="text-[10px] text-gray-500 mt-1 leading-tight">Users will log in with their mobile number followed by this keyword.</p>
+    </div>
+    </div>
+  </div>
 
- <div data-section="menu-order" class="bg-white dark:bg-darksurface rounded-xl shadow border border-gray-200 dark:border-darkborder p-4">
-   <div class="flex justify-between items-center mb-3">
-     <h3 class="font-bold text-base text-blue-600 dark:text-blue-400">App Menu Order</h3>
-     <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted cursor-grab section-handle" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>
-   </div>
-   <div id="menu-order-list" class="space-y-1.5 bg-gray-100 dark:bg-darkinput p-2 rounded-lg border border-gray-300 dark:border-gray-600"></div>
- </div>
+  <div data-section="menu-order" class="admin-section-card bg-white dark:bg-darksurface rounded-xl shadow border border-gray-200 dark:border-darkborder overflow-hidden">
+    <div class="admin-accordion-header flex justify-between items-center px-4 py-3 cursor-pointer select-none hover:bg-gray-50 dark:hover:bg-darkhover transition" onclick="toggleAdminSection('menu-order')" aria-expanded="true">
+      <h3 class="font-bold text-base text-blue-600 dark:text-blue-400">App Menu Order</h3>
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted admin-accordion-chevron transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+        <svg class="w-5 h-5 text-gray-400 dark:text-darkmuted cursor-grab section-handle hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>
+      </div>
+    </div>
+    <div id="admin-section-content-menu-order" class="admin-accordion-content px-4 pb-4">
+    <div id="menu-order-list" class="space-y-1.5 bg-gray-100 dark:bg-darkinput p-2 rounded-lg border border-gray-300 dark:border-gray-600"></div>
+    </div>
+  </div>
 
 </div>
 
@@ -998,7 +852,7 @@ Administration
 </main>
 
 <!-- Mobile Bottom Tab Bar -->
-<div id="bottom-bar" class="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-darksurface/95 backdrop-blur-sm border-t border-gray-200/80 dark:border-darkborder z-[45] md:hidden">
+<div id="bottom-bar" class="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-darksurface/95 backdrop-blur-sm border-t border-gray-200/80 dark:border-darkborder z-[45]">
 <div class="flex items-center justify-around h-[56px] px-1 mobile-pb-safe">
 <button onclick="switchTab('dashboard')" id="bottom-dashboard" class="bottom-tab flex flex-col items-center justify-center gap-0.5 px-2 py-1 rounded-lg transition text-gray-500 dark:text-darkmuted min-w-[48px]">
 <svg class="bottom-tab-icon w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12l2-2m0 0l7-7 7 7M5 12v4a1 1 0 001 1h2m10-5l2 2m0 0l7-7 7 7M5 12v4a1 1 0 001 1h2m8-5l2-2m0 0l7-7 7 7M15 12v4a1 1 0 001 1h2"/></svg>

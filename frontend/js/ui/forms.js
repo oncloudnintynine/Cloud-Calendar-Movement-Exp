@@ -3,19 +3,18 @@
 // ==========================================
 
 function toggleInfoAll(forceState) {
- isInfoAll = forceState !== undefined ? forceState : !isInfoAll;['form-event-infoall-btn', 'form-combined-infoall-btn'].forEach(id => {
-  const btn = document.getElementById(id);
-  if(!btn) return;
-  if(isInfoAll) {
-      btn.innerHTML = '<svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 4.741a1 1 0 01.332-.536l.042-.026a7 7 0 015.382-.652c.376.047.592.44.446.79l-.74 1.768a1 1 0 01-.832.608l-.456.056a5 5 0 00-3.858 2.382l-.18.318a1 1 0 01-.878.496H4.5a1 1 0 01-.894-1.448l1.83-3.158z"/></svg>Info All (ON)';
-      btn.classList.add('bg-yellow-400', 'dark:bg-yellow-500', 'text-yellow-900', 'dark:text-yellow-900', 'border-yellow-500', 'dark:border-yellow-400', 'shadow-md');
-      btn.classList.remove('text-gray-500', 'dark:text-gray-400', 'border-gray-300', 'dark:border-gray-600', 'hover:bg-gray-100', 'dark:hover:bg-darkhover');
-  } else {
-      btn.innerHTML = 'Info All';
-      btn.classList.remove('bg-yellow-400', 'dark:bg-yellow-500', 'text-yellow-900', 'dark:text-yellow-900', 'border-yellow-500', 'dark:border-yellow-400', 'shadow-md');
-      btn.classList.add('text-gray-500', 'dark:text-gray-400', 'border-gray-300', 'dark:border-gray-600', 'hover:bg-gray-100', 'dark:hover:bg-darkhover');
-  }
-});
+ isInfoAll = forceState !== undefined ? forceState : !isInfoAll;
+ const btn = document.getElementById('form-combined-infoall-btn');
+ if(!btn) return;
+ if(isInfoAll) {
+     btn.innerHTML = '<svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 4.741a1 1 0 01.332-.536l.042-.026a7 7 0 015.382-.652c.376.047.592.44.446.79l-.74 1.768a1 1 0 01-.832.608l-.456.056a5 5 0 00-3.858 2.382l-.18.318a1 1 0 01-.878.496H4.5a1 1 0 01-.894-1.448l1.83-3.158z"/></svg>Info All (ON)';
+     btn.classList.add('bg-yellow-400', 'dark:bg-yellow-500', 'text-yellow-900', 'dark:text-yellow-900', 'border-yellow-500', 'dark:border-yellow-400', 'shadow-md');
+     btn.classList.remove('text-gray-500', 'dark:text-gray-400', 'border-gray-300', 'dark:border-gray-600', 'hover:bg-gray-100', 'dark:hover:bg-darkhover');
+ } else {
+     btn.innerHTML = 'Info All';
+     btn.classList.remove('bg-yellow-400', 'dark:bg-yellow-500', 'text-yellow-900', 'dark:text-yellow-900', 'border-yellow-500', 'dark:border-yellow-400', 'shadow-md');
+     btn.classList.add('text-gray-500', 'dark:text-gray-400', 'border-gray-300', 'dark:border-gray-600', 'hover:bg-gray-100', 'dark:hover:bg-darkhover');
+ }
 }
 
 function validateForm(ctx) {
@@ -117,21 +116,7 @@ const errorEl = document.getElementById(`form-${ctx}-error`);
 if (errorEl) errorEl.classList.add('hidden');
 }
 
-function toggleEventAllDay() {
-appData.event.isAllDay = document.getElementById('form-event-allday').checked;
-updateButtonLabels();
-}
-
-function toggleCombinedAllDay() {
-appData.combined.isAllDay = document.getElementById('form-combined-allday').checked;
-updateButtonLabels();
-}
-
-function openEventPicker(field) {
-openPicker(appData.event.isAllDay ? 'date' : 'datetime', 'event', field);
-}
-
-function toggleRepeatUntil(ctx = 'event') {
+function toggleRepeatUntil(ctx = 'combined') {
 const val = document.getElementById(`form-${ctx}-repeat`).value;
 const container = document.getElementById(`${ctx}-until-container`);
 if(val === 'NONE') container.classList.add('hidden');
@@ -358,125 +343,108 @@ function triggerEdit(id) {
 const l = allLeaves.find(x => x.ID === id);
 if(!l) return;
 currentEditId = id;
+
+appData.combined.startD = new Date(l.StartDate);
+appData.combined.endD = new Date(l.EndDate);
+
+if (user.role === 'admin') {
+ selectBehalf('combined', l.Name, l.Phone, l.Department);
+}
+
+const typeEl = document.getElementById('form-combined-type');
+if (typeEl) typeEl.value = l.LeaveType;
+
+toggleCombinedFields();
+
 const typeObj = window.appTypicalEventTypes ? window.appTypicalEventTypes.find(t => t.name === l.LeaveType) : null;
 const isEvent = typeObj ? typeObj.isEvent : false;
 
-const ctx = appMode === 'combined' ? 'combined' : (isEvent ? 'event' : 'leave');
-
-appData[ctx].startD = new Date(l.StartDate);
-appData[ctx].endD = new Date(l.EndDate);
-
-if (user.role === 'admin') {
-selectBehalf(ctx, l.Name, l.Phone, l.Department);
-}
-
-const typeEl = document.getElementById(`form-${ctx}-type`) || document.getElementById(`form-${ctx}-name`);
-if (typeEl) typeEl.value = l.LeaveType;
-
-if (appMode === 'combined') {
- toggleCombinedFields();
-} else if (!isEvent) {
- toggleOverseasFields('leave');
-}
-
 if (isEvent || l.LeaveType === 'Official Trip') {
-eventAttendees =[];
-if(l.Attendees) {
- try {
-   eventAttendees = JSON.parse(l.Attendees);
- } catch(e) {
-   const savedPhones = String(l.Attendees).split(',');
-   savedPhones.forEach(ph => {
-     const contact = companyContacts.find(c => String(c.phone) === String(ph));
-     if(contact) eventAttendees.push({ id: contact.phone, name: contact.name, dept: contact.dept, type: 'contact' });
-   });
+ eventAttendees =[];
+ if(l.Attendees) {
+  try {
+    eventAttendees = JSON.parse(l.Attendees);
+  } catch(e) {
+    const savedPhones = String(l.Attendees).split(',');
+    savedPhones.forEach(ph => {
+      const contact = companyContacts.find(c => String(c.phone) === String(ph));
+      if(contact) eventAttendees.push({ id: contact.phone, name: contact.name, dept: contact.dept, type: 'contact' });
+    });
+  }
  }
-}
-renderAttendees(ctx);
+ renderAttendees('combined');
 }
 
 if (isEvent) {
-appData[ctx].isAllDay = String(l.IsAllDay).toUpperCase() === 'TRUE';
-appData[ctx].untilD = l.UntilDate ? new Date(l.UntilDate) : new Date(l.EndDate);
-document.getElementById(`form-${ctx}-allday`).checked = appData[ctx].isAllDay;
-document.getElementById(`form-${ctx}-location`).value = l.Location || 'Office';
+ appData.combined.isAllDay = String(l.IsAllDay).toUpperCase() === 'TRUE';
+ appData.combined.untilD = l.UntilDate ? new Date(l.UntilDate) : new Date(l.EndDate);
+ document.getElementById('form-combined-allday').checked = appData.combined.isAllDay;
+ document.getElementById('form-combined-location').value = l.Location || 'Office';
 
-const locDetEl = document.getElementById(`form-${ctx}-location-details`);
-if (locDetEl) locDetEl.value = l.LocationDetails || '';
+ const locDetEl = document.getElementById('form-combined-location-details');
+ if (locDetEl) locDetEl.value = l.LocationDetails || '';
 
-document.getElementById(`form-${ctx}-repeat`).value = l.HalfDay || 'NONE'; 
-toggleInfoAll(String(l.InfoAll).toUpperCase() === 'TRUE');
-toggleRepeatUntil(ctx);
+ document.getElementById('form-combined-repeat').value = l.HalfDay || 'NONE';
+ toggleInfoAll(String(l.InfoAll).toUpperCase() === 'TRUE');
+ toggleRepeatUntil('combined');
 } else {
-document.getElementById(`form-${ctx}-country`).value = l.Country || '';
-document.getElementById(`form-${ctx}-state`).value = l.State || '';
+ document.getElementById('form-combined-country').value = l.Country || '';
+ document.getElementById('form-combined-state').value = l.State || '';
 
-let start = 'AM', end = 'PM';
-if (l.HalfDay === 'AM') end = 'AM';
-else if (l.HalfDay === 'PM') start = 'PM';
-else if (l.HalfDay === 'Start PM, End AM') { start = 'PM'; end = 'AM'; }
-else if (l.HalfDay === 'Start PM') start = 'PM';
-else if (l.HalfDay === 'End AM') end = 'AM';
-appData[ctx].startAMPM = start; appData[ctx].endAMPM = end;
-updateTimeSliderVisual('start', start, ctx); updateTimeSliderVisual('end', end, ctx);
+ let start = 'AM', end = 'PM';
+ if (l.HalfDay === 'AM') end = 'AM';
+ else if (l.HalfDay === 'PM') start = 'PM';
+ else if (l.HalfDay === 'Start PM, End AM') { start = 'PM'; end = 'AM'; }
+ else if (l.HalfDay === 'Start PM') start = 'PM';
+ else if (l.HalfDay === 'End AM') end = 'AM';
+ appData.combined.startAMPM = start; appData.combined.endAMPM = end;
+ updateTimeSliderVisual('start', start, 'combined'); updateTimeSliderVisual('end', end, 'combined');
 }
 
-document.getElementById(`form-${ctx}-remarks`).value = l.Remarks || '';
-document.getElementById(`submit-${ctx}-btn`).innerText = "Update Record";
-document.getElementById(`cancel-edit-${ctx}-btn`).classList.remove('hidden');
+document.getElementById('form-combined-remarks').value = l.Remarks || '';
+document.getElementById('submit-combined-btn').innerText = "Update Record";
+document.getElementById('cancel-edit-combined-btn').classList.remove('hidden');
 
 updateButtonLabels();
-switchTab(`submit-${ctx}`);
+switchTab('submit-combined');
 
 setTimeout(() => {
-const el = document.getElementById(`form-${ctx}-remarks`);
-if(el) { el.style.height='auto'; el.style.height=el.scrollHeight+'px'; }
+ const el = document.getElementById('form-combined-remarks');
+ if(el) { el.style.height='auto'; el.style.height=el.scrollHeight+'px'; }
 }, 50);
 }
 
 function cancelEditMode() {
-currentEditId = null; 
-initDates();['leave-form', 'event-form', 'combined-form'].forEach(id => {
- const form = document.getElementById(id);
- if(form) form.reset();
-});['form-leave-remarks', 'form-event-remarks', 'form-combined-remarks'].forEach(id => { 
-const el = document.getElementById(id); 
-if(el) el.style.height='auto'; 
-});
+currentEditId = null;
+initDates();
+const combinedForm = document.getElementById('combined-form');
+if(combinedForm) combinedForm.reset();
+const remarksEl = document.getElementById('form-combined-remarks');
+if(remarksEl) remarksEl.style.height='auto';
 
-appData.leave.startAMPM = 'AM'; appData.leave.endAMPM = 'PM';
 appData.combined.startAMPM = 'AM'; appData.combined.endAMPM = 'PM';
-appData.event.isAllDay = false;
-appData.combined.isAllDay = false;['form-event-allday', 'form-combined-allday'].forEach(id => {
- const el = document.getElementById(id);
- if (el) el.checked = false;
-});
+appData.combined.isAllDay = false;
+const alldayEl = document.getElementById('form-combined-allday');
+if (alldayEl) alldayEl.checked = false;
 
-updateTimeSliderVisual('start', 'AM', 'leave'); updateTimeSliderVisual('end', 'PM', 'leave');
 updateTimeSliderVisual('start', 'AM', 'combined'); updateTimeSliderVisual('end', 'PM', 'combined');
 
-if (appMode === 'combined') toggleCombinedFields();
-else toggleOverseasFields('leave');
+toggleCombinedFields();
 
 toggleInfoAll(false);
-toggleRepeatUntil('event');
 toggleRepeatUntil('combined');
 
-clearBehalf('leave');
-clearBehalf('event');
 clearBehalf('combined');
 
-eventAttendees =[]; 
-renderAttendees('event');
-renderAttendees('leave');
-renderAttendees('combined');['leave', 'event', 'combined'].forEach(ctx => {
- const btn = document.getElementById(`submit-${ctx}-btn`);
- const cancelBtn = document.getElementById(`cancel-edit-${ctx}-btn`);
- if (btn) btn.innerText = "Save Record";
- if (cancelBtn) cancelBtn.classList.add('hidden');
-});
+eventAttendees =[];
+renderAttendees('combined');
 
-switchTab(appMode === 'combined' ? 'dashboard' : 'my-leaves');
+const btn = document.getElementById('submit-combined-btn');
+const cancelBtn = document.getElementById('cancel-edit-combined-btn');
+if (btn) btn.innerText = "Save Record";
+if (cancelBtn) cancelBtn.classList.add('hidden');
+
+switchTab('dashboard');
 }
 
 function toggleAMPM(type, ctx) {
@@ -505,29 +473,16 @@ function toggleOverseasFields(ctx) {
 const type = document.getElementById(`form-${ctx}-type`).value;
 const el = document.getElementById(`${ctx}-overseas-fields`);
 const cInput = document.getElementById(`form-${ctx}-country`);
-const attWrap = document.getElementById(`${ctx}-attendees-wrapper`);
-const timeStart = document.getElementById(`${ctx}-time-start`);
-const timeEnd = document.getElementById(`${ctx}-time-end`);
 
 if (type === 'Overseas Leave' || type === 'Official Trip') { 
 el.classList.remove('hidden'); cInput.required = true; 
 } else { 
 el.classList.add('hidden'); cInput.required = false; cInput.value = ''; document.getElementById(`form-${ctx}-state`).value = ''; 
 }
-
-if (type === 'Official Trip') {
-if(attWrap) attWrap.classList.remove('hidden');
-if(timeStart) timeStart.classList.add('hidden');
-if(timeEnd) timeEnd.classList.add('hidden');
-} else {
-if(attWrap) attWrap.classList.add('hidden');
-if(timeStart) timeStart.classList.remove('hidden');
-if(timeEnd) timeEnd.classList.remove('hidden');
-}
 }
 
 async function submitForm(ctx) {
-if (!validateForm(ctx)) {
+if (!validateForm('combined')) {
   return;
 }
 
@@ -546,13 +501,13 @@ targetDepts = new Set([adminBehalfUser.dept]);
  showLoader(false); return;
  }
 
-const typeValue = document.getElementById(`form-${ctx}-type`) ? document.getElementById(`form-${ctx}-type`).value : document.getElementById(`form-${ctx}-name`).value;
+const typeValue = document.getElementById('form-combined-type').value;
 const typeObj = window.appTypicalEventTypes ? window.appTypicalEventTypes.find(t => t.name === typeValue) : null;
-const isEvent = ctx === 'event' || (ctx === 'combined' && typeObj && typeObj.isEvent);
+const isEvent = typeObj && typeObj.isEvent;
 
 const toLocalISO = (d) => new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 19);
-const sDate = toLocalISO(appData[ctx].startD);
-const eDate = toLocalISO(appData[ctx].endD);
+const sDate = toLocalISO(appData.combined.startD);
+const eDate = toLocalISO(appData.combined.endD);
 
 let calculatedHalfDay = 'None';
 let loc = '';
@@ -565,62 +520,62 @@ let country = '';
 let state = '';
 
 if (!isEvent) {
-if (typeValue === 'Official Trip') {
- calculatedHalfDay = 'None';
-} else {
- const isSameDay = appData[ctx].startD.toDateString() === appData[ctx].endD.toDateString();
- if (isSameDay) {
-   if (appData[ctx].startAMPM === 'AM' && appData[ctx].endAMPM === 'AM') calculatedHalfDay = 'AM';
-   else if (appData[ctx].startAMPM === 'PM' && appData[ctx].endAMPM === 'PM') calculatedHalfDay = 'PM';
+ if (typeValue === 'Official Trip') {
+  calculatedHalfDay = 'None';
  } else {
-   if (appData[ctx].startAMPM === 'PM' && appData[ctx].endAMPM === 'AM') calculatedHalfDay = 'Start PM, End AM';
-   else if (appData[ctx].startAMPM === 'PM') calculatedHalfDay = 'Start PM';
-   else if (appData[ctx].endAMPM === 'AM') calculatedHalfDay = 'End AM';
+  const isSameDay = appData.combined.startD.toDateString() === appData.combined.endD.toDateString();
+  if (isSameDay) {
+    if (appData.combined.startAMPM === 'AM' && appData.combined.endAMPM === 'AM') calculatedHalfDay = 'AM';
+    else if (appData.combined.startAMPM === 'PM' && appData.combined.endAMPM === 'PM') calculatedHalfDay = 'PM';
+  } else {
+    if (appData.combined.startAMPM === 'PM' && appData.combined.endAMPM === 'AM') calculatedHalfDay = 'Start PM, End AM';
+    else if (appData.combined.startAMPM === 'PM') calculatedHalfDay = 'Start PM';
+    else if (appData.combined.endAMPM === 'AM') calculatedHalfDay = 'End AM';
+  }
  }
-}
-country = document.getElementById(`form-${ctx}-country`) ? document.getElementById(`form-${ctx}-country`).value : '';
-state = document.getElementById(`form-${ctx}-state`) ? document.getElementById(`form-${ctx}-state`).value : '';
+ country = document.getElementById('form-combined-country').value || '';
+ state = document.getElementById('form-combined-state').value || '';
 
-if (typeValue === 'Official Trip') {
-  eventAttendees.forEach(a => { 
-      if (a.dept !== 'Custom') targetDepts.add(a.dept); 
-  });
-  finalAttendeesStr = JSON.stringify(eventAttendees);
-}
-} else {
-calculatedHalfDay = document.getElementById(`form-${ctx}-repeat`).value; 
-loc = document.getElementById(`form-${ctx}-location`).value;
+ if (typeValue === 'Official Trip') {
+   eventAttendees.forEach(a => { 
+       if (a.dept !== 'Custom') targetDepts.add(a.dept); 
+   });
+   finalAttendeesStr = JSON.stringify(eventAttendees);
+ }
+ } else {
+ calculatedHalfDay = document.getElementById('form-combined-repeat').value; 
+ loc = document.getElementById('form-combined-location').value;
 
-const locDetEl = document.getElementById(`form-${ctx}-location-details`);
-if (locDetEl) locDetails = locDetEl.value.trim();
+ const locDetEl = document.getElementById('form-combined-location-details');
+ if (locDetEl) locDetails = locDetEl.value.trim();
 
-finalInfoAll = isInfoAll;
-eventIsAllDay = appData[ctx].isAllDay;
+ finalInfoAll = isInfoAll;
+ eventIsAllDay = appData.combined.isAllDay;
 
-if (calculatedHalfDay !== 'NONE') {
- eventUntilDate = toLocalISO(appData[ctx].untilD);
-}
+ if (calculatedHalfDay !== 'NONE') {
+  eventUntilDate = toLocalISO(appData.combined.untilD);
+ }
 
-eventAttendees.forEach(a => { 
-   if (a.dept !== 'Custom') targetDepts.add(a.dept); 
-});
-finalAttendeesStr = JSON.stringify(eventAttendees);
-}
+ eventAttendees.forEach(a => { 
+    if (a.dept !== 'Custom') targetDepts.add(a.dept); 
+ });
+ finalAttendeesStr = JSON.stringify(eventAttendees);
+ }
 
 const payload = {
-id: currentEditId, name: targetName, phone: targetPhone, departments: Array.from(targetDepts),
-leaveType: typeValue,
-startDate: sDate, endDate: eDate, halfDay: calculatedHalfDay, 
-coveringPerson: '',
-country: country,
-state: state,
-remarks: document.getElementById(`form-${ctx}-remarks`).value,
-location: loc,
-locationDetails: locDetails,
-attendees: finalAttendeesStr,
-infoAll: finalInfoAll,
-isAllDay: eventIsAllDay,
-untilDate: eventUntilDate
+ id: currentEditId, name: targetName, phone: targetPhone, departments: Array.from(targetDepts),
+ leaveType: typeValue,
+ startDate: sDate, endDate: eDate, halfDay: calculatedHalfDay, 
+ coveringPerson: '',
+ country: country,
+ state: state,
+ remarks: document.getElementById('form-combined-remarks').value,
+ location: loc,
+ locationDetails: locDetails,
+ attendees: finalAttendeesStr,
+ infoAll: finalInfoAll,
+ isAllDay: eventIsAllDay,
+ untilDate: eventUntilDate
 };
 
 try {
