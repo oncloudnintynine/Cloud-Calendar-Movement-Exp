@@ -193,9 +193,6 @@ function formFooterHtml(buttonText, cancelId) {
   return html;
 }
 
-
-function adminSectionHtml(title, color, content, reorderable) {
-
 function adminSectionHtml(title, color, content, reorderable) {
   var handle = reorderable
     ? '<svg class="w-5 h-5 text-gray-400 dark:text-darkmuted cursor-grab section-handle" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>'
@@ -208,6 +205,7 @@ function adminSectionHtml(title, color, content, reorderable) {
     content +
     '</div>';
 }
+
 
 function statusBadgeHtml(status) {
   var safe = String(status || '');
