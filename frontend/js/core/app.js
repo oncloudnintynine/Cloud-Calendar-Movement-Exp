@@ -14,12 +14,12 @@ if (metaTheme) metaTheme.setAttribute('content', wantsDark ? '#121212' : '#fffff
 // Environment Banner Logic
 const devBanner = document.getElementById('dev-banner');
 if (devBanner && ENV !== 'Prod') {
- devBanner.classList.remove('hidden-view');
- devBanner.innerText = `${ENV.toUpperCase()} MODE`;
- if (ENV === 'Exp') {
-     devBanner.classList.remove('bg-red-600');
-     devBanner.classList.add('bg-purple-600');
- }
+devBanner.classList.remove('hidden');
+devBanner.innerText = `${ENV.toUpperCase()} MODE`;
+if (ENV === 'Exp') {
+devBanner.classList.remove('bg-red-600');
+devBanner.classList.add('bg-purple-600');
+}
 }
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -32,9 +32,9 @@ showExternalApp();
 } else {
 if (user) {
 if (!user.pass) {
- logout(); 
+logout(); 
 } else {
- showApp(); 
+showApp(); 
 }
 } else {
 showLogin();
@@ -78,7 +78,7 @@ initDates();
 });
 
 async function showExternalApp() {
-await updateProgress(15, 'Connecting...');
+showLoader(true);
 document.getElementById('login-view').classList.add('hidden-view');
 document.getElementById('app-view').classList.remove('hidden-view');
 
@@ -87,11 +87,8 @@ const nav = document.querySelector('nav');
 if(nav) nav.classList.add('hidden-view');
 const slideMenu = document.getElementById('slide-menu');
 if(slideMenu) slideMenu.classList.add('hidden-view', '!hidden', 'lg:!hidden');
-const bottomBar = document.getElementById('bottom-bar');
-if(bottomBar) bottomBar.classList.add('hidden-view');
 
 try {
-await updateProgress(40, 'Fetching portal data...');
 const extData = await apiCall('getExternalData', { extToken: window.externalToken });
 
 window.appTypicalEventTypes = extData.typicalEventTypes || [];
@@ -140,112 +137,32 @@ title.innerText = "External Booking Portal";
 formWrapper.prepend(title);
 }
 
-await updateProgress(100, 'Ready');
 switchTab('submit-combined');
 if (typeof toggleCombinedFields === 'function') toggleCombinedFields();
 
 } catch (e) {
 console.error("External init error:", e);
-if (window.showToast) showToast("Error loading external booking form. The link may be invalid or revoked.", "error");
-else alert("Error loading external booking form. The link may be invalid or revoked.");
+alert("Error loading external booking form. The link may be invalid or revoked.");
 }
 showLoader(false);
 }
 
 async function showApp() {
-await updateProgress(15, 'Connecting to server...');
+showLoader(true);
 document.getElementById('login-view').classList.add('hidden-view');
 document.getElementById('app-view').classList.remove('hidden-view');
 document.getElementById('logout-btn').classList.remove('hidden');
-document.getElementById('theme-toggle').classList.remove('hidden');
-document.getElementById('active-tab-title').classList.remove('hidden-view');
+document.getElementById('menu-btn').classList.remove('hidden');
+document.getElementById('active-tab-title').classList.remove('hidden');
 
 user.departments = user.departments ||[]; // Safety fallback for Admins
 
 document.getElementById('nav-user-name').innerText = user.role === 'admin' ? "Administrator" : (user.departments.length ? `${user.name}` : user.name);
 
-// Skeleton Setup
-const dashAgenda = document.getElementById('dash-agenda');
-const myAgenda = document.getElementById('my-agenda');
-const paradeBody = document.getElementById('parade-state-body');
-
-if (dashAgenda && C.skeletonCard) {
- dashAgenda.innerHTML = `
-   <div class="${C.skeletonCard} mb-3"></div>
-   <div class="${C.skeletonCard} mb-3"></div>
-   <div class="${C.skeletonCard} mb-3"></div>
- `;
-}
-if (myAgenda && C.skeletonCard) {
- myAgenda.innerHTML = `
-   <div class="${C.skeletonCard} mb-3"></div>
-   <div class="${C.skeletonCard} mb-3"></div>
- `;
-}
-if (paradeBody && C.skeletonCard) {
- paradeBody.innerHTML = `
-   <div class="${C.skeletonCard} h-32 mb-3"></div>
-   <div class="${C.skeletonCard} h-20 mb-3"></div>
- `;
-}
-
-const cachedData = sessionStorage.getItem('initialData');
-if (cachedData) {
- try {
-   const parsed = JSON.parse(cachedData);
-   applyInitialData(parsed.settings, parsed.leaves);
-   await updateProgress(50, 'Updating from server...');
- } catch(e) {}
-}
-
 try {
- await updateProgress(25, 'Fetching your data...');
- const initialData = await apiCall('getInitialData', { adminPass: user.role === 'admin' ? user.pass : null }); 
- 
- await updateProgress(65, 'Preparing dashboard...');
- applyInitialData(initialData.settings, initialData.leaves);
- sessionStorage.setItem('initialData', JSON.stringify(initialData));
-
- if (cachedData) {
-   const warnEl = document.getElementById('cache-warning');
-   if (warnEl) warnEl.classList.add('hidden-view');
- }
-
- await updateProgress(80, 'Almost ready...');
- 
- const allUnitsForIndex = new Set(companyStructure);
- const uniqueDeptsForIndex = Array.from(allUnitsForIndex).sort((a, b) => {
-   if (a.toUpperCase() === 'HQ') return -1;
-   if (b.toUpperCase() === 'HQ') return 1;
-   return a.localeCompare(b);
- });
- buildAttendeeSearchIndex(uniqueDeptsForIndex);
- 
- renderTabIfActive('dashboard');
- renderTabIfActive('my-leaves');
-
- await updateProgress(100, 'Done!');
- await delay(400);
- showLoader(false);
-
-} catch(e) {
- console.error("Error loading settings: ", e);
- if (!cachedData) {
-   const barEl = document.getElementById('loader-bar');
-   if (barEl) barEl.classList.add('error');
-   showLoader(true, 100, 'Failed to load. Please try again.');
-   setTimeout(() => showLoader(false), 3000);
-   alertError('login-alert', 'Error initializing app.');
- } else {
-   const warnEl = document.getElementById('cache-warning');
-   if (warnEl) warnEl.classList.remove('hidden-view');
-   showLoader(false);
- }
-}
-}
-
-function applyInitialData(settings, leaves) {
-allLeaves = leaves;
+// Optimize Load Time: Fetch settings and leaves simultaneously via the getInitialData gateway
+const initialData = await apiCall('getInitialData', { adminPass: user.role === 'admin' ? user.pass : null }); 
+const settings = initialData.settings;
 
 window.appTypicalEventTypes = settings.typicalEventTypes ||[]; 
 window.appAcronyms = settings.acronyms || {};
@@ -350,20 +267,49 @@ if (adminRegUnit) adminRegUnit.innerHTML = regOptions;
 if (editUserUnit) editUserUnit.innerHTML = regOptions;
 unitsLoaded = true;
 
+if (companyContacts.length > 0) {
+companyContacts.forEach(c => {
+c.formattedName = window.formatContactName(c.name, c.dept);
+});
+
+const uniqueNames =[...new Set(companyContacts.map(c => c.name))];
+validContactNames = uniqueNames.map(n => n.toLowerCase());
+fuseAllContacts = new Fuse(companyContacts, { keys:['formattedName', 'name', 'dept', 'phone'], threshold: 0.3 });
+
+let attendeeOptions = companyContacts.map(c => ({ id: c.phone, name: c.name, formattedName: c.formattedName, dept: c.dept, type: 'contact' }));
+uniqueRegDepts.forEach(dept => {
+attendeeOptions.push({ id: dept, name: `zz All in ${dept}`, formattedName: `zz All in ${dept}`, dept: dept, type: 'group', expandedNames: `All in ${dept}` });
+});
+
+window.appCustomKahGroups.forEach(g => {
+const customNames = g.members.map(phone => {
+const c = companyContacts.find(contact => String(contact.phone) === String(phone));
+return c ? c.name : phone;
+}).join(', ');
+attendeeOptions.push({ id: `kah_custom_${g.name}`, name: `zz KAH: ${g.name}`, formattedName: `zz KAH: ${g.name}`, dept: 'Custom', type: 'group', expandedNames: customNames });
+});
+
+fuseAttendees = new Fuse(attendeeOptions, { keys:['formattedName', 'name'], threshold: 0.3 });
+}
+
 if (user.role === 'admin') {
+document.getElementById('menu-admin-group').classList.remove('hidden');
+document.getElementById('menu-maintenance-group').classList.remove('hidden');
 document.getElementById('admin-behalf-leave').classList.remove('hidden-view');
 document.getElementById('admin-behalf-event').classList.remove('hidden-view');
 document.getElementById('admin-behalf-combined').classList.remove('hidden-view');
 if(typeof populateAdminSettingsForm === 'function') populateAdminSettingsForm(settings);
 } else {
+document.getElementById('menu-admin-group').classList.add('hidden');
+document.getElementById('menu-maintenance-group').classList.add('hidden');
 document.getElementById('admin-behalf-leave').classList.add('hidden-view');
 document.getElementById('admin-behalf-event').classList.add('hidden-view');
 document.getElementById('admin-behalf-combined').classList.add('hidden-view');
 }
 
-if (typeof toggleCombinedFields === 'function') toggleCombinedFields();
+await loadLeavesData(initialData.leaves);
 
-if (typeof applyWidgetsState === 'function') applyWidgetsState();
+if (typeof toggleCombinedFields === 'function') toggleCombinedFields();
 
 let targetTab = window.appLandingPage;
 if (appMode === 'separated' && targetTab === 'submit-combined') targetTab = 'submit-leave';
@@ -371,7 +317,11 @@ if (appMode === 'combined' && (targetTab === 'submit-leave' || targetTab === 'su
 
 switchTab(user.role === 'admin' ? 'admin' : targetTab); 
 
-window._pendingTabRenders = new Set(['dashboard', 'my-leaves']);
+} catch(e) {
+console.error("Error loading settings: ", e);
+alertError('login-alert', 'Error initializing app.');
+}
+showLoader(false);
 }
 
 if ('serviceWorker' in navigator) {
