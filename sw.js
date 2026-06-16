@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cloudy-v120';
+const CACHE_NAME = 'cloudy-v121';
 
 const urlsToCache =[
 './',
@@ -11,6 +11,9 @@ const urlsToCache =[
 './frontend/js/core/auth.js',
 './frontend/js/core/app.js',
 './frontend/js/ui/ui.js',
+'./frontend/js/ui/tokens.js',
+'./frontend/js/ui/toast.js',
+'./frontend/js/ui/confirm.js',
 './frontend/js/ui/forms.js',
 './frontend/js/ui/picker.js',
 './frontend/js/features/calendar.js',

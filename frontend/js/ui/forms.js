@@ -7,16 +7,121 @@ isInfoAll = forceState !== undefined ? forceState : !isInfoAll;
 ['form-event-infoall-btn', 'form-combined-infoall-btn'].forEach(id => {
 const btn = document.getElementById(id);
 if(!btn) return;
-const isHidden = btn.classList.contains('hidden-view');
-
 if(isInfoAll) {
-btn.innerHTML = '<span class="mr-1.5 text-base leading-none">📢</span> Announce';
-btn.className = `shrink-0 border-2 border-blue-600 bg-blue-600 text-white rounded-xl px-3 sm:px-5 py-3 font-bold text-sm shadow-[0_0_15px_rgba(37,99,235,0.4)] hover:bg-blue-700 hover:border-blue-700 transition h-[52px] flex items-center justify-center whitespace-nowrap outline-none ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-darksurface ring-offset-white ${isHidden ? 'hidden-view' : ''}`;
+    btn.innerHTML = '<svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 4.741a1 1 0 01.332-.536l.042-.026a7 7 0 015.382-.652c.376.047.592.44.446.79l-.74 1.768a1 1 0 01-.832.608l-.456.056a5 5 0 00-3.858 2.382l-.18.318a1 1 0 01-.878.496H4.5a1 1 0 01-.894-1.448l1.83-3.158z"/></svg>Info All (ON)';
+    btn.classList.add('bg-yellow-400', 'dark:bg-yellow-500', 'text-yellow-900', 'dark:text-yellow-900', 'border-yellow-500', 'dark:border-yellow-400', 'shadow-md');
+    btn.classList.remove('text-gray-500', 'dark:text-gray-400', 'border-gray-300', 'dark:border-gray-600', 'hover:bg-gray-100', 'dark:hover:bg-darkhover', 'bg-gray-50', 'dark:bg-darkinput');
 } else {
-btn.innerHTML = 'Announce';
-btn.className = `shrink-0 border-2 border-gray-200 dark:border-gray-700 rounded-xl px-3 sm:px-5 py-3 font-bold text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-darkinput hover:bg-gray-200 dark:hover:bg-darkhover transition h-[52px] flex items-center justify-center whitespace-nowrap outline-none ${isHidden ? 'hidden-view' : ''}`;
+    btn.innerHTML = 'Announce';
+    btn.classList.remove('bg-yellow-400', 'dark:bg-yellow-500', 'text-yellow-900', 'dark:text-yellow-900', 'border-yellow-500', 'dark:border-yellow-400', 'shadow-md');
+    btn.classList.add('text-gray-500', 'dark:text-gray-400', 'border-gray-300', 'dark:border-gray-600', 'hover:bg-gray-100', 'dark:hover:bg-darkhover', 'bg-gray-50', 'dark:bg-darkinput');
 }
 });
+}
+
+function validateForm(ctx) {
+let isValid = true;
+let errors = [];
+
+const clearFieldError = (el) => {
+  if (!el) return;
+  el.classList.remove('input-error');
+  const errorId = el.id + '-error';
+  const errorEl = document.getElementById(errorId);
+  if (errorEl) errorEl.remove();
+};
+
+const showFieldError = (el, message) => {
+  if (!el) return;
+  el.classList.add('input-error');
+  const errorId = el.id + '-error';
+  let errorEl = document.getElementById(errorId);
+  if (!errorEl) {
+    errorEl = document.createElement('div');
+    errorEl.id = errorId;
+    errorEl.className = 'field-error-msg';
+    errorEl.innerHTML = `<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span></span>`;
+    errorEl.querySelector('span').textContent = message;
+    el.parentElement.insertBefore(errorEl, el.nextSibling);
+  }
+};
+
+const viewEl = document.getElementById(`view-submit-${ctx}`);
+if (viewEl) {
+  const requiredEls = viewEl.querySelectorAll('input[required], select[required], textarea[required]');
+  requiredEls.forEach(el => {
+    if (!el.closest('.hidden-view') && !el.value.trim()) {
+       let fieldName = 'Field';
+       if (el.previousElementSibling) {
+           fieldName = el.previousElementSibling.textContent.replace('(Optional)', '').replace('*', '').trim();
+       }
+       errors.push(`${fieldName} is required`);
+       showFieldError(el, 'Required');
+       isValid = false;
+    } else {
+       clearFieldError(el);
+    }
+  });
+}
+
+const startBtn = document.getElementById(`btn-${ctx}-start`) || document.getElementById(`btn-${ctx}-leave-start`);
+const timeStartWrapEvent = document.getElementById(`block-${ctx}-time-event`);
+const timeStartWrapLeave = document.getElementById(`block-${ctx}-time-leave`);
+const isTimeVisible = (timeStartWrapEvent && !timeStartWrapEvent.classList.contains('hidden-view')) || 
+                      (timeStartWrapLeave && !timeStartWrapLeave.classList.contains('hidden-view'));
+
+if (isTimeVisible && !appData[ctx].startD) {
+  errors.push('Please select a start date');
+  if (startBtn) showFieldError(startBtn, 'Required');
+  isValid = false;
+} else if (startBtn) {
+  clearFieldError(startBtn);
+}
+
+if (window.isExternalMode) {
+  const extName = document.getElementById('ext-guest-name');
+  const extContact = document.getElementById('ext-guest-contact');
+  if (extName && !extName.value.trim()) { errors.push('Name is required'); showFieldError(extName, 'Required'); isValid = false; } else clearFieldError(extName);
+  if (extContact && !extContact.value.trim()) { errors.push('Contact info is required'); showFieldError(extContact, 'Required'); isValid = false; } else clearFieldError(extContact);
+}
+
+if (!isValid && errors.length > 0) {
+  showFormError(ctx, errors.join('<br>'));
+} else {
+  hideFormError(ctx);
+}
+
+return isValid;
+}
+
+function showFormError(ctx, message) {
+let errorEl = document.getElementById(`form-${ctx}-error`);
+if (!errorEl) {
+  errorEl = document.createElement('div');
+  errorEl.id = `form-${ctx}-error`;
+  errorEl.className = 'bg-red-50 dark:bg-red-900/20 border border-red-200/80 dark:border-red-800 text-red-700 dark:text-red-400 text-sm p-4 rounded-lg mb-3 flex items-start gap-3 shadow-md';
+  errorEl.style.animation = 'fadeIn 0.2s ease-out, pulseRed 1s ease-in-out 2';
+  const formDiv = document.getElementById(`view-submit-${ctx}`);
+  if (formDiv) {
+    const form = formDiv.querySelector('form');
+    if (form) {
+      const scrollTarget = form.querySelector('.flex-grow');
+      if (scrollTarget) scrollTarget.insertBefore(errorEl, scrollTarget.firstChild);
+      else form.insertBefore(errorEl, form.firstChild);
+    }
+  }
+}
+errorEl.innerHTML = `<svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg><span class="flex-1 font-medium">${message}</span>`;
+errorEl.classList.remove('hidden-view');
+
+setTimeout(() => {
+  errorEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}, 100);
+}
+
+function hideFormError(ctx) {
+const errorEl = document.getElementById(`form-${ctx}-error`);
+if (errorEl) errorEl.classList.add('hidden-view');
 }
 
 function toggleEventAllDay() {
@@ -94,7 +199,7 @@ if (input) {
 input.required = config.req;
 const label = document.getElementById(`label-${inputId}`);
 if (label && wrapperId) {
- label.innerHTML = `${wrapperId.includes('attendees') ? 'Attendees' : (wrapperId.includes('location-details') ? 'Location Details' : 'Location')} ${config.req ? '<span class="text-red-500">*</span>' : '<span class="text-xs font-normal text-gray-500 dark:text-gray-400">(Optional)</span>'}`;
+label.innerHTML = `${wrapperId.includes('attendees') ? 'Attendees' : (wrapperId.includes('location-details') ? 'Location Details' : 'Location')} ${config.req ? '<span class="text-red-500">*</span>' : '<span class="text-xs font-normal text-gray-500 dark:text-gray-400">(Optional)</span>'}`;
 }
 }
 };
@@ -250,6 +355,8 @@ document.getElementById(`form-${ctx}-behalf-search`).classList.remove('hidden-vi
 }
 
 // --- Attendees Form Logic ---
+let _attendeeHighlightIdx = -1;
+
 function searchAttendees(ctx) {
 const inputEl = document.getElementById(`form-${ctx}-attendee-search`);
 const q = inputEl.value;
@@ -258,21 +365,61 @@ const resC = document.getElementById(`${ctx}-attendees-results`);
 if(!q || !fuseAttendees) { 
 resC.classList.add('hidden-view'); 
 inputEl.classList.remove('ring-2', 'ring-blue-500');
+_attendeeHighlightIdx = -1;
 return; 
 }
 
 inputEl.classList.add('ring-2', 'ring-blue-500');
 const results = fuseAttendees.search(q).slice(0, 6).map(r => r.item);
 if (results.length > 0) {
-resC.innerHTML = results.map(item => `
-<div class="p-3 border-b border-gray-100 dark:border-gray-800 cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/30 text-base" onclick="selectAttendee('${ctx}', '${item.id}', '${item.name.replace(/'/g, "\\'")}', '${item.dept}', '${item.type}', '${(item.expandedNames || '').replace(/'/g, "\\'")}', '${item.formattedName.replace(/'/g, "\\'")}')">
+resC.innerHTML = results.map((item, idx) => `
+<div class="p-3 border-b border-gray-100 dark:border-gray-800 cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/30 text-base ${idx === _attendeeHighlightIdx ? 'bg-blue-100 dark:bg-blue-800/40' : ''}" onclick="selectAttendee('${ctx}', '${item.id}', '${item.name.replace(/'/g, "\\'")}', '${item.dept}', '${item.type}', '${(item.expandedNames || '').replace(/'/g, "\\'")}', '${item.formattedName.replace(/'/g, "\\'")}')">
 <span class="font-semibold text-blue-800 dark:text-blue-300">${item.formattedName}</span>
 </div>
 `).join('');
+
+resC.setAttribute('role', 'listbox');
+const items = resC.querySelectorAll('[onclick^="selectAttendee"]');
+items.forEach((el, i) => {
+  el.setAttribute('role', 'option');
+  if (i === _attendeeHighlightIdx) el.classList.add('bg-blue-100', 'dark:bg-blue-800/40');
+});
+
 resC.classList.remove('hidden-view');
 } else {
 resC.innerHTML = `<div class="p-3 text-gray-500 text-base">No match found</div>`; resC.classList.remove('hidden-view');
+_attendeeHighlightIdx = -1;
 }
+
+inputEl.onkeydown = function(e) {
+  const items = resC.querySelectorAll('[onclick^="selectAttendee"]');
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    _attendeeHighlightIdx = (_attendeeHighlightIdx + 1) % items.length;
+    updateDropdownHighlight(resC, items);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    _attendeeHighlightIdx = (_attendeeHighlightIdx - 1 + items.length) % items.length;
+    updateDropdownHighlight(resC, items);
+  } else if (e.key === 'Enter' && _attendeeHighlightIdx >= 0) {
+    e.preventDefault();
+    items[_attendeeHighlightIdx].click();
+  } else if (e.key === 'Escape') {
+    resC.classList.add('hidden-view');
+    _attendeeHighlightIdx = -1;
+  }
+};
+}
+
+function updateDropdownHighlight(resC, items) {
+ items.forEach((el, i) => {
+   if (i === _attendeeHighlightIdx) {
+     el.classList.add('bg-blue-100', 'dark:bg-blue-800/40');
+     el.scrollIntoView({ block: 'nearest' });
+   } else {
+     el.classList.remove('bg-blue-100', 'dark:bg-blue-800/40');
+   }
+ });
 }
 
 function selectAttendee(ctx, id, name, dept, type, expandedNames, formattedName) {
@@ -280,6 +427,7 @@ if (!eventAttendees.some(a => a.id === id)) {
 eventAttendees.push({ id, name, dept, type, expandedNames, formattedName }); 
 renderAttendees(ctx); 
 }
+_attendeeHighlightIdx = -1;
 const inputEl = document.getElementById(`form-${ctx}-attendee-search`);
 inputEl.value = '';
 inputEl.classList.remove('ring-2', 'ring-blue-500');
@@ -439,6 +587,9 @@ toggleRepeatUntil('combined');
 clearBehalf('leave');
 clearBehalf('event');
 clearBehalf('combined');
+hideFormError('leave');
+hideFormError('event');
+hideFormError('combined');
 
 eventAttendees =[]; 
 renderAttendees('event');
@@ -476,6 +627,10 @@ tPM.classList.remove(act); tPM.classList.add(...inact);
 }
 
 async function submitForm(ctx) {
+if (!validateForm(ctx)) {
+ return;
+}
+
 let targetName = user ? user.name : '';
 let targetPhone = user ? user.phone : '';
 let targetDepts = new Set();
@@ -483,10 +638,6 @@ let targetDepts = new Set();
 if (window.isExternalMode) {
 const extNameEl = document.getElementById('ext-guest-name');
 const extContactEl = document.getElementById('ext-guest-contact');
-if (!extNameEl.value.trim() || !extContactEl.value.trim()) {
-alert("Please provide your Name and Contact Info.");
-return;
-}
 targetName = `${extNameEl.value.trim()} (${extContactEl.value.trim()})`;
 targetPhone = 'EXTERNAL';
 } else {
@@ -501,11 +652,10 @@ targetDepts = new Set();
 if (adminBehalfUser.dept) {
 adminBehalfUser.dept.split(',').forEach(d => { if (d) targetDepts.add(d.trim()); });
 }
-} else if (user.role === 'admin' && !adminBehalfUser) {
-alert("Admin: Please select a user to submit on behalf of.");
-return;
 }
 }
+
+showLoader(true);
 
 const typeValue = document.getElementById(`form-${ctx}-type`) ? document.getElementById(`form-${ctx}-type`).value : document.getElementById(`form-${ctx}-name`).value;
 const typeObj = window.appTypicalEventTypes ? window.appTypicalEventTypes.find(t => t.name === typeValue) : null;
@@ -596,16 +746,16 @@ involvedPhones.add(String(targetPhone));
 if (typeObj && typeObj.fields && typeObj.fields.attendees && typeObj.fields.attendees.show) {
 eventAttendees.forEach(a => {
 if (a.type === 'contact') {
-  involvedPhones.add(String(a.id));
+ involvedPhones.add(String(a.id));
 } else if (a.type === 'group') {
-  if (a.dept === 'Custom') {
-       const customG = window.appCustomKahGroups.find(cg => cg.name === a.name.replace('zz KAH: ', ''));
-       if (customG) customG.members.forEach(m => involvedPhones.add(String(m)));
-  } else if (a.name.startsWith('zz KAH:')) {
-       // Fallback for transition
-  } else {
-       companyContacts.filter(c => c.dept && String(c.dept).includes(a.dept)).forEach(c => involvedPhones.add(String(c.phone)));
-  }
+ if (a.dept === 'Custom') {
+      const customG = window.appCustomKahGroups.find(cg => cg.name === a.name.replace('zz KAH: ', ''));
+      if (customG) customG.members.forEach(m => involvedPhones.add(String(m)));
+ } else if (a.name.startsWith('zz KAH:')) {
+      // Fallback for transition
+ } else {
+      companyContacts.filter(c => c.dept && String(c.dept).includes(a.dept)).forEach(c => involvedPhones.add(String(c.phone)));
+ }
 }
 });
 }
@@ -613,9 +763,9 @@ if (a.type === 'contact') {
 if (window.appCustomKahGroups) {
 window.appCustomKahGroups.forEach(g => {
 if (g.hasCalendar && g.calendarName) {
-  if (g.members.some(m => involvedPhones.has(String(m)))) {
-      targetDepts.add(g.calendarName);
-  }
+ if (g.members.some(m => involvedPhones.has(String(m)))) {
+     targetDepts.add(g.calendarName);
+ }
 }
 });
 }
@@ -641,10 +791,10 @@ untilDate: eventUntilDate
 };
 
 if (window.isExternalMode) {
-showLoader(true);
 try {
 await apiCall('submitExternalEvent', { ...payload, extToken: window.externalToken });
-alert("Your booking has been submitted successfully!");
+if (window.showToast) showToast("Your booking has been submitted successfully!", "success");
+else alert("Your booking has been submitted successfully!");
 document.getElementById('combined-form').reset();
 eventAttendees = [];
 renderAttendees('combined');
@@ -652,7 +802,8 @@ appData.combined.startD = new Date();
 appData.combined.endD = new Date(new Date().getTime() + 60 * 60 * 1000);
 updateButtonLabels();
 } catch (e) {
-alert("Error submitting booking: " + e.message);
+if (window.showToast) showToast("Error submitting booking: " + e.message, "error");
+else alert("Error submitting booking: " + e.message);
 } finally {
 showLoader(false);
 }
@@ -696,6 +847,8 @@ allLeaves.push(localMock);
 window.agendaDirty = true;
 window.myAgendaDirty = true;
 
+const wasEdit = currentEditId;
+
 // Automatically drop user back into dashboard seamlessly
 cancelEditMode();
 
@@ -706,11 +859,17 @@ if (window.jumpToDate) window.jumpToDate('dash', startCopy);
 if (window.jumpToDate) window.jumpToDate('my', startCopy);
 }
 
+if (window.showToast) showToast(`Record successfully ${wasEdit ? 'updated' : 'submitted'}!`, 'success');
+
 queueSyncAction(isEdit ? 'editLeave' : 'submitLeave', payload);
+
+// Let the optimistic UI take over, hide loader
+showLoader(false);
 }
 
-function cancelLeave(id, targetPhone) {
-if(!confirm("Are you sure you want to cancel this record?")) return;
+async function cancelLeave(id, targetPhone) {
+const confirmed = await showConfirm("Are you sure you want to cancel this record?", "Cancel Record", { danger: true, dangerText: 'This action cannot be undone.' });
+if(!confirmed) return;
 
 // Optimistic UI Cancel
 const existingIdx = allLeaves.findIndex(l => l.ID === id);
@@ -718,9 +877,11 @@ if (existingIdx !== -1) {
 allLeaves[existingIdx].Status = 'Cancelled';
 window.agendaDirty = true;
 window.myAgendaDirty = true;
-renderDashboard();
-renderMyLeaves();
+if (typeof renderDashboard === 'function') renderDashboard();
+if (typeof renderMyLeaves === 'function') renderMyLeaves();
 }
+
+if (window.showToast) showToast("Record cancelled.", "success");
 
 queueSyncAction('cancelLeave', { id: id, phone: targetPhone || user.phone });
 }

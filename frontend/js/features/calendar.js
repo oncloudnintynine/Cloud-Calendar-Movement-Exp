@@ -6,12 +6,127 @@ window.agendaDirty = true;
 window.myAgendaDirty = true;
 window.isProgrammaticScroll = false;
 window.progScrollTimeout = null;
+window._tabsRendered = { dashboard: false, myLeaves: false };
+
+window.renderTabIfActive = function(tabId) {
+if (tabId === 'dashboard' && !window._tabsRendered.dashboard) {
+ renderDashboard();
+ window._tabsRendered.dashboard = true;
+ if (window._pendingTabRenders) window._pendingTabRenders.delete('dashboard');
+}
+if (tabId === 'my-leaves' && !window._tabsRendered.myLeaves) {
+ renderMyLeaves();
+ window._tabsRendered.myLeaves = true;
+ if (window._pendingTabRenders) window._pendingTabRenders.delete('my-leaves');
+}
+};
 
 window.isAgendaCollapsed = { dash: false, my: false };
-window.isTopWidgetsHidden = { dash: false, my: false };
+window.widgetsCollapsed = {
+ dash: localStorage.getItem('dashWidgetsCollapsed') !== 'false',
+ my: localStorage.getItem('myWidgetsCollapsed') !== 'false'
+};
 
-window.isDefaultDashAgendaSet = false;
-window.isDefaultMyAgendaSet = false;
+window.toggleWidgets = function(ctx) {
+ const wrapper = document.getElementById(`${ctx}-widgets-container`);
+ const btn = document.getElementById(`${ctx}-widgets-toggle-btn`);
+
+ window.widgetsCollapsed[ctx] = !window.widgetsCollapsed[ctx];
+
+ if (window.widgetsCollapsed[ctx]) {
+   wrapper.classList.add('hidden-view');
+   btn.innerText = 'Show Widgets';
+ } else {
+   wrapper.classList.remove('hidden-view');
+   btn.innerText = 'Hide Widgets';
+ }
+
+ localStorage.setItem(`${ctx}WidgetsCollapsed`, window.widgetsCollapsed[ctx]);
+};
+
+window.toggleInfoAllPanel = function(ctx) {
+ const infoAllContainer = document.getElementById(`${ctx}-infoall-container`);
+ const toggleBtn = document.getElementById(`${ctx}-infoall-toggle-btn`);
+ const widgetsContainer = document.getElementById(`${ctx}-widgets-container`);
+
+ const isHidden = infoAllContainer.classList.contains('hidden-view');
+ if (isHidden) {
+   infoAllContainer.classList.remove('hidden-view');
+   if (window.widgetsCollapsed[ctx]) {
+     window.widgetsCollapsed[ctx] = false;
+     widgetsContainer.classList.remove('hidden-view');
+     const wBtn = document.getElementById(`${ctx}-widgets-toggle-btn`);
+     if (wBtn) wBtn.innerText = 'Hide Widgets';
+     localStorage.setItem(`${ctx}WidgetsCollapsed`, 'false');
+   }
+   toggleBtn.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+   toggleBtn.classList.remove('bg-white', 'dark:bg-darkinput', 'border-gray-300', 'dark:border-gray-600', 'text-gray-500', 'dark:text-darkmuted', 'hover:bg-gray-50', 'dark:hover:bg-darkhover');
+ } else {
+   infoAllContainer.classList.add('hidden-view');
+   toggleBtn.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+   toggleBtn.classList.add('bg-white', 'dark:bg-darkinput', 'border-gray-300', 'dark:border-gray-600', 'text-gray-500', 'dark:text-darkmuted', 'hover:bg-gray-50', 'dark:hover:bg-darkhover');
+ }
+
+ updateInfoAllDisplay(ctx);
+};
+
+window.applyWidgetsState = function() {
+ ['dash', 'my'].forEach(ctx => {
+   const wrapper = document.getElementById(`${ctx}-widgets-container`);
+   const btn = document.getElementById(`${ctx}-widgets-toggle-btn`);
+   if (wrapper && btn) {
+     if (window.widgetsCollapsed[ctx]) {
+       wrapper.classList.add('hidden-view');
+       btn.innerText = 'Show Widgets';
+     } else {
+       wrapper.classList.remove('hidden-view');
+       btn.innerText = 'Hide Widgets';
+     }
+   }
+ });
+};
+
+window.toggleAgendaCard = function(headerEl) {
+const card = headerEl.parentElement;
+const body = card.querySelector('.agenda-card-body');
+const chevron = card.querySelector('.chevron-icon');
+if(!body) return;
+
+if(body.classList.contains('hidden-view')) {
+   body.classList.remove('hidden-view');
+   if(chevron) chevron.classList.add('rotate-180');
+} else {
+   body.classList.add('hidden-view');
+   if(chevron) chevron.classList.remove('rotate-180');
+}
+};
+
+window.toggleAllAgendaCards = function(ctx) {
+window.isAgendaCollapsed[ctx] = !window.isAgendaCollapsed[ctx];
+const btn = document.getElementById(`${ctx}-expand-toggle-btn`);
+if(btn) {
+   btn.innerText = window.isAgendaCollapsed[ctx] ? 'Expand All' : 'Collapse All';
+}
+
+const container = document.getElementById(`${ctx}-agenda`);
+const infoAllContainer = document.getElementById(`${ctx}-infoall-list`);
+
+const updateNodes = (parent) => {
+   if(!parent) return;
+   const cards = parent.querySelectorAll('.agenda-card-body');
+   const chevrons = parent.querySelectorAll('.chevron-icon');
+   if (window.isAgendaCollapsed[ctx]) {
+      cards.forEach(b => b.classList.add('hidden-view'));
+      chevrons.forEach(c => c.classList.remove('rotate-180'));
+   } else {
+       cards.forEach(b => b.classList.remove('hidden-view'));
+       chevrons.forEach(c => c.classList.add('rotate-180'));
+   }
+};
+
+updateNodes(container);
+updateNodes(infoAllContainer);
+};
 
 window.jumpToToday = function(ctx) {
 const today = new Date();
@@ -57,7 +172,6 @@ window.scrollToAgendaDate = function(ctx, targetDateObj) {
 const container = document.getElementById(`${ctx}-agenda`);
 if (!container) return;
 
-// If the container is currently hidden (e.g. tab hasn't switched yet), wait and try again
 if (container.offsetParent === null) {
 setTimeout(() => window.scrollToAgendaDate(ctx, targetDateObj), 50);
 return;
@@ -72,62 +186,6 @@ container.scrollTop += (gRect.top - cRect.top);
 }
 };
 
-window.toggleTopWidgets = function(ctx) {
-window.isTopWidgetsHidden[ctx] = !window.isTopWidgetsHidden[ctx];
-const container = document.getElementById(`${ctx}-top-widgets-container`);
-const btn = document.getElementById(`${ctx}-toggle-widgets-btn`);
-
-if (window.isTopWidgetsHidden[ctx]) {
-if(container) { container.classList.add('hidden-view'); container.classList.remove('flex'); }
-if(btn) btn.innerHTML = `<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg> Show Cal`;
-} else {
-if(container) { container.classList.remove('hidden-view'); container.classList.add('flex'); }
-if(btn) btn.innerHTML = `<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" /><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" /><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" /><line x1="2" x2="22" y1="2" y2="22" /></svg> Hide Cal`;
-}
-};
-
-window.toggleAgendaCard = function(headerEl) {
-const card = headerEl.parentElement;
-const body = card.querySelector('.agenda-card-body');
-const chevron = card.querySelector('.chevron-icon');
-if(!body) return;
-
-if(body.classList.contains('hidden-view')) {
-body.classList.remove('hidden-view');
-if(chevron) chevron.classList.add('rotate-180');
-} else {
-body.classList.add('hidden-view');
-if(chevron) chevron.classList.remove('rotate-180');
-}
-};
-
-window.toggleAllAgendaCards = function(ctx) {
-window.isAgendaCollapsed[ctx] = !window.isAgendaCollapsed[ctx];
-const btn = document.getElementById(`${ctx}-expand-toggle-btn`);
-if(btn) {
-btn.innerText = window.isAgendaCollapsed[ctx] ? 'Expand All' : 'Collapse All';
-}
-
-const container = document.getElementById(`${ctx}-agenda`);
-const infoAllContainer = document.getElementById(`${ctx}-infoall-list`);
-
-const updateNodes = (parent) => {
-if(!parent) return;
-const cards = parent.querySelectorAll('.agenda-card-body');
-const chevrons = parent.querySelectorAll('.chevron-icon');
-if (window.isAgendaCollapsed[ctx]) {
-cards.forEach(b => b.classList.add('hidden-view'));
-chevrons.forEach(c => c.classList.remove('rotate-180'));
-} else {
-cards.forEach(b => b.classList.remove('hidden-view'));
-chevrons.forEach(c => c.classList.add('rotate-180'));
-}
-};
-
-updateNodes(container);
-updateNodes(infoAllContainer);
-};
-
 function setProgrammaticScroll() {
 window.isProgrammaticScroll = true;
 clearTimeout(window.progScrollTimeout);
@@ -138,7 +196,6 @@ function applyAcronymsFront(text) {
 if (!text || !window.appAcronyms) return text;
 let result = text;
 
-// Sort by length of full text descending to avoid partial replacements of nested words
 const keys = Object.keys(window.appAcronyms).sort((a, b) => {
 const fullA = typeof window.appAcronyms[a] === 'object' ? (window.appAcronyms[a].full || '') : (window.appAcronyms[a] || '');
 const fullB = typeof window.appAcronyms[b] === 'object' ? (window.appAcronyms[b].full || '') : (window.appAcronyms[b] || '');
@@ -154,11 +211,8 @@ let active = typeof val === 'object' ? val.active : true;
 if (!active || !full) continue;
 
 const escapedFull = full.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-
-// Safe boundary application. Avoids regex breaking when full phrases contain punctuation.
 const prefix = /^[\w\u00C0-\u017F]/.test(full) ? "\\b" : "";
 const suffix = /[\w\u00C0-\u017F]$/.test(full) ? "\\b" : "";
-
 const regex = new RegExp(prefix + escapedFull + suffix, "gi");
 result = result.replace(regex, key);
 }
@@ -175,41 +229,29 @@ const dashWrapMonth = document.getElementById('dash-month-wrapper');
 const myWrapAgenda = document.getElementById('my-agenda-wrapper');
 const myWrapMonth = document.getElementById('my-month-wrapper');
 
-const dashTopWidgets = document.getElementById('dash-top-widgets-container');
-const myTopWidgets = document.getElementById('my-top-widgets-container');
-
-const activeClass =['bg-white', 'dark:bg-darksurface', 'shadow', 'text-blue-600', 'dark:text-blue-400', 'font-bold'];
-const inactiveClass =['text-gray-500', 'dark:text-darkmuted', 'hover:text-gray-800', 'dark:hover:text-gray-200', 'bg-transparent', 'font-semibold'];
+const activeClass =['bg-white', 'dark:bg-darksurface', 'shadow-sm', 'text-blue-600', 'dark:text-blue-400'];
+const inactiveClass =['text-gray-500', 'dark:text-darkmuted', 'hover:text-gray-700', 'dark:hover:text-gray-300', 'bg-transparent'];
 
 if (mode === 'agenda') {
-btnAgenda.classList.add(...activeClass); btnAgenda.classList.remove(...inactiveClass);
-btnMonth.classList.remove(...activeClass); btnMonth.classList.add(...inactiveClass);
+btnAgenda.classList.add(...activeClass);
+btnAgenda.classList.remove(...inactiveClass);
+btnMonth.classList.remove(...activeClass);
+btnMonth.classList.add(...inactiveClass);
 
 if (dashWrapAgenda) dashWrapAgenda.classList.remove('hidden-view');
 if (dashWrapMonth) dashWrapMonth.classList.add('hidden-view');
 if (myWrapAgenda) myWrapAgenda.classList.remove('hidden-view');
 if (myWrapMonth) myWrapMonth.classList.add('hidden-view');
-
-if (dashTopWidgets && !window.isTopWidgetsHidden['dash']) { dashTopWidgets.classList.remove('hidden-view'); dashTopWidgets.classList.add('flex'); }
-if (myTopWidgets && !window.isTopWidgetsHidden['my']) { myTopWidgets.classList.remove('hidden-view'); myTopWidgets.classList.add('flex'); }
 } else {
-btnMonth.classList.add(...activeClass); btnMonth.classList.remove(...inactiveClass);
-btnAgenda.classList.remove(...activeClass); btnAgenda.classList.add(...inactiveClass);
+btnMonth.classList.add(...activeClass);
+btnMonth.classList.remove(...inactiveClass);
+btnAgenda.classList.remove(...activeClass);
+btnAgenda.classList.add(...inactiveClass);
 
-if (dashWrapMonth) {
-dashWrapMonth.classList.remove('hidden-view');
-dashWrapMonth.classList.add('flex');
-}
+if (dashWrapMonth) dashWrapMonth.classList.remove('hidden-view');
 if (dashWrapAgenda) dashWrapAgenda.classList.add('hidden-view');
-
-if (myWrapMonth) {
-myWrapMonth.classList.remove('hidden-view');
-myWrapMonth.classList.add('flex');
-}
+if (myWrapMonth) myWrapMonth.classList.remove('hidden-view');
 if (myWrapAgenda) myWrapAgenda.classList.add('hidden-view');
-
-if (dashTopWidgets) { dashTopWidgets.classList.add('hidden-view'); dashTopWidgets.classList.remove('flex'); }
-if (myTopWidgets) { myTopWidgets.classList.add('hidden-view'); myTopWidgets.classList.remove('flex'); }
 }
 
 window.agendaDirty = true;
@@ -228,14 +270,45 @@ allLeaves = await apiCall('getLeaves');
 window.agendaDirty = true;
 window.myAgendaDirty = true;
 
-renderDashboard(); 
-renderMyLeaves(); 
+try {
+ const cached = JSON.parse(sessionStorage.getItem('initialData') || '{}');
+ cached.leaves = allLeaves;
+ sessionStorage.setItem('initialData', JSON.stringify(cached));
+} catch(e) {}
+
+renderDashboard();
+renderMyLeaves();
 
 const paradeView = document.getElementById('view-parade-state');
 if(paradeView && !paradeView.classList.contains('hidden-view') && typeof renderParadeState === 'function') {
 renderParadeState(); 
 }
 } catch (err) { console.error("Error loading leaves data: ", err); }
+}
+
+function buildAttendeeSearchIndex(uniqueDepts) {
+if (companyContacts.length === 0) return;
+
+const uniqueNames =[...new Set(companyContacts.map(c => c.name))];
+validContactNames = uniqueNames.map(n => n.toLowerCase());
+fuseAllContacts = new Fuse(companyContacts, { keys:['formattedName', 'name', 'dept', 'phone'], threshold: 0.3 });
+
+let attendeeOptions = companyContacts.map(c => ({ id: c.phone, name: c.name, formattedName: c.formattedName, dept: c.dept, type: 'contact' }));
+uniqueDepts.forEach(dept => {
+ attendeeOptions.push({ id: dept, name: `zz All in ${dept}`, formattedName: `zz All in ${dept}`, dept: dept, type: 'group', expandedNames: `All in ${dept}` });
+});
+
+if (window.appCustomKahGroups) {
+ window.appCustomKahGroups.forEach(g => {
+  const customNames = g.members.map(phone => {
+      const c = companyContacts.find(contact => String(contact.phone) === String(phone));
+      return c ? c.name : phone;
+  }).join(', ');
+  attendeeOptions.push({ id: `kah_custom_${g.name}`, name: `zz KAH: ${g.name}`, formattedName: `zz KAH: ${g.name}`, dept: 'Custom', type: 'group', expandedNames: customNames });
+ });
+}
+
+fuseAttendees = new Fuse(attendeeOptions, { keys:['formattedName', 'name'], threshold: 0.3 });
 }
 
 function changeMonth(ctx, offset) {
@@ -280,22 +353,38 @@ cells.forEach(cell => {
 const cellDay = parseInt(cell.dataset.day);
 const isToday = cell.dataset.istoday === 'true';
 
-let baseClass = "cal-day-cell flex flex-col items-center justify-center w-6 h-6 md:w-8 md:h-8 mx-auto rounded-full cursor-pointer transition-colors text-[10px] md:text-xs font-medium leading-none ";
+let baseClass = "cal-day-cell relative flex items-center justify-center w-8 h-8 mx-auto rounded-full cursor-pointer transition-colors text-sm font-medium ";
 if (isToday) baseClass += "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200 dark:ring-1 dark:ring-blue-500 font-bold ";
 else baseClass += "hover:bg-gray-200 dark:hover:bg-darkhover ";
 
 if (cellDay === d) {
-baseClass = "cal-day-cell flex flex-col items-center justify-center w-6 h-6 md:w-8 md:h-8 mx-auto rounded-full cursor-pointer transition-colors text-[10px] md:text-xs font-bold bg-blue-600 text-white shadow-md leading-none ";
+baseClass = "cal-day-cell relative flex items-center justify-center w-8 h-8 mx-auto rounded-full cursor-pointer transition-colors text-sm font-bold bg-blue-600 text-white shadow-md ";
 }
 
 cell.className = baseClass;
 
 const hasEvent = cell.dataset.hasevent === 'true';
 if (hasEvent) {
-const dotColor = cellDay === d ? 'bg-white' : 'bg-blue-500';
-cell.innerHTML = `<span>${cellDay}</span><div class="w-1 h-1 md:w-1.5 md:h-1.5 mt-px md:mt-0.5 ${dotColor} rounded-full"></div>`;
+const data = ctx === 'dash' ? window.dashFilteredLeaves ||[] : window.myFilteredLeaves ||[];
+const monthDate = ctx === 'dash' ? dashMonth : myMonth;
+const y = monthDate.getFullYear();
+const m = monthDate.getMonth();
+const current = new Date(y, m, cellDay);
+const dayEvents = data.filter(l => isEventOnDate(l, current));
+const typeCounts = {};
+dayEvents.forEach(l => {
+ const t = l.LeaveType || 'Other';
+ typeCounts[t] = (typeCounts[t] || 0) + 1;
+});
+const topTypes = Object.entries(typeCounts).sort((a, b) => b[1] - a[1]).slice(0, 2);
+const dotsHtml = topTypes.map(([type]) => {
+ const colors = getEventTypeColor(type);
+ const dotColor = cellDay === d ? 'ring-1 ring-white dark:ring-black' : colors.dot;
+ return `<div class="w-1.5 h-1.5 ${dotColor} rounded-full"></div>`;
+}).join('');
+cell.innerHTML = `${cellDay}<div class="absolute -bottom-1 flex gap-1">${dotsHtml}</div>`;
 } else {
-cell.innerHTML = `<span>${cellDay}</span><div class="w-1 h-1 md:w-1.5 md:h-1.5 mt-px md:mt-0.5 bg-transparent rounded-full"></div>`;
+cell.innerHTML = `${cellDay}`;
 }
 });
 }
@@ -324,20 +413,20 @@ let topDateStr = null;
 
 if (isAtBottom) {
 for (let i = groups.length - 1; i >= 0; i--) {
-const rect = groups[i].getBoundingClientRect();
-if (rect.top < containerBottom) {
-topDateStr = groups[i].dataset.date; 
-break;
-}
+   const rect = groups[i].getBoundingClientRect();
+   if (rect.top < containerBottom) {
+       topDateStr = groups[i].dataset.date; 
+       break;
+   }
 }
 } else {
 for (const group of groups) {
-const rect = group.getBoundingClientRect();
-if (rect.top >= containerTop && rect.top <= containerTop + 100) {
-topDateStr = group.dataset.date; break;
-} else if (rect.top < containerTop && rect.bottom > containerTop + 20) {
-topDateStr = group.dataset.date; break;
-}
+   const rect = group.getBoundingClientRect();
+   if (rect.top >= containerTop && rect.top <= containerTop + 100) {
+       topDateStr = group.dataset.date; break;
+   } else if (rect.top < containerTop && rect.bottom > containerTop + 20) {
+       topDateStr = group.dataset.date; break;
+   }
 }
 }
 
@@ -347,20 +436,18 @@ const targetDate = isDash ? dashDate : myDate;
 const targetMonth = isDash ? dashMonth : myMonth;
 
 if (targetDate.getDate() !== d || targetDate.getMonth() !== (m-1) || targetDate.getFullYear() !== y) {
-if (isDash) dashDate = new Date(y, m - 1, d);
-else myDate = new Date(y, m - 1, d);
-
-if (targetMonth.getMonth() !== (m-1) || targetMonth.getFullYear() !== y) {
-if (isDash) {
-   dashMonth = new Date(y, m - 1, 1);
-} else {
-   myMonth = new Date(y, m - 1, 1);
-}
-renderMiniCalendar(ctx);
-updateInfoAllDisplay(ctx);
-} else {
-updateMiniCalendarSelection(ctx, d);
-}
+   if (isDash) dashDate = new Date(y, m - 1, d);
+   else myDate = new Date(y, m - 1, d);
+   
+   if (targetMonth.getMonth() !== (m-1) || targetMonth.getFullYear() !== y) {
+       if (isDash) dashMonth = new Date(y, m - 1, 1);
+       else myMonth = new Date(y, m - 1, 1);
+       
+       renderMiniCalendar(ctx);
+       updateInfoAllDisplay(ctx);
+   } else {
+       updateMiniCalendarSelection(ctx, d);
+   }
 }
 }
 }, 50);
@@ -417,17 +504,31 @@ for(let d=1; d<=daysInMonth; d++) {
 const current = new Date(y, m, d); current.setHours(0,0,0,0);
 const isSelected = current.toDateString() === selDate.toDateString();
 const isToday = current.toDateString() === new Date().toDateString();
-const hasEvent = data.some(l => isEventOnDate(l, current));
 
-let baseClass = "cal-day-cell flex flex-col items-center justify-center w-6 h-6 md:w-8 md:h-8 mx-auto rounded-full cursor-pointer transition-colors text-[10px] md:text-xs font-medium leading-none ";
+const dayEvents = data.filter(l => isEventOnDate(l, current));
+const hasEvent = dayEvents.length > 0;
+
+let baseClass = "cal-day-cell relative flex items-center justify-center w-7 h-7 mx-auto rounded-full cursor-pointer transition-colors text-xs font-medium ";
 if (isSelected) baseClass += "bg-blue-600 text-white font-bold shadow-md ";
 else if (isToday) baseClass += "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200 dark:ring-1 dark:ring-blue-500 font-bold ";
 else baseClass += "hover:bg-gray-200 dark:hover:bg-darkhover ";
 
-const dotColor = isSelected ? 'bg-white' : 'bg-blue-500';
-const dot = hasEvent ? `<div class="w-1 h-1 md:w-1.5 md:h-1.5 mt-px md:mt-0.5 ${dotColor} rounded-full"></div>` : `<div class="w-1 h-1 md:w-1.5 md:h-1.5 mt-px md:mt-0.5 bg-transparent rounded-full"></div>`;
+let dotsHtml = '';
+if (hasEvent) {
+const typeCounts = {};
+dayEvents.forEach(l => {
+ const t = l.LeaveType || 'Other';
+ typeCounts[t] = (typeCounts[t] || 0) + 1;
+});
+const topTypes = Object.entries(typeCounts).sort((a, b) => b[1] - a[1]).slice(0, 2);
+dotsHtml = topTypes.map(([type]) => {
+ const colors = getEventTypeColor(type);
+ const dotColor = isSelected ? 'ring-1 ring-white dark:ring-black' : colors.dot;
+ return `<div class="w-1 h-1 ${dotColor} rounded-full"></div>`;
+}).join('');
+}
 
-html += `<div class="${baseClass}" data-day="${d}" data-istoday="${isToday}" data-hasevent="${hasEvent}" onclick="selectDate('${ctx}', ${y}, ${m}, ${d})"><span>${d}</span>${dot}</div>`;
+html += `<div class="${baseClass}" data-day="${d}" data-istoday="${isToday}" data-hasevent="${hasEvent}" onclick="selectDate('${ctx}', ${y}, ${m}, ${d})">${d}${dotsHtml ? `<div class="absolute -bottom-0.5 flex gap-0.5">${dotsHtml}</div>` : ''}</div>`;
 }
 const gridEl = document.getElementById(`${ctx}-cal-grid`);
 if (gridEl) gridEl.innerHTML = html;
@@ -460,20 +561,20 @@ let evEnd = new Date(l.EndDate); evEnd.setHours(0,0,0,0);
 
 if (isRepeating) {
 for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-if (isEventOnDate(l, d)) {
-instances.push({ l: l, start: new Date(d), end: new Date(d), isLeave: isLeave });
-}
+   if (isEventOnDate(l, d)) {
+       instances.push({ l: l, start: new Date(d), end: new Date(d), isLeave: isLeave });
+   }
 }
 } else {
 if (evStart <= endDate && evEnd >= startDate) {
-let clampedStart = new Date(Math.max(evStart, startDate));
-let clampedEnd = new Date(Math.min(evEnd, endDate));
-instances.push({ l: l, start: clampedStart, end: clampedEnd, isLeave: isLeave });
+   let clampedStart = new Date(Math.max(evStart, startDate));
+   let clampedEnd = new Date(Math.min(evEnd, endDate));
+   instances.push({ l: l, start: clampedStart, end: clampedEnd, isLeave: isLeave });
 }
 }
 });
 
-let html = '<div class="flex flex-col flex-grow bg-gray-200 dark:bg-darkborder gap-px border border-gray-300 dark:border-darkborder rounded-xl overflow-hidden shadow-inner">';
+let html = '<div class="flex flex-col flex-grow bg-gray-200 dark:bg-darkborder gap-px border border-gray-300 dark:border-darkborder rounded overflow-hidden shadow-inner">';
 
 for (let w = new Date(startDate); w <= endDate; w.setDate(w.getDate() + 7)) {
 let weekEnd = new Date(w); weekEnd.setDate(weekEnd.getDate() + 6);
@@ -491,37 +592,40 @@ let slots =[];
 segments.forEach(seg => {
 let slotIdx = 0;
 while (true) {
-if (!slots[slotIdx]) slots[slotIdx] =[];
-let conflict = false;
-for (let i = seg.sDay; i <= seg.eDay; i++) {
-if (slots[slotIdx][i]) { conflict = true; break; }
-}
-if (!conflict) {
-for (let i = seg.sDay; i <= seg.eDay; i++) slots[slotIdx][i] = true;
-seg.slot = slotIdx;
-break;
-}
-slotIdx++;
+   if (!slots[slotIdx]) slots[slotIdx] =[];
+   let conflict = false;
+   for (let i = seg.sDay; i <= seg.eDay; i++) {
+       if (slots[slotIdx][i]) { conflict = true; break; }
+   }
+   if (!conflict) {
+       for (let i = seg.sDay; i <= seg.eDay; i++) slots[slotIdx][i] = true;
+       seg.slot = slotIdx;
+       break;
+   }
+   slotIdx++;
 }
 });
 
-let rowHeight = Math.max(80, (slots.length * 22) + 32);
-html += `<div class="flex-1 relative bg-white dark:bg-darksurface flex" style="min-height: ${rowHeight}px;">`;
+let rowHeight = Math.max(80, (slots.length * 20) + 30);
+html += `<div class="flex-1 relative bg-white dark:bg-darksurface flex min-h-[${rowHeight}px]">`;
 
 for (let i = 0; i < 7; i++) {
 let curD = new Date(w); curD.setDate(curD.getDate() + i);
 let isToday = curD.toDateString() === new Date().toDateString();
 let isCurMonth = curD.getMonth() === m;
-let bg = isCurMonth ? '' : 'bg-gray-50/50 dark:bg-[#151515]';
-html += `<div class="flex-1 border-r border-gray-200 last:border-r-0 dark:border-darkborder ${bg} p-1" onclick="selectDate('${ctx}', ${curD.getFullYear()}, ${curD.getMonth()}, ${curD.getDate()})">
-<div class="text-[11px] font-bold ${isToday ? 'bg-blue-600 text-white rounded-full w-5 h-5 mx-auto flex items-center justify-center shadow-md' : 'text-gray-500 dark:text-darkmuted text-center'}">${curD.getDate()}</div>
+let bg = isCurMonth ? '' : 'bg-gray-50/50 dark:bg-darksurface/50';
+html += `<div class="flex-1 border-r border-gray-200 last:border-r-0 dark:border-darkborder ${bg} p-1.5" onclick="selectDate('${ctx}', ${curD.getFullYear()}, ${curD.getMonth()}, ${curD.getDate()})">
+   <div class="text-xs font-bold ${isToday ? 'bg-blue-600 text-white rounded-full w-[26px] h-[26px] mx-auto flex items-center justify-center shadow-md' : 'text-gray-500 dark:text-darkmuted text-center'}">${curD.getDate()}</div>
 </div>`;
 }
 
-html += `<div class="absolute top-7 left-0 right-0 bottom-0 pointer-events-none overflow-hidden">`;
+html += `<div class="absolute top-8 left-0 right-0 bottom-0 pointer-events-none overflow-hidden">`;
 segments.forEach(seg => {
-const isPublicHoliday = seg.l.LeaveType === 'Public Holiday';
-const color = isPublicHoliday ? 'bg-indigo-500 dark:bg-indigo-600 text-white' : (seg.isLeave ? 'bg-[#e26d5c] dark:bg-[#c25a4a] text-white' : (seg.len > 1 ? 'bg-[#f4c264] dark:bg-[#d6a54d] text-gray-900' : 'bg-[#50b182] dark:bg-[#3d9369] text-white'));
+const typeColors = getEventTypeColor(seg.l.LeaveType);
+const isMultiDay = seg.len > 1;
+const color = seg.isLeave 
+ ? `${typeColors.dot} text-white` 
+ : (isMultiDay ? 'bg-amber-400 dark:bg-amber-600 text-gray-900' : `${typeColors.dot} text-white`);
 
 let locStr = seg.l.Location || '';
 if (seg.l.LocationDetails) locStr += ` - ${seg.l.LocationDetails}`;
@@ -531,24 +635,25 @@ const displayType = safeType === 'Generic' && seg.l.Remarks ? `${safeType}: ${se
 
 let dispName = applyAcronymsFront(seg.l.Name || "");
 if (dispName === (seg.l.Name || "")) {
-dispName = dispName.split(' ')[0];
+   dispName = dispName.split(' ')[0];
 }
 
+const isPublicHoliday = seg.l.LeaveType === 'Public Holiday';
 const titleRawStr = isPublicHoliday ? seg.l.Name : (seg.isLeave ? `${dispName} : ${displayType}` : displayType);
 const appliedTitle = applyAcronymsFront(titleRawStr);
 
 const left = (seg.sDay / 7) * 100;
 const width = (seg.len / 7) * 100;
-const topOffset = (seg.slot * 22) + 2; 
+const topOffset = (seg.slot * 20) + 26; 
 
-let rounded = 'rounded-md';
+let rounded = 'rounded-sm';
 if (seg.len > 1) {
-if (seg.sDay === 0 && seg.eDay === 6) rounded = 'rounded-none';
-else if (seg.sDay === 0) rounded = 'rounded-r-md';
-else if (seg.eDay === 6) rounded = 'rounded-l-md';
+  if (seg.sDay === 0 && seg.eDay === 6) rounded = 'rounded-none';
+  else if (seg.sDay === 0) rounded = 'rounded-r-sm';
+  else if (seg.eDay === 6) rounded = 'rounded-l-sm';
 }
 
-html += `<div class="absolute h-[20px] px-1.5 text-[10px] md:text-xs font-bold leading-snug truncate shadow-sm pointer-events-auto cursor-pointer border border-black/5 ${color} ${rounded}" style="left: calc(${left}% + 2px); width: calc(${width}% - 4px); top: ${topOffset}px;" onclick="selectDate('${ctx}', ${w.getFullYear()}, ${w.getMonth()}, ${w.getDate() + seg.sDay})" title="${appliedTitle}">${appliedTitle}</div>`;
+html += `<div class="absolute h-[22px] px-1.5 text-[11px] md:text-[12px] font-bold leading-tight truncate shadow-sm pointer-events-auto cursor-pointer border-b border-black/10 ${color} ${rounded}" style="left: calc(${left}% + 2px); width: calc(${width}% - 4px); top: ${topOffset}px;" onclick="selectDate('${ctx}', ${w.getFullYear()}, ${w.getMonth()}, ${w.getDate() + seg.sDay})" title="${appliedTitle}">${appliedTitle}</div>`;
 });
 html += `</div></div>`; 
 }
@@ -559,20 +664,23 @@ return html;
 function getBadgeClass(status, leaveType) {
 if(leaveType === 'Public Holiday') return 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400';
 const safeStatus = String(status || '');
-if(safeStatus.includes('Pending')) return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400';
-if(safeStatus.includes('Cancelled')) return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
-return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+if(safeStatus.includes('Pending')) return C.badgePending;
+if(safeStatus.includes('Cancelled')) return C.badgeCancelled;
+return C.badgeApproved;
 }
 
 function formatStatusBadge(status, leaveType) {
 if(leaveType === 'Public Holiday') return 'Holiday';
 let s = String(status || '').replace('Approved', 'Cal Updated');
+let icon = ICONS.check;
+if (s.includes('Pending')) icon = ICONS.alert;
+else if (s.includes('Cancelled')) icon = ICONS.x;
 if (s.includes('KAH Limit Crossed')) {
 const match = s.match(/KAH Limit Crossed for (.*)\)/);
 const dept = match ? match[1] : '';
-return `Cal Updated<br><span class="text-[9px] font-bold text-red-600 dark:text-red-400 tracking-tight leading-tight block mt-1">KAH Limit Crossed</span><span class="text-[9px] font-bold text-red-600 dark:text-red-400 tracking-tight leading-none block mt-0.5">${dept}</span>`;
+return `${ICONS.alert} Cal Updated<br><span class="text-[9px] font-bold text-red-600 dark:text-red-400 tracking-tight leading-tight block mt-1">KAH Limit Crossed</span><span class="text-[9px] font-bold text-red-600 dark:text-red-400 tracking-tight leading-none block mt-0.5">${dept}</span>`;
 }
-return s;
+return `${icon} ${s}`;
 }
 
 function parseAndCleanTemplate(templateStr, vars) {
@@ -584,54 +692,64 @@ for (let i = 0; i < lines.length; i++) {
 let line = lines[i];
 
 let hasVariables = false;
-let hasPresentValue = false;
+let hasMissingValue = false;
 
-// Extract all variables in the line
 const matches = line.match(/{.*?}/g) ||[];
 
 for (let match of matches) {
-hasVariables = true;
-let varName = match.replace(/[{}]/g, '');
-let val = vars[varName] !== undefined ? vars[varName] : '';
-
-if (val && String(val).trim() !== '') {
-hasPresentValue = true;
+  hasVariables = true;
+  let varName = match.replace(/[{}]/g, '');
+  let val = vars[varName] !== undefined ? vars[varName] : '';
+  
+  if (!val || val.trim() === '') {
+      hasMissingValue = true;
+  }
+  line = line.replace(match, val);
 }
-line = line.replace(match, val);
-}
 
-// Only skip the line if it contained variables and ALL of them were empty
-if (hasVariables && !hasPresentValue) continue;
+if (hasVariables && hasMissingValue) continue;
 
 if (line.trim() !== '') {
-// Cleanup artifacts like trailing commas, stray hyphens, empty parens left by missing variables
-line = line.replace(/,\s*(?=[,\)]|$)/g, "")  // Remove trailing commas
-   .replace(/\(\s*\)/g, "")          // Remove empty parentheses
-   .replace(/:\s*[,|-]\s*/g, ": ")   // Remove stray hyphens or commas immediately after a label colon
-   .replace(/\s+/g, " ")             // Normalize spaces
-   .trim();
+  line = line.replace(/,\s*(?=[,\)]|$)/g, "")
+    .replace(/\(\s*\)/g, "")
+    .replace(/:\s*[,|-]\s*/g, ": ")
+    .replace(/\s+/g, " ")
+    .trim();
 
-if (line.endsWith('-')) line = line.slice(0, -1).trim();
-if (line.endsWith(':')) line = line.slice(0, -1).trim();
+  if (line.endsWith('-')) line = line.slice(0, -1).trim();
+  if (line.endsWith(':')) line = line.slice(0, -1).trim();
 
-if (line !== '') {
-validLines.push(`<p class="text-[11px] md:text-xs text-gray-600 dark:text-darkmuted mt-0.5 leading-snug">${line}</p>`);
-}
+  if (line !== '') {
+      validLines.push(`<p class="text-xs md:text-sm text-gray-600 dark:text-darkmuted mt-0.5">${line}</p>`);
+  }
 }
 }
 return validLines.join('');
 }
 
 function buildAgendaHtml(items, isMyCalendar, isInfoAllContext) {
-if (!items || items.length === 0) return isInfoAllContext ? '' : `<p class="text-gray-500 dark:text-darkmuted text-center italic text-xs md:text-sm mt-2">No records for this date.</p>`;
+if (!items || items.length === 0) return isInfoAllContext ? '' : `<p class="text-gray-500 dark:text-darkmuted text-center italic mt-2">No records for this date.</p>`;
 
 const ctx = isMyCalendar ? 'my' : 'dash';
 const isCollapsed = window.isAgendaCollapsed[ctx];
+
+const isNowActive = (item) => {
+ try {
+   const now = new Date();
+   const start = new Date(item.StartDate.replace('T', ' '));
+   const end = new Date(item.EndDate.replace('T', ' '));
+   if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+     return now >= start && now <= end;
+   }
+ } catch(e) {}
+ return false;
+};
 
 return items.map(l => {
 const isPublicHoliday = l.LeaveType === 'Public Holiday';
 const typeObj = window.appTypicalEventTypes ? window.appTypicalEventTypes.find(t => t.name === l.LeaveType) : null;
 const isEvent = isPublicHoliday ? true : (typeObj ? typeObj.isEvent : false);
+const typeColors = getEventTypeColor(l.LeaveType);
 
 let timeStr = "";
 let startTimeStr = "";
@@ -655,8 +773,8 @@ if (l.HalfDay && l.HalfDay !== 'NONE' && l.HalfDay !== 'None') {
 timeStr += ` <span class="font-bold text-purple-600 dark:text-purple-400">↻ ${l.HalfDay}</span>`;
 endTimeStr += ` <span class="font-bold text-purple-600 dark:text-purple-400">↻ ${l.HalfDay}</span>`;
 if (l.UntilDate) {
-timeStr += ` until ${formatDisplayDate(new Date(l.UntilDate))}`;
-endTimeStr += ` until ${formatDisplayDate(new Date(l.UntilDate))}`;
+  timeStr += ` until ${formatDisplayDate(new Date(l.UntilDate))}`;
+  endTimeStr += ` until ${formatDisplayDate(new Date(l.UntilDate))}`;
 }
 }
 } else {
@@ -673,21 +791,12 @@ endTimeStr = eD;
 let actionBtns = '';
 let compactActionBtns = '';
 if ((String(l.Phone) === String(user.phone) || user.role === 'admin') && l.Status !== 'Cancelled' && !isPublicHoliday) {
-actionBtns = `
-<button onclick="triggerEdit('${l.ID}')" class="p-1.5 text-blue-500 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition shrink-0" title="Edit Record">
-<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.89 1.147l-2.952.81a.375.375 0 01-.465-.465l.81-2.952a4.5 4.5 0 011.147-1.89L16.862 4.487z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 7.125L16.862 4.487" /></svg>
-</button>
-<button onclick="cancelLeave('${l.ID}', '${l.Phone}')" class="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition shrink-0" title="Cancel Record">
-<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
-</button>`;
+actionBtns = `<div class="flex space-x-3 mt-4 pt-4 border-t border-gray-200 dark:border-darkborder"><button onclick="triggerEdit('${l.ID}')" class="${C.btnEdit}">Edit</button><button onclick="cancelLeave('${l.ID}', '${l.Phone}')" class="${C.btnCancel}">Cancel</button></div>`;
 
-compactActionBtns = `
-<button onclick="triggerEdit('${l.ID}')" class="p-1 text-blue-500 hover:text-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-lg transition shrink-0" title="Edit Record">
-<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.89 1.147l-2.952.81a.375.375 0 01-.465-.465l.81-2.952a4.5 4.5 0 011.147-1.89L16.862 4.487z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 7.125L16.862 4.487" /></svg>
-</button>
-<button onclick="cancelLeave('${l.ID}', '${l.Phone}')" class="p-1 text-red-500 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-lg transition shrink-0" title="Cancel Record">
-<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
-</button>`;
+compactActionBtns = `<div class="flex justify-end space-x-1 mt-1 pt-1 border-t border-blue-100 dark:border-blue-800/50">
+<button onclick="triggerEdit('${l.ID}')" class="${C.btnEditSm}">Edit</button>
+<button onclick="cancelLeave('${l.ID}', '${l.Phone}')" class="${C.btnCancelSm}">Cancel</button>
+</div>`;
 }
 
 let attendeesDisplay = '';
@@ -695,32 +804,33 @@ if (l.Attendees) {
 try {
 const attArr = JSON.parse(l.Attendees);
 if (attArr && attArr.length > 0) {
-attendeesDisplay = attArr.map(a => {
-if (a.expandedNames) return a.expandedNames;
-
-if (a.type === 'group') {
-if (a.name.startsWith('zz KAH:')) {
-   const gName = a.name.replace('zz KAH: ', '').trim();
-   const cGrp = window.appCustomKahGroups && window.appCustomKahGroups.find(g => g.name === gName);
-   if (cGrp) {
-       return cGrp.members.map(ph => {
-           const c = companyContacts.find(x => String(x.phone) === String(ph));
-           return c ? c.name : ph;
-       }).join(', ');
-   }
-   return a.name.replace('zz KAH: ', '');
-} else if (a.name.startsWith('zz All in ')) {
-   return a.name.replace('zz ', '');
-}
-return a.name.replace('zz KAH: ', '').replace('zz ', '');
-}
-return a.name;
-}).join(', ');
+ attendeesDisplay = attArr.map(a => {
+     if (a.expandedNames) return a.expandedNames;
+     
+     if (a.type === 'group') {
+         if (a.name.startsWith('zz KAH:')) {
+             const gName = a.name.replace('zz KAH: ', '').trim();
+             const cGrp = window.appCustomKahGroups && window.appCustomKahGroups.find(g => g.name === gName);
+             if (cGrp) {
+                 return cGrp.members.map(ph => {
+                     const c = companyContacts.find(x => String(x.phone) === String(ph));
+                     return c ? c.name : ph;
+                 }).join(', ');
+             }
+             return a.name.replace('zz KAH: ', '');
+         } else if (a.name.startsWith('zz All in ')) {
+             return a.name.replace('zz ', '');
+         }
+         return a.name.replace('zz KAH: ', '').replace('zz ', '');
+     }
+     return a.name;
+ }).join(', ');
 }
 } catch(e) {}
 }
 
 let locStr = l.Location || '';
+if (l.LocationDetails) locStr += ` - ${l.LocationDetails}`;
 
 if (!isEvent && l.LeaveType === 'Overseas Leave' && l.Country) {
 locStr = l.Country + (l.State ? ` (${l.State})` : "");
@@ -795,42 +905,57 @@ const finalDetailsHtml = detailsRaw ? parseAndCleanTemplate(detailsRaw, tplVars)
 
 const hasBody = finalDetailsHtml.trim() !== '' || (isInfoAllContext ? compactActionBtns !== '' : actionBtns !== '');
 
+const typeIcon = isEvent ? ICONS.event : ICONS.leave;
+const typeChipHtml = `<span class="${C.agendaTypeChip} ${typeColors.bg} ${typeColors.text}">${typeIcon}${displayType}</span>`;
+
+const nowBadge = isNowActive(l) ? `<span class="text-[11px] md:text-[12px] font-bold px-2.5 py-1 rounded text-center inline-block leading-tight bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200/80 dark:border-green-800 animate-pulse">● Now</span>` : '';
+
+const metaDataHtml = `
+<div class="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 text-xs text-gray-500 dark:text-darkmuted">
+${timeStr ? `<span class="inline-flex items-center gap-1">${ICONS.clock}${timeStr}</span>` : ''}
+${locStr ? `<span class="inline-flex items-center gap-1">${ICONS.location}${applyAcronymsFront(locStr)}</span>` : ''}
+${attendeesDisplay ? `<span class="inline-flex items-center gap-1">${ICONS.users}${applyAcronymsFront(attendeesDisplay).split(',').length} attendee${attendeesDisplay.split(',').length > 1 ? 's' : ''}</span>` : ''}
+</div>`;
+
 if (isInfoAllContext) {
-return `<div class="p-2 rounded-lg border border-blue-200 dark:border-blue-800/60 bg-blue-50/50 dark:bg-blue-900/10 shadow-sm flex flex-col transition hover:shadow-md">
+return `<div class="${C.agendaCardInfoAll}">
 <div class="flex justify-between items-start ${hasBody ? 'cursor-pointer select-none' : ''}" ${hasBody ? 'onclick="toggleAgendaCard(this)"' : ''}>
-<div class="flex-grow pr-2">
-<h3 class="font-bold text-[11px] md:text-sm text-blue-900 dark:text-blue-300 leading-tight">${finalTitle}</h3>
-<p class="font-semibold text-[10px] text-blue-600 dark:text-blue-400 mt-0.5 leading-none">${timeStr}</p>
-</div>
-${hasBody ? `<svg class="w-4 h-4 text-blue-500 transition-transform duration-300 chevron-icon shrink-0 ${isCollapsed ? '' : 'rotate-180'}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>` : ''}
+ <div class="flex-grow pr-2">
+   <div class="flex items-center gap-2 mb-2">
+     ${typeChipHtml}
+   </div>
+   <h3 class="font-bold text-xs md:text-sm text-blue-900 dark:text-blue-300">${finalTitle}</h3>
+   ${metaDataHtml}
+ </div>
+ ${hasBody ? `<svg class="w-4 h-4 text-blue-500 transition-transform duration-200 chevron-icon shrink-0 ${isCollapsed ? '' : 'rotate-180'}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>` : ''}
 </div>
 ${hasBody ? `
 <div class="agenda-card-body ${isCollapsed ? 'hidden-view' : ''}">
-<div class="flex flex-col mt-1">
-${finalDetailsHtml ? `<div class="whitespace-pre-wrap w-full">${finalDetailsHtml}</div>` : ''}
-${compactActionBtns ? `<div class="flex justify-end space-x-1 mt-1 pt-1 border-t border-blue-100 dark:border-blue-800/50">${compactActionBtns}</div>` : ''}
-</div>
+  ${finalDetailsHtml ? `<div class="whitespace-pre-wrap mt-2">${finalDetailsHtml}</div>` : ''}
+  ${compactActionBtns}
 </div>` : ''}
 </div>`;
 }
 
-return `<div class="p-2.5 md:p-3 rounded-xl bg-white dark:bg-darkinput shadow-sm flex flex-col transition hover:shadow-md border border-gray-200 dark:border-darkborder">
+return `<div class="${C.agendaCard} ${typeColors.accent}">
 <div class="flex justify-between items-start ${hasBody ? 'cursor-pointer select-none' : ''}" ${hasBody ? 'onclick="toggleAgendaCard(this)"' : ''}>
-<div class="flex-grow pr-2">
-<h3 class="font-bold text-sm md:text-base text-gray-900 dark:text-gray-100 leading-tight">${finalTitle}</h3>
-${!isMyCalendar && !isEvent && l.HalfDay !== 'None' && l.HalfDay !== 'NONE' ? `<p class="font-medium text-xs text-gray-700 dark:text-darktext mt-0.5">(${l.HalfDay})</p>` : ''}
+<div class="flex-grow pr-2 min-w-0">
+<div class="flex items-center gap-2 mb-2 flex-wrap">
+${typeChipHtml}
+${nowBadge}<span class="text-[11px] md:text-[12px] font-bold px-2.5 py-1 rounded text-center inline-block leading-tight ${getBadgeClass(l.Status, l.LeaveType)}">${formatStatusBadge(l.Status, l.LeaveType)}</span>
 </div>
-<div class="flex items-center shrink-0">
-<span class="text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-md text-center inline-block leading-tight shadow-sm ${getBadgeClass(l.Status, l.LeaveType)}">${formatStatusBadge(l.Status, l.LeaveType)}</span>
-${hasBody ? `<svg class="w-5 h-5 ml-1.5 text-gray-400 dark:text-darkmuted transition-transform duration-300 chevron-icon shrink-0 ${isCollapsed ? '' : 'rotate-180'}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>` : ''}
+<h3 class="font-bold text-sm md:text-base text-gray-900 dark:text-gray-100 leading-tight">${finalTitle}</h3>
+${metaDataHtml}
+${!isMyCalendar && !isEvent && l.HalfDay !== 'None' && l.HalfDay !== 'NONE' ? `<p class="font-medium text-xs md:text-sm text-gray-700 dark:text-darktext mt-1.5">(${l.HalfDay})</p>` : ''}
+</div>
+<div class="flex items-center shrink-0 ml-2">
+${hasBody ? `<svg class="w-5 h-5 text-gray-400 dark:text-darkmuted transition-transform duration-200 chevron-icon shrink-0 ${isCollapsed ? '' : 'rotate-180'}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>` : ''}
 </div>
 </div>
 ${hasBody ? `
 <div class="agenda-card-body ${isCollapsed ? 'hidden-view' : ''}">
-<div class="flex justify-between items-end gap-2 mt-1.5">
-${finalDetailsHtml ? `<div class="whitespace-pre-wrap flex-grow pt-1">${finalDetailsHtml}</div>` : '<div class="flex-grow"></div>'}
-${actionBtns ? `<div class="flex shrink-0 space-x-1.5 pb-0.5">${actionBtns}</div>` : ''}
-</div>
+${finalDetailsHtml ? `<div class="whitespace-pre-wrap mt-3">${finalDetailsHtml}</div>` : ''}
+${actionBtns}
 </div>` : ''}
 </div>`;
 }).join('');
@@ -870,31 +995,34 @@ const container = document.getElementById(`${ctx}-agenda`);
 if (!container) return;
 
 const targetDate = ctx === 'dash' ? dashDate : myDate;
-const start = new Date(targetDate.getFullYear(), targetDate.getMonth() - 2, 1);
-const end = new Date(targetDate.getFullYear(), targetDate.getMonth() + 6, 0);
+const start = new Date(targetDate.getFullYear(), targetDate.getMonth() - 1, 1);
+const end = new Date(targetDate.getFullYear(), targetDate.getMonth() + 2, 0);
 
 let html = '';
 for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
 const dayEvents = data.filter(l => isEventOnDate(l, d));
 
 if (dayEvents.length > 0 || d.toDateString() === targetDate.toDateString()) {
-const yyyy = d.getFullYear();
-const mm = String(d.getMonth() + 1).padStart(2, '0');
-const dd = String(d.getDate()).padStart(2, '0');
-
-html += `
-<div class="agenda-day-group mb-2.5 md:mb-3" data-date="${yyyy}-${mm}-${dd}">
-<div class="sticky top-0 bg-gray-50/95 dark:bg-darkbase/95 backdrop-blur-md z-10 py-1 border-b border-gray-200 dark:border-darkborder mb-1.5 md:mb-2">
-<h3 class="font-bold text-[13px] md:text-sm text-blue-700 dark:text-blue-400 pl-1">${formatDisplayDate(d)}</h3>
-</div>
-<div class="space-y-1.5 px-1">
-${buildAgendaHtml(dayEvents, ctx === 'my' || (ctx==='dash' && document.getElementById('dash-dept-nav').value==='MY_CALENDAR'), false)}
-</div>
-</div>`;
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const isToday = d.toDateString() === new Date().toDateString();
+  const countBadge = dayEvents.length > 0 ? `<span class="ml-2 inline-flex items-center justify-center w-6 h-6 text-[11px] font-bold rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400">${dayEvents.length}</span>` : '';
+   
+   html += `
+   <div class="agenda-day-group mb-6" data-date="${yyyy}-${mm}-${dd}">
+       <div class="${C.sectionHeader} mb-3 flex items-center">
+           <h3 class="font-bold text-sm md:text-base ${isToday ? 'text-blue-700 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'}">${isToday ? 'Today' : formatDisplayDate(d)}</h3>
+           ${countBadge}
+       </div>
+       <div class="space-y-3 px-2">
+          ${buildAgendaHtml(dayEvents, ctx === 'my' || (ctx==='dash' && document.getElementById('dash-dept-nav').value==='MY_CALENDAR'), false)}
+      </div>
+  </div>`;
 }
 }
 
-container.innerHTML = html || `<p class="text-gray-500 dark:text-darkmuted text-center text-xs mt-4">No records found.</p>`;
+container.innerHTML = html || `<div class="${C.emptyState}">${ICONS.empty}<p class="${C.emptyStateText} mt-2">No records found for this period.</p></div>`;
 
 container.removeEventListener('scroll', ctx === 'dash' ? () => handleAgendaScroll('dash') : () => handleAgendaScroll('my'));
 container.addEventListener('scroll', ctx === 'dash' ? () => handleAgendaScroll('dash') : () => handleAgendaScroll('my'));
@@ -913,31 +1041,71 @@ let group = container.querySelector(`.agenda-day-group[data-date="${dateStr}"]`)
 
 if (!group) {
 group = document.createElement('div');
-group.className = 'agenda-day-group mb-2.5 md:mb-3';
+group.className = 'agenda-day-group mb-6';
 group.dataset.date = dateStr;
+const isToday = targetDateObj.toDateString() === new Date().toDateString();
 group.innerHTML = `
-<div class="sticky top-0 bg-gray-50/95 dark:bg-darkbase/95 backdrop-blur-md z-10 py-1 border-b border-gray-200 dark:border-darkborder mb-1.5 md:mb-2">
-<h3 class="font-bold text-[13px] md:text-sm text-blue-700 dark:text-blue-400 pl-1">${formatDisplayDate(targetDateObj)}</h3>
-</div>
-<div class="space-y-1.5 px-1">
-<p class="text-gray-500 dark:text-darkmuted text-center italic text-xs mt-2">No records for this date.</p>
-</div>`;
+   <div class="sticky top-0 bg-gray-50 dark:bg-darkinput z-10 py-2 border-y border-gray-200 dark:border-darkborder mb-3 shadow-sm px-3 rounded-lg flex items-center">
+       <h3 class="font-bold text-sm md:text-base ${isToday ? 'text-blue-700 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'}">${isToday ? 'Today' : formatDisplayDate(targetDateObj)}</h3>
+       <span class="ml-2 inline-flex items-center justify-center w-6 h-6 text-[11px] font-bold rounded-full bg-gray-200 dark:bg-darkborder text-gray-500 dark:text-darkmuted">0</span>
+   </div>
+   <div class="space-y-3 px-2">
+      <div class="${C.emptyState} py-8">${ICONS.empty}<p class="${C.emptyStateText} mt-2">No records for this date.</p></div>
+  </div>`;
 
 const allGroups = Array.from(container.querySelectorAll('.agenda-day-group'));
 let inserted = false;
 for (let i = 0; i < allGroups.length; i++) {
-if (allGroups[i].dataset.date > dateStr) {
-container.insertBefore(group, allGroups[i]);
-inserted = true;
-break;
-}
+  if (allGroups[i].dataset.date > dateStr) {
+      container.insertBefore(group, allGroups[i]);
+      inserted = true;
+      break;
+  }
 }
 if (!inserted) container.appendChild(group);
 }
 return group;
 }
 
+window._activeFilterDash = 'all';
+window._activeFilterMy = 'all';
+
+function renderFilterChips(data, ctx) {
+const containerId = ctx === 'my' ? 'my-filter-chips' : 'dash-filter-chips';
+const container = document.getElementById(containerId);
+if (!container) return;
+
+const typeCounts = {};
+data.forEach(l => {
+if (l.Status === 'Cancelled') return;
+const t = l.LeaveType || 'Other';
+typeCounts[t] = (typeCounts[t] || 0) + 1;
+});
+
+const types = Object.keys(typeCounts).sort();
+const filterKey = ctx === 'my' ? '_activeFilterMy' : '_activeFilterDash';
+const activeFilter = window[filterKey] || 'all';
+
+const chipsHtml = types.map(type => {
+const isActive = activeFilter === type;
+const chipClass = isActive ? C.filterChipActive : C.filterChipInactive;
+const safeType = type.replace(/'/g, "\\'");
+return `<button class="${C.filterChip} ${chipClass}" onclick="window.${filterKey}='${safeType}'; window.agendaDirty=true; window.myAgendaDirty=true; renderDashboard(); renderMyLeaves();">${type} <span class="opacity-60">${typeCounts[type]}</span></button>`;
+}).join('');
+
+const allClass = activeFilter === 'all' ? C.filterChipActive : C.filterChipInactive;
+
+container.innerHTML = `
+<button class="${C.filterChip} ${allClass}" onclick="window.${filterKey}='all'; window.agendaDirty=true; window.myAgendaDirty=true; renderDashboard(); renderMyLeaves();">All</button>
+${chipsHtml}
+`;
+
+container.classList.remove('hidden-view');
+container.classList.add('flex');
+}
+
 function renderDashboard() {
+window._tabsRendered.dashboard = true;
 const searchEl = document.getElementById('dash-search');
 const q = searchEl ? searchEl.value.toLowerCase() : '';
 const deptNav = document.getElementById('dash-dept-nav');
@@ -974,7 +1142,6 @@ filtered = filtered.filter(l => {
 if (String(l.InfoAll).toUpperCase() === 'TRUE') return true;
 if (String(l.Department||'').toUpperCase().includes(d.toUpperCase())) return true;
 
-// Robustly check Attendees JSON to restore visibility if getLeaves overwrote the Department column
 if (l.Attendees) {
 try {
 const att = JSON.parse(l.Attendees);
@@ -984,8 +1151,8 @@ if (a.type === 'group' && a.name.startsWith('zz KAH:')) {
 const customG = window.appCustomKahGroups && window.appCustomKahGroups.find(cg => cg.name === a.name.replace('zz KAH: ', '').trim());
 if (customG) {
 return customG.members.some(phone => {
-  const contact = companyContacts.find(c => String(c.phone) === String(phone));
-  return contact && contact.dept && String(contact.dept).toUpperCase().includes(d.toUpperCase());
+const contact = companyContacts.find(c => String(c.phone) === String(phone));
+return contact && contact.dept && String(contact.dept).toUpperCase().includes(d.toUpperCase());
 });
 }
 }
@@ -1004,15 +1171,17 @@ return false;
 }
 
 if (q) {
-const fuse = new Fuse(filtered, { keys:['Name', 'LeaveType', 'Remarks', 'Attendees'], threshold: 0.3 });
+const fuse = new Fuse(filtered, { keys:['Name', 'LeaveType', 'Remarks', 'Location', 'LocationDetails', 'Country', 'Attendees'], threshold: 0.3 });
 filtered = fuse.search(q).map(res => res.item);
 }
 
-window.dashFilteredLeaves = filtered;
-
-if (!window.isDefaultDashAgendaSet) {
-window.isDefaultDashAgendaSet = true;
+if (window._activeFilterDash && window._activeFilterDash !== 'all') {
+filtered = filtered.filter(l => l.LeaveType === window._activeFilterDash);
 }
+
+renderFilterChips(filtered, 'dash');
+
+window.dashFilteredLeaves = filtered;
 
 if (dashViewMode === 'agenda') {
 renderMiniCalendar('dash');
@@ -1024,7 +1193,10 @@ window.agendaDirty = false;
 
 const agendaEl = document.getElementById('dash-agenda');
 if (agendaEl) {
-window.scrollToAgendaDate('dash', dashDate);
+setTimeout(() => {
+   const group = ensureAgendaDateExists('dash', dashDate);
+   if (group) group.scrollIntoView({ behavior: 'smooth' });
+}, 10);
 }
 
 updateInfoAllDisplay('dash');
@@ -1042,6 +1214,7 @@ if (monthGridEl) monthGridEl.innerHTML = buildFullMonthGrid(dashMonth, filtered,
 }
 
 function renderMyLeaves() {
+window._tabsRendered.myLeaves = true;
 const my = allLeaves.filter(l => {
 if (l.Status === 'Cancelled') return false;
 if (String(l.InfoAll).toUpperCase() === 'TRUE') return true;
@@ -1069,20 +1242,26 @@ return false;
 
 window.myFilteredLeaves = my;
 
-if (!window.isDefaultMyAgendaSet) {
-window.isDefaultMyAgendaSet = true;
+let myFiltered = my;
+if (window._activeFilterMy && window._activeFilterMy !== 'all') {
+myFiltered = my.filter(l => l.LeaveType === window._activeFilterMy);
 }
+
+renderFilterChips(myFiltered, 'my');
 
 if (dashViewMode === 'agenda') {
 renderMiniCalendar('my');
 if (window.myAgendaDirty) {
-generateContinuousAgenda('my', my);
+generateContinuousAgenda('my', myFiltered);
 window.myAgendaDirty = false;
 }
 
 const agendaEl = document.getElementById('my-agenda');
 if (agendaEl) {
-window.scrollToAgendaDate('my', myDate);
+setTimeout(() => {
+   const group = ensureAgendaDateExists('my', myDate);
+   if (group) group.scrollIntoView({ behavior: 'smooth' });
+}, 10);
 }
 
 updateInfoAllDisplay('my');
