@@ -24,11 +24,11 @@ const inactiveClass =['text-gray-500', 'dark:text-darkmuted', 'hover:text-gray-8
 if (mode === 'personnel') {
   btnPersonnel.classList.add(...activeClass); btnPersonnel.classList.remove(...inactiveClass);
   btnTree.classList.remove(...activeClass); btnTree.classList.add(...inactiveClass);
-  if(unassignedBoard) unassignedBoard.classList.remove('hidden');
+  if(unassignedBoard) unassignedBoard.classList.remove('hidden-view');
 } else {
   btnTree.classList.add(...activeClass); btnTree.classList.remove(...inactiveClass);
   btnPersonnel.classList.remove(...activeClass); btnPersonnel.classList.add(...inactiveClass);
-  if(unassignedBoard) unassignedBoard.classList.add('hidden');
+  if(unassignedBoard) unassignedBoard.classList.add('hidden-view');
 }
 
 renderStructureUI();
@@ -119,7 +119,7 @@ function buildTreeHtml(node, depth) {
                    
                    ${!isGrandChild ? `
                    <div class="flex space-x-2 mt-2">
-                        <input type="text" id="new-child-${fullPath}" placeholder="Add Sub-Unit to ${k}..." class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg py-1.5 px-3 text-xs bg-white dark:bg-black text-gray-900 dark:text-white uppercase outline-none focus:border-blue-500 transition">
+                       <input type="text" id="new-child-${fullPath}" placeholder="Add Sub-Unit to ${k}..." class="w-full border border-gray-300 dark:border-gray-600 rounded p-1.5 text-xs bg-white dark:bg-black text-gray-900 dark:text-white uppercase outline-none focus:border-blue-500 transition">
                        <button onclick="addChildUnit('${fullPath}')" class="bg-gray-600 hover:bg-gray-700 text-white text-xs font-bold px-3 rounded transition">Add</button>
                    </div>` : ''}
                </div>
@@ -145,7 +145,7 @@ rightContainer.innerHTML = `
 function renderCards(contacts, showCross, currentUnit) {
 if (!contacts) return '';
 return contacts.map(c => `
-    <div onclick="openReassignModal('${c.resourceName}', '${c.name.replace(/'/g, "\\'")}', '${c.phone}', '${currentUnit}')" class="relative bg-white dark:bg-darkinput p-2 rounded-lg shadow-sm border border-gray-200 dark:border-darkborder text-xs flex flex-col cursor-pointer transition-colors hover:border-blue-400 dark:hover:border-blue-600">
+   <div onclick="openReassignModal('${c.resourceName}', '${c.name.replace(/'/g, "\\'")}', '${c.phone}', '${currentUnit}')" class="relative bg-white dark:bg-darkinput p-2 rounded shadow-sm border border-gray-200 dark:border-darkborder text-xs flex flex-col cursor-pointer transition-colors hover:border-blue-400 dark:hover:border-blue-600">
      <span class="font-bold text-gray-800 dark:text-gray-100 pr-4 truncate">${c.name}</span>
      <span class="text-[10px] text-gray-500 dark:text-darkmuted mt-0.5">${c.phone}</span>
      ${showCross ? `
@@ -179,91 +179,66 @@ let html = allUnits.map(u => `
 `).join('');
 
 document.getElementById('reassign-unit-list').innerHTML = html;
- const modal = document.getElementById('reassign-modal');
- modal.classList.remove('hidden');
- modal.classList.add('flex');
+document.getElementById('reassign-modal').classList.remove('hidden-view');
+document.getElementById('reassign-modal').classList.add('flex');
+}
 
- // Focus management - trap focus in modal
- const closeBtn = modal.querySelector('button[onclick="closeReassignModal()"]');
- if (closeBtn) setTimeout(() => closeBtn.focus(), 50);
+function confirmReassign(newUnit) {
+if (reassignTargetResource) {
+   pendingStructureChanges[reassignTargetResource] = newUnit;
+   renderStructureUI();
+}
+closeReassignModal();
+}
 
- // Trap focus within modal
- modal.addEventListener('keydown', function handler(e) {
-   if (e.key === 'Tab') {
-     e.preventDefault();
-     const focusable = modal.querySelectorAll('button, [tabindex]');
-     const currentFocus = document.activeElement;
-     let nextIdx = Array.from(focusable).indexOf(currentFocus) + 1;
-     if (nextIdx >= focusable.length) nextIdx = 0;
-     focusable[nextIdx].focus();
-   }
-   if (e.key === 'Escape') {
-     closeReassignModal();
-     modal.removeEventListener('keydown', handler);
-   }
- });
- }
-
- function confirmReassign(newUnit) {
- if (reassignTargetResource) {
-    pendingStructureChanges[reassignTargetResource] = newUnit;
-    renderStructureUI();
- }
- closeReassignModal();
- }
-
- function closeReassignModal() {
- reassignTargetResource = null;
- const modal = document.getElementById('reassign-modal');
- modal.classList.add('hidden');
- modal.classList.remove('flex');
- }
+function closeReassignModal() {
+reassignTargetResource = null;
+document.getElementById('reassign-modal').classList.add('hidden-view');
+document.getElementById('reassign-modal').classList.remove('flex');
+}
 
 function addParentUnit() {
- const input = document.getElementById('new-parent-unit');
- const val = input.value.trim().toUpperCase();
- if (!val) return;
- if (companyStructure.includes(val)) return showToast("Parent unit already exists.", "warning");
+const input = document.getElementById('new-parent-unit');
+const val = input.value.trim().toUpperCase();
+if (!val) return;
+if (companyStructure.includes(val)) return alert("Parent unit already exists.");
 
- companyStructure.push(val);
- input.value = '';
- renderStructureUI();
- showToast("Parent unit added.", "success");
- }
+companyStructure.push(val);
+input.value = '';
+renderStructureUI();
+}
 
- function addChildUnit(parentPath) {
- const input = document.getElementById(`new-child-${parentPath}`);
- const val = input.value.trim().toUpperCase();
- if (!val) return;
+function addChildUnit(parentPath) {
+const input = document.getElementById(`new-child-${parentPath}`);
+const val = input.value.trim().toUpperCase();
+if (!val) return;
 
- const fullPath = `${parentPath}-${val}`;
- if (companyStructure.includes(fullPath)) return showToast("Unit already exists.", "warning");
+const fullPath = `${parentPath}-${val}`;
+if (companyStructure.includes(fullPath)) return alert("Unit already exists.");
 
- companyStructure.push(fullPath);
- renderStructureUI();
- showToast("Sub-unit added.", "success");
- }
+companyStructure.push(fullPath);
+renderStructureUI();
+}
 
 async function renameUnitPrompt(oldPath, e) {
- if (e) { e.stopPropagation(); e.preventDefault(); }
- const newName = prompt(`Enter new exact name to replace unit path:\n'${oldPath}'`, oldPath);
- if (!newName || newName.trim() === '' || newName === oldPath) return;
+if (e) { e.stopPropagation(); e.preventDefault(); }
+const newName = prompt(`Enter new exact name to replace unit path:\n'${oldPath}'`, oldPath);
+if (!newName || newName.trim() === '' || newName === oldPath) return;
 
- showLoader(true);
- try {
-   await apiCall('renameUnit', { adminPass: user.pass, oldName: oldPath, newName: newName.trim().toUpperCase() });
-   showToast("Unit successfully renamed across all platforms!", "success");
-   setTimeout(() => window.location.reload(), 1500);
- } catch (err) {
-   showToast("Error renaming unit: " + err.message, "error");
-   showLoader(false);
- }
- }
+showLoader(true);
+try {
+  await apiCall('renameUnit', { adminPass: user.pass, oldName: oldPath, newName: newName.trim().toUpperCase() });
+  alert("Unit successfully renamed across all platforms!");
+  window.location.reload();
+} catch (err) {
+  alert("Error renaming unit: " + err.message);
+  showLoader(false);
+}
+}
 
- async function removeUnit(fullPath, e) {
- if (e) { e.stopPropagation(); e.preventDefault(); }
- const confirmed = await showConfirm(`Are you sure you want to delete ${fullPath} and all its sub-units? Personnel inside will automatically be marked as Unassigned.`, "Delete Unit", { danger: true, dangerText: 'Personnel in this unit will become Unassigned.' });
- if (!confirmed) return;
+function removeUnit(fullPath, e) {
+if (e) { e.stopPropagation(); e.preventDefault(); }
+if (!confirm(`Are you sure you want to delete ${fullPath} and all its sub-units? Personnel inside will automatically be marked as Unassigned.`)) return;
 
 const toDelete = companyStructure.filter(p => p === fullPath || p.startsWith(`${fullPath}-`));
 companyContacts.forEach(c => {
@@ -278,52 +253,55 @@ renderStructureUI();
 
 async function saveCompanyStructure() {
 showLoader(true);
- const finalChanges = {};
- for (let resName in pendingStructureChanges) {
-    const originalContact = companyContacts.find(c => c.resourceName === resName);
-    let originalDept = "UNASSIGNED";
-    if (originalContact && originalContact.dept) {
-        originalDept = originalContact.dept.split(',')[0].trim().toUpperCase();
-    }
-    if (originalDept !== pendingStructureChanges[resName]) {
-        finalChanges[resName] = pendingStructureChanges[resName];
-    }
+const finalChanges = {};
+for (let resName in pendingStructureChanges) {
+   const originalContact = companyContacts.find(c => c.resourceName === resName);
+   let originalDept = "UNASSIGNED";
+   if (originalContact && originalContact.dept) {
+       originalDept = originalContact.dept.split(',')[0].trim().toUpperCase();
+   }
+   if (originalDept !== pendingStructureChanges[resName]) {
+       finalChanges[resName] = pendingStructureChanges[resName];
+   }
+}
+
+try {
+ await apiCall('saveSettings', { adminPass: user.pass, companyStructure: companyStructure });
+ if (Object.keys(finalChanges).length > 0) {
+   await apiCall('updateUserUnits', { adminPass: user.pass, changes: finalChanges });
+   alert("Hierarchy and Personnel assignments successfully updated!");
+ } else {
+   alert("Hierarchy successfully updated!");
  }
+ window.location.reload();
+} catch (err) { alert("Error saving: " + err.message); showLoader(false); }
+}
 
- try {
-  await apiCall('saveSettings', { adminPass: user.pass, companyStructure: companyStructure });
-  const msg = Object.keys(finalChanges).length > 0 ? "Hierarchy and Personnel assignments updated!" : "Hierarchy updated!";
-  showToast(msg, "success");
-  setTimeout(() => window.location.reload(), 1500);
- } catch (err) { showToast("Error saving: " + err.message, "error"); showLoader(false); }
- }
+async function forceOverwriteContacts() {
+if (!confirm("WARNING: This will perform a 100% overwrite of Google Contacts using the current App data. All App users will be renamed and re-tagged to the groups shown here.\n\nProceed only if Google Contacts has drifted from the app.")) return;
 
- async function forceOverwriteContacts() {
- const confirmed = await showConfirm("This will perform a 100% overwrite of Google Contacts using the current App data. All App users will be renamed and re-tagged to the groups shown here.\n\nProceed only if Google Contacts has drifted from the app.", "Force Sync Google Contacts", { danger: true, dangerText: 'This action cannot be undone.' });
- if (!confirmed) return;
+showLoader(true);
 
- showLoader(true);
+const payloadContacts = companyContacts.map(c => {
+    return {
+        resourceName: c.resourceName,
+        name: c.name.replace(/'/g, "\\'"),
+        unit: getEffectiveDept(c)
+    };
+});
 
- const payloadContacts = companyContacts.map(c => {
-     return {
-         resourceName: c.resourceName,
-         name: c.name.replace(/'/g, "\\'"),
-         unit: getEffectiveDept(c)
-     };
- });
+const payload = {
+    adminPass: user.pass,
+    structure: companyStructure,
+    contacts: payloadContacts
+};
 
- const payload = {
-     adminPass: user.pass,
-     structure: companyStructure,
-     contacts: payloadContacts
- };
-
- try {
-     await apiCall('forceSyncContacts', payload);
-     showToast("Google Contacts synchronized with App data!", "success");
-     setTimeout(() => window.location.reload(), 1500);
- } catch (err) {
-     showToast("Error syncing contacts: " + err.message, "error");
+try {
+    await apiCall('forceSyncContacts', payload);
+    alert("Google Contacts successfully overwritten & synchronized with App data!");
+    window.location.reload();
+} catch (err) {
+    alert("Error syncing contacts: " + err.message);
     showLoader(false);
 }
 }

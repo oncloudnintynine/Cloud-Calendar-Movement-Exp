@@ -5,9 +5,10 @@
 let unitsLoaded = false;
 
 function showLogin() {
-document.getElementById('login-view').classList.remove('hidden');
-document.getElementById('app-view').classList.add('hidden');
+document.getElementById('login-view').classList.remove('hidden-view');
+document.getElementById('app-view').classList.add('hidden-view');
 document.getElementById('logout-btn').classList.add('hidden');
+document.getElementById('menu-btn').classList.add('hidden');
 document.getElementById('active-tab-title').classList.add('hidden');
 
 const controlsWrapper = document.getElementById('dash-controls-wrapper');
@@ -19,8 +20,8 @@ if (controlsWrapper) {
 
 function toggleRegisterView(show) {
 if (show) {
- document.getElementById('login-form-container').classList.add('hidden');
- document.getElementById('register-form-container').classList.remove('hidden');
+ document.getElementById('login-form-container').classList.add('hidden-view');
+ document.getElementById('register-form-container').classList.remove('hidden-view');
  
  if (!unitsLoaded) {
    apiCall('getSettings', { adminPass: null }).then(settings => {
@@ -56,8 +57,8 @@ if (show) {
    }).catch(e => console.error("Error loading units", e));
  }
 } else {
- document.getElementById('login-form-container').classList.remove('hidden');
- document.getElementById('register-form-container').classList.add('hidden');
+ document.getElementById('login-form-container').classList.remove('hidden-view');
+ document.getElementById('register-form-container').classList.add('hidden-view');
 }
 }
 
@@ -65,15 +66,15 @@ async function handleLogin() {
 const pass = document.getElementById('login-pass').value;
 if (!pass) return alertError('login-alert', 'Please enter your password');
 
-await updateProgress(10, 'Verifying credentials...');
+showLoader(true);
 try {
-  user = await apiCall('login', { password: pass });
-  localStorage.setItem('user', JSON.stringify(user));
-  document.getElementById('login-pass').value = '';
-  showApp(); 
+ user = await apiCall('login', { password: pass });
+ localStorage.setItem('user', JSON.stringify(user));
+ document.getElementById('login-pass').value = '';
+ showApp(); 
 } catch (err) { 
-  alertError('login-alert', err.message); 
-  showLoader(false); 
+ alertError('login-alert', err.message); 
+ showLoader(false); 
 }
 }
 
@@ -99,16 +100,16 @@ const bday = appData[ctxObj].birthdayD;
 const bdayStr = `${bday.getFullYear()}-${String(bday.getMonth()+1).padStart(2,'0')}-${String(bday.getDate()).padStart(2,'0')}`;
 
 showLoader(true);
- try {
-  await apiCall('registerUser', { fullName: name, mobile: mobile, unit: unit, birthday: bdayStr });
-  showToast('User successfully registered!', 'success');
-  if (context === 'self') toggleRegisterView(false);
-  
-  document.getElementById(prefix + 'name').value = '';
-  document.getElementById(prefix + 'mobile').value = '';
-  document.getElementById(prefix + 'unit').value = '';
-  initDates(); 
- } catch(e) { alertError(context === 'admin' ? 'admin-alert' : 'register-alert', e.message); } finally { showLoader(false); }
- }
+try {
+ await apiCall('registerUser', { fullName: name, mobile: mobile, unit: unit, birthday: bdayStr });
+ alert('User successfully registered!');
+ if (context === 'self') toggleRegisterView(false);
+ 
+ document.getElementById(prefix + 'name').value = '';
+ document.getElementById(prefix + 'mobile').value = '';
+ document.getElementById(prefix + 'unit').value = '';
+ initDates(); 
+} catch(e) { alertError(context === 'admin' ? 'admin-alert' : 'register-alert', e.message); } finally { showLoader(false); }
+}
 
-function logout() { localStorage.removeItem('user'); sessionStorage.removeItem('initialData'); user = null; showLogin(); }
+function logout() { localStorage.removeItem('user'); user = null; showLogin(); }

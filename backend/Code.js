@@ -16,35 +16,64 @@ var props = PropertiesService.getScriptProperties();
 if (!props.getProperty('adminPassword')) props.setProperty('adminPassword', 'P@ssw0rd');
 if (!props.getProperty('kahLimit')) props.setProperty('kahLimit', '50');
 if (!props.getProperty('approvingAuthority')) props.setProperty('approvingAuthority', Session.getActiveUser().getEmail());
-if (!props.getProperty('kahList')) props.setProperty('kahList', JSON.stringify([]));
 if (!props.getProperty('menuOrder')) props.setProperty('menuOrder', JSON.stringify(['dashboard', 'parade-state', 'my-leaves', 'submit-combined']));
-if (!props.getProperty('adminSectionsOrder')) props.setProperty('adminSectionsOrder', JSON.stringify(['app-mode', 'register-user', 'manage-users', 'admin-pass', 'user-keyword', 'menu-order']));
+if (!props.getProperty('landingPage')) props.setProperty('landingPage', 'dashboard');
+if (!props.getProperty('dashboardDeptOrder')) props.setProperty('dashboardDeptOrder', JSON.stringify([]));
+if (!props.getProperty('adminSectionsOrder')) props.setProperty('adminSectionsOrder', JSON.stringify(['landing-page', 'app-mode', 'dashboard-filter-order', 'admin-pass', 'user-keyword', 'external-booking', 'menu-order']));
+if (!props.getProperty('adminContactsSectionsOrder')) props.setProperty('adminContactsSectionsOrder', JSON.stringify(['contact-format', 'register-user', 'manage-users']));
+if (!props.getProperty('externalToken')) props.setProperty('externalToken', Utilities.getUuid());
 
-if (!props.getProperty('typicalEventTypes')) {
-var oldLeaveTypes = JSON.parse(props.getProperty('leaveTypes') || "[]");
+var typicalEventTypes = props.getProperty('typicalEventTypes');
+if (!typicalEventTypes) {
 var defaultTypes =[
-{name: 'Meeting', isEvent: true, defaultLoc: 'Conference Room'},
-{name: 'Others', isEvent: true},
-{name: 'Official Trip', isEvent: false},
-{name: 'Overseas Leave', isEvent: false},
-{name: 'Local Leave', isEvent: false}
+{name: 'Generic', isEvent: true, defaultLoc: 'In Camp', isKahRelevant: false, fields: { location:{show:true, req:true}, locationDetails:{show:true,req:false}, attendees:{show:true,req:false}, remarks:{show:true,req:true,label:'Meeting Description'} }, fieldOrder: ['time', 'location', 'attendees', 'remarks', 'repeat', 'overseas']},
+{name: 'Others', isEvent: true, defaultLoc: 'Out of Camp', isKahRelevant: false, fields: { location:{show:true, req:true}, locationDetails:{show:true,req:false}, attendees:{show:true,req:false}, remarks:{show:true,req:false,label:'Remarks'} }, fieldOrder: ['time', 'location', 'attendees', 'remarks', 'repeat', 'overseas']},
+{name: 'Official Trip', isEvent: false, isKahRelevant: true, fields: { location:{show:false, req:false}, locationDetails:{show:false,req:false}, attendees:{show:true,req:false}, remarks:{show:true,req:false,label:'Remarks'} }, fieldOrder: ['overseas', 'time', 'remarks', 'attendees', 'location', 'repeat']},
+{name: 'Overseas Leave', isEvent: false, isKahRelevant: true, fields: { location:{show:false, req:false}, locationDetails:{show:false,req:false}, attendees:{show:false,req:false}, remarks:{show:true,req:false,label:'Remarks'} }, fieldOrder: ['overseas', 'time', 'remarks', 'attendees', 'location', 'repeat']},
+{name: 'Local Leave', isEvent: false, isKahRelevant: false, fields: { location:{show:false, req:false}, locationDetails:{show:false,req:false}, attendees:{show:false,req:false}, remarks:{show:true,req:false,label:'Remarks'} }, fieldOrder: ['time', 'remarks', 'attendees', 'location', 'repeat', 'overseas']}
 ];
-oldLeaveTypes.forEach(function(lt) {
-if (!defaultTypes.some(function(dt) { return dt.name === lt; })) {
- defaultTypes.push({name: lt, isEvent: false});
+props.setProperty('typicalEventTypes', JSON.stringify(defaultTypes));
+} else {
+var existing = JSON.parse(typicalEventTypes);
+var updated = false;
+existing.forEach(function(t) {
+if (t.name === 'Meeting') { t.name = 'Generic'; updated = true; }
+if (t.defaultLoc === 'Office') { t.defaultLoc = 'In Camp'; updated = true; }
+if (t.defaultLoc === 'Others') { t.defaultLoc = 'Out of Camp'; updated = true; }
+if (!t.fields) {
+t.fields = {
+   location: {show: t.isEvent, req: t.isEvent},
+   locationDetails: {show: t.isEvent, req: false},
+   attendees: {show: t.isEvent || t.name === 'Official Trip', req: false},
+   remarks: {show: true, req: t.name==='Generic', label: t.name==='Generic'?'Meeting Description':'Remarks'}
+};
+updated = true;
+}
+if (!t.fieldOrder) {
+if (t.name === 'Official Trip' || t.name === 'Overseas Leave') {
+   t.fieldOrder = ['overseas', 'time', 'remarks', 'attendees', 'location', 'repeat'];
+} else {
+   t.fieldOrder = ['time', 'location', 'attendees', 'remarks', 'repeat', 'overseas'];
+}
+updated = true;
+}
+if (typeof t.isKahRelevant === 'undefined') {
+t.isKahRelevant = (t.name === 'Official Trip' || t.name === 'Overseas Leave');
+updated = true;
 }
 });
-props.setProperty('typicalEventTypes', JSON.stringify(defaultTypes));
+if (updated) props.setProperty('typicalEventTypes', JSON.stringify(existing));
 }
 
 if (!props.getProperty('kahEmailSubject')) props.setProperty('kahEmailSubject', 'Leave Requires Approval: KAH Limit Crossed for {Unit}');
 if (!props.getProperty('kahEmailBody')) props.setProperty('kahEmailBody', 'User {Name} applied for {EventType} but KAH limit was crossed for {Unit}.');
 
-if (!props.getProperty('gcalTemplate')) props.setProperty('gcalTemplate', '{EventType} - {Name}, {Attendees} {Time}');
+if (!props.getProperty('gcalTemplate')) props.setProperty('gcalTemplate', '{EventType} - {Name}, {Attendees}');
 if (props.getProperty('agendaTemplate') === null) props.setProperty('agendaTemplate', '{EventType} - {Name} ({Department})');
-if (props.getProperty('agendaDetailsTemplate') === null) props.setProperty('agendaDetailsTemplate', 'Time: {Time}\nLocation: {Location}\nAttendees: {Attendees}\nEvent Description: {EventDescription}');
+if (props.getProperty('agendaDetailsTemplate') === null) props.setProperty('agendaDetailsTemplate', 'Start: {StartTime}\nEnd: {EndTime}\nLocation: {Location}\nAttendees: {Attendees}\nEvent Description: {EventDescription}');
 if (props.getProperty('infoAllTemplate') === null) props.setProperty('infoAllTemplate', '{EventType} - {Name} ({Department})');
-if (props.getProperty('infoAllDetailsTemplate') === null) props.setProperty('infoAllDetailsTemplate', 'Time: {Time}\nLocation: {Location}\nEvent Description: {EventDescription}');
+if (props.getProperty('infoAllDetailsTemplate') === null) props.setProperty('infoAllDetailsTemplate', 'Start: {StartTime}\nEnd: {EndTime}\nLocation: {Location}\nEvent Description: {EventDescription}');
+if (!props.getProperty('contactNameFormat')) props.setProperty('contactNameFormat', '{Name} (Cloud Group : {Unit})');
 
 if (!props.getProperty('acronyms')) props.setProperty('acronyms', JSON.stringify({}));
 if (!props.getProperty('customKahGroups')) props.setProperty('customKahGroups', JSON.stringify([]));
@@ -57,11 +86,20 @@ var dbId = props.getProperty('dbSheetId');
 if (!dbId) {
 var ss = SpreadsheetApp.create("Company_Leaves_DB");
 var sheet = ss.getActiveSheet();
+sheet.setName("Leaves");
 sheet.appendRow(['ID', 'Timestamp', 'Phone', 'Name', 'Department', 'LeaveType', 'StartDate', 'EndDate', 'HalfDay', 'CoveringPerson', 'Country', 'State', 'Remarks', 'Status', 'EventIDs', 'Location', 'Attendees', 'InfoAll', 'IsAllDay', 'UntilDate', 'LocationDetails']);
 props.setProperty('dbSheetId', ss.getId());
 } else {
-verifySchema(SpreadsheetApp.openById(dbId).getActiveSheet());
+var ss = SpreadsheetApp.openById(dbId);
+var mainSheet = ss.getSheetByName("Leaves") || ss.getSheets()[0];
+verifySchema(mainSheet);
 }
+
+// Proactive generation of the static Cloud Meeting Room calendar
+try {
+var cmr = CalendarApp.getCalendarsByName("Cloud Meeting Room");
+if (cmr.length === 0) CalendarApp.createCalendar("Cloud Meeting Room");
+} catch(e) {}
 }
 
 function verifySchema(sheet) {
@@ -109,12 +147,60 @@ result = result.replace(regex, key);
 return result;
 }
 
+function getExternalData(data) {
+var props = PropertiesService.getScriptProperties();
+if (data.extToken !== props.getProperty('externalToken')) throw new Error("Invalid or revoked external link.");
+
+var cg = getContactsAndGroups();
+var allContacts = [];
+var format = getContactNameFormat();
+
+cg.connections.forEach(function(person) {
+var phone = (person.phoneNumbers && person.phoneNumbers.length > 0) ? person.phoneNumbers[0].value.replace(/\D/g, '').slice(-8) : "";
+if (phone && person.names && person.names.length > 0) {
+var name = extractName(person.names[0].displayName, format);
+if (person.memberships) {
+  var depts = [];
+  person.memberships.forEach(function(m) {
+      if (m.contactGroupMembership && m.contactGroupMembership.contactGroupResourceName) {
+          var gName = cg.groupMap[m.contactGroupMembership.contactGroupResourceName];
+          if (gName) depts.push(gName);
+      }
+  });
+  if (depts.length > 0) {
+      var deptsStr = depts.join(',');
+      allContacts.push({ name: name, phone: phone, dept: deptsStr });
+  }
+}
+}
+});
+
+return {
+typicalEventTypes: JSON.parse(props.getProperty('typicalEventTypes') || "[]"),
+acronyms: JSON.parse(props.getProperty('acronyms') || "{}"),
+companyContacts: allContacts,
+customKahGroups: JSON.parse(props.getProperty('customKahGroups') || "[]"),
+contactNameFormat: format
+};
+}
+
+function submitExternalEvent(data) {
+var props = PropertiesService.getScriptProperties();
+if (data.extToken !== props.getProperty('externalToken')) throw new Error("Invalid or revoked external link.");
+
+data.leaveType = 'Generic'; // Force to generic
+data._userRole = 'admin'; // Bypass phone security check in submitLeave
+data._userPhone = 'EXTERNAL'; // For logging safety
+
+return submitLeave(data);
+}
+
 function doPost(e) {
 var lock = LockService.getScriptLock();
 var payload = JSON.parse(e.postData.contents);
 var action = payload.action;
 
-var needsLock =['submitLeave', 'editLeave', 'cancelLeave', 'registerUser', 'updateUser', 'deleteUser', 'updateUserUnits', 'saveSettings', 'renameUnit', 'forceSyncContacts'].indexOf(action) !== -1;
+var needsLock =['submitLeave', 'editLeave', 'cancelLeave', 'registerUser', 'updateUser', 'deleteUser', 'updateUserUnits', 'saveSettings', 'renameUnit', 'forceSyncContacts', 'backfillCustomCalendar', 'addCalendarAcl', 'removeCalendarAcl', 'updateCalendarAcl', 'deleteCalendar', 'submitExternalEvent', 'regenerateExternalToken'].indexOf(action) !== -1;
 if (needsLock) lock.waitLock(15000); 
 
 try {
@@ -122,14 +208,15 @@ var data = payload.data || {};
 var credentials = payload.credentials || {};
 var responseData = {};
 
-var secureActions =['getSettings', 'saveSettings', 'submitLeave', 'editLeave', 'cancelLeave', 'getLeaves', 'updateUser', 'deleteUser', 'updateUserUnits', 'renameUnit', 'forceSyncContacts', 'getInitialData'];
+var secureActions =['getSettings', 'saveSettings', 'submitLeave', 'editLeave', 'cancelLeave', 'getLeaves', 'updateUser', 'deleteUser', 'updateUserUnits', 'renameUnit', 'forceSyncContacts', 'deleteCalendar', 'backfillCustomCalendar', 'getInitialData', 'getCalendarAcls', 'addCalendarAcl', 'removeCalendarAcl', 'updateCalendarAcl', 'regenerateExternalToken'];
 if (secureActions.indexOf(action) !== -1) {
 if (!credentials.pass && !data.adminPass) throw new Error("Unauthorized: Missing credentials");
 
-var verifiedUser = verifyAuth(credentials, data);
+var checkPass = data.adminPass || credentials.pass;
+var verifiedUser = handleLogin({ password: checkPass });
 
 if (verifiedUser.role !== 'admin' && String(verifiedUser.phone) !== String(credentials.phone)) {
-  throw new Error("Unauthorized: Invalid credentials");
+throw new Error("Unauthorized: Invalid credentials");
 }
 
 data._userRole = verifiedUser.role;
@@ -137,12 +224,13 @@ data._userPhone = verifiedUser.phone;
 }
 
 if (action === 'login') responseData = handleLogin(data);
+else if (action === 'getExternalData') responseData = getExternalData(data);
+else if (action === 'submitExternalEvent') responseData = submitExternalEvent(data);
 else if (action === 'getSettings') responseData = getSettings(data);
 else if (action === 'saveSettings') responseData = saveSettings(data);
 else if (action === 'submitLeave') responseData = submitLeave(data);
 else if (action === 'editLeave') responseData = editLeave(data);
 else if (action === 'getLeaves') responseData = getLeaves(data);
-else if (action === 'getInitialData') responseData = getInitialData(data);
 else if (action === 'cancelLeave') responseData = cancelLeave(data);
 else if (action === 'registerUser') responseData = registerUser(data);
 else if (action === 'updateUser') responseData = updateUser(data);
@@ -150,6 +238,14 @@ else if (action === 'deleteUser') responseData = deleteUser(data);
 else if (action === 'updateUserUnits') responseData = updateUserUnits(data);
 else if (action === 'renameUnit') responseData = renameUnit(data);
 else if (action === 'forceSyncContacts') responseData = forceSyncContacts(data);
+else if (action === 'deleteCalendar') responseData = deleteCalendar(data);
+else if (action === 'backfillCustomCalendar') responseData = backfillCustomCalendar(data);
+else if (action === 'getCalendarAcls') responseData = getCalendarAcls(data);
+else if (action === 'addCalendarAcl') responseData = addCalendarAcl(data);
+else if (action === 'removeCalendarAcl') responseData = removeCalendarAcl(data);
+else if (action === 'updateCalendarAcl') responseData = updateCalendarAcl(data);
+else if (action === 'regenerateExternalToken') responseData = regenerateExternalToken(data);
+else if (action === 'getInitialData') responseData = { settings: getSettings(data), leaves: getLeaves(data) };
 
 return ContentService.createTextOutput(JSON.stringify({ success: true, data: responseData })).setMimeType(ContentService.MimeType.JSON);
 } catch (err) {
